@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #2874f0;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    color: white;
+    align-items: center;
+}
+
+.navbar-left .logo {
+    height: 30px;
+}
+
+.navbar-left .brand-name {
+    font-size: 1.5em;
+    margin-left: 10px;
+}
+
+/* Main Section Styles */
+main {
+    padding: 30px;
+}
+
+/* Cart Page */
+.cart-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.cart-table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+.cart-table th, .cart-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-table th {
+    background-color: #2874f0;
+    color: white;
+}
+
+.cart-table input {
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+}
+
+.remove-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    background-color: #e53935;
+}
+
+.cart-summary {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.cart-summary h2 {
+    margin-bottom: 10px;
+}
+
+.cart-summary p {
+    font-size: 1.1em;
+}
+
+.checkout-btn {
+    background-color: #2874f0;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+
+.checkout-btn:hover {
+    background-color: #1c5bb0;
+}
+
+/* Contact Us Page */
+.contact-us-section {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.contact-us-section h1, .contact-us-section h2 {
+    color: #2874f0;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact-form label {
+    font-size: 1.1em;
+    color: #555;
+}
+
+.contact-form input, .contact-form textarea {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.contact-form textarea {
+    resize: vertical;
+}
+
+.submit-btn {
+    background-color: #2874f0;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+.submit-btn:hover {
+    background-color: #1c5bb0;
+}
+
+/* Profile Page */
+.profile-section {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.profile-section h1 {
+    color: #2874f0;
+}
+
+.profile-info {
+    margin-bottom: 30px;
+}
+
+.profile-info p {
+    font-size: 1.1em;
+    color: #555;
+}
+
+.edit-btn {
+    background-color: #2874f0;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+.edit-btn:hover {
+    background-color: #1c5bb0;
+}
+
+.profile-order-history {
+    margin-top: 30px;
+}
+
+.profile-order-history table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.profile-order-history th, .profile-order-history td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile-order-history th {
+    background-color: #2874f0;
+    color: white;
+}
+
+.profile-order-history tr:hover {
+    background-color: #f4f4f4;
+}
+
+/* Footer Styles */
+.footer {
+    background-color: #2874f0;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer ul li {
+    display: inline;
+    margin: 0 10px;
+}
+
+.footer ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar-left {
+        margin-bottom: 10px;
+    }
+
+    .cart-section, .contact-us-section, .profile-section {
+        padding: 15px;
+    }
+
+    .cart-table, .profile-order-history table {
+        width: 100%;
+        font-size: 0.9em;
+    }
+
+    .contact-form input, .contact-form textarea {
+        font-size: 0.9em;
+    }
+
+    .submit-btn, .checkout-btn, .edit-btn {
+        font-size: 1em;
+    }
+}
+
+    </style>
+
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="/templates/logo.png" alt="Logo" class="logo">
+            <span class="brand-name">SwiftCart</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="contact-us-section">
+            <h1>Contact Us</h1>
+            <p>If you have any questions or need assistance, please get in touch with us using the methods below:</p>
+
+            <h2>Email Support</h2>
+            <p>Email us directly at <a href="mailto:support@alpha.com">support@alpha.com</a> for any inquiries.</p>
+
+            <h2>Phone Support</h2>
+            <p>You can reach our customer support team at <strong>+123 456 7890</strong> (available 24/7).</p>
+
+            <h2>Contact Form</h2>
+            <form action="#" method="POST" class="contact-form">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="subject">Subject</label>
+                <textarea id="subject" name="subject" rows="1" required></textarea>
+
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5" required></textarea>
+
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <ul>
+            <li><a href="/aboutus">About Us</a></li>
+            <li><a href="/help">Help</a></li>
+            <li><a href="/terms">Terms & Conditions</a></li>
+            <li><a href="/privacypolicy">Privacy Policy</a></li>
+        </ul>
+    </footer>
+</body>
+</html>

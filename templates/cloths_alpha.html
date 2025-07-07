@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clothing Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #2874f0;
+            color: white;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .brand-name {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .search-bar input {
+            width: 400px;
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+        }
+
+        .search-bar button {
+            padding: 10px;
+            background-color: #ffbe0b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background-color: #f39c12;
+        }
+
+        .navbar-right a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Categories Section */
+        .categories {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .category-card {
+            text-align: center;
+            width: 30%;
+        }
+
+        .category-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .category-card h3 {
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+
+        /* Product Listings */
+        .products {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .products h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .product-card {
+            display: inline-block;
+            width: 30%;
+            padding: 20px;
+            background-color: white;
+            margin: 10px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .product-card h4 {
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+
+        .product-card p {
+            font-size: 1.1em;
+            color: #ff5722;
+            font-weight: bold;
+        }
+
+        .add-to-cart-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #2874f0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #215bb8;
+        }
+
+        /* Footer Styling */
+        .footer {
+            background-color: #2874f0;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .footer ul {
+            list-style: none;
+        }
+
+        .footer ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        .footer ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer ul li a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="/images/logo.png" alt="Logo" class="logo">
+            <span class="brand-name">SwiftCart Clothing</span>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search for clothing, brands and more">
+            <button class="search-btn">Search</button>
+        </div>
+        <div class="navbar-right">
+            <a href="/profile">Profile</a>
+            <a href="/cart">Cart</a>
+            <a href="/contact">Contact</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </header>
+
+    <section class="products">
+        <h2>Trending Clothing</h2>
+        <div class="product-card">
+            <a href="#">
+                <img src="/images/men-jacket.jpg" alt="Men's Jacket">
+            </a>
+            <h4>Men's Stylish Jacket</h4>
+            <p>$49.99</p>
+            <label>Select Quantity</label>
+            <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="10" step="1">
+            <br>
+            <button class="add-to-cart-btn" onclick="addToCart('Men\'s Stylish Jacket', 49.99)">Add to Cart</button>
+        </div>
+        <div class="product-card">
+            <a href="#">
+                <img src="/images/women-dress.jpg" alt="Women's Dress">
+            </a>
+            <h4>Elegant Women's Dress</h4>
+            <p>$69.99</p>
+            <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="10" step="1">
+            <br>
+            <button class="add-to-cart-btn" onclick="addToCart('Elegant Women\'s Dress', 69.99)">Add to Cart</button>
+        </div>
+        <div class="product-card">
+            <a href="#">
+                <img src="/images/kids-shirt.jpg" alt="Kids' Shirt">
+            </a>
+            <h4>Colorful Kids' Shirt</h4>
+            <p>$19.99</p>
+            <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="10" step="1">
+            <br>
+            <button class="add-to-cart-btn" onclick="addToCart('Colorful Kids\' Shirt', 19.99)">Add to Cart</button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <ul>
+            <li><a href="/aboutus">About Us</a></li>
+            <li><a href="/help">Help</a></li>
+            <li><a href="/terms">Terms & Conditions</a></li>
+            <li><a href="/privacypolicy">Privacy Policy</a></li>
+        </ul>
+    </footer>
+
+    <script>
+        // Function to add item to cart (LocalStorage)
+        function addToCart(itemName, itemPrice) {
+            var quantity = document.getElementById("quantity").value;
+            quantity = parseInt(quantity);
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];  // Retrieve cart from LocalStorage or initialize it
+            const item = { name: itemName, price: itemPrice, quantity: quantity };
+            cart.push(item);  // Add item to cart array
+            localStorage.setItem('cart', JSON.stringify(cart));  // Save updated cart to LocalStorage
+            alert(itemName + ' has been added to your cart!');
+        }
+    </script>
+
+</body>
+</html>

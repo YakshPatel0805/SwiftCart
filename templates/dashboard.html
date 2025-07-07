@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #2874f0;
+            color: white;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .brand-name {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .search-bar input {
+            width: 400px;
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+        }
+
+        .search-bar button {
+            padding: 10px;
+            background-color: #ffbe0b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background-color: #f39c12;
+        }
+
+        .navbar-right a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Main Banner */
+        .main-banner img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Categories Section */
+        .categories {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .category-card {
+            text-align: center;
+            width: 30%;
+        }
+
+        .category-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .category-card h3 {
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+
+        /* Product Listings */
+        .products {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .products h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .product-card {
+            display: inline-block;
+            width: 30%;
+            padding: 20px;
+            background-color: white;
+            margin: 10px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .product-card h4 {
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+
+        .product-card p {
+            font-size: 1.1em;
+            color: #ff5722;
+            font-weight: bold;
+        }
+
+        .logo-container {
+            display: flex;            /* Aligns the logos in a row */
+            overflow-x: auto;         /* Enables horizontal scrolling if the logos overflow */
+            white-space: nowrap;      /* Prevents wrapping of logos to the next line */
+            align-items: center;      /* All logos are in center of the div */
+        }
+
+        .company-logo {
+            border-radius: 15px;
+            width: 200px;             /* Set a fixed width for each logo */
+            height: auto;            /* Set a fixed height for each logo */
+            object-fit: contain;      /* Ensures logos are scaled while maintaining aspect ratio */
+            margin: 0px 20px;             /* Optional: adds space between the logos */
+        }
+
+
+        /* Footer Styling */
+        .footer {
+            background-color: #2874f0;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .footer ul {
+            list-style: none;
+        }
+
+        .footer ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        .footer ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer ul li a:hover {
+            text-decoration: underline;
+        }
+        </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="/images/logo.png" alt="Logo" class="logo">
+            <span class="brand-name">SwiftCart</span>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search for products, brands and more">
+            <button class="search-btn">Search</button>
+        </div>
+        <div class="navbar-right">
+            <a href="/profile">Profile</a>
+            <a href="/cart">Cart</a>
+            <a href="/contact">Contact</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </header>
+
+    <section class="categories">
+        <div class="category-card">
+            <a href="{{ url_for('electronic_alpha')}}"><img src="/images/electronics.avif" alt="Category 1"></a>
+            <h3>Electronics</h3>
+        </div>
+        <div class="category-card">
+            <a href="{{ url_for('cloth_alpha')}}"><img src="/images/clothing.jpg" alt="Category 2"></a>
+            <h3>Clothing</h3>
+        </div>
+        <div class="category-card">
+            <a href="{{ url_for('furniture_alpha')}}"><img src="/images/homeandfurniture.jpg" alt="Category 3"></a>
+            <h3>Home & Furniture</h3>
+        </div>
+    </section>
+
+    <section class="products">
+        <h2>Top Deals</h2>
+        <div class="product-card">
+            <a href="https://www.apple.com/in/iphone/compare/?modelList=iphone-15-pro-max,iphone-15-plus">
+                <img src="/images/15promax.jpeg" alt="Product 1">
+            </a>
+            <h4>Apple iPhone 15 Pro Max</h4>
+        </div>
+        <div class="product-card">
+            <a href="https://www.realme.com/in/realme-11-5g/specs">
+                <img src="/images/realme11.jpeg" alt="Product 2">
+            </a>
+            <h4>Realme 11 5G</h4>
+        </div>
+        <div class="product-card">
+            <a href="https://www.flipkart.com/samsung-galaxy-s24-ultra-5g-titanium-gray-512-gb/p/itm463827d6eb2be">
+                <img src="/images/s24ultra.webp" alt="Product 3">
+            </a>
+            <h4>Samsung Galaxy s24 Ultra</h4>
+        </div>
+    </section>
+
+    <section class="products">
+            <h2>Choose Your Favourite Brand</h2>
+            <div class="logo-container">
+                <a href="https://www.apple.com/in/">
+                    <img src="/images/apple.png" class="company-logo">
+                </a>
+                <a href="https://www.samsung.com/in/">
+                    <img src="/images/samsung.png" class="company-logo">
+                </a>
+                <a href="https://www.realme.com/in/">
+                    <img src="/images/realme.png" class="company-logo">
+                </a>
+                <a href="https://www.oneplus.com/in/">
+                    <img src="/images/1+.png" class="company-logo">
+                </a>
+                <a href="https://www.vivo.com/in/">
+                    <img src="/images/vivo.png" class="company-logo">
+                </a>
+                <a href="https://www.honor.com/in/">
+                    <img src="/images/honor.png" class="company-logo">
+                </a>
+                <a href="https://www.huawei.com/in/">
+                    <img src="/images/Huawei.png" class="company-logo">
+                </a>
+                <a href="https://www.sony.com/in/">
+                    <img src="/images/sony.png" class="company-logo">
+                </a>
+            </div>
+    </section>
+
+    <section class="products">
+        <h2>Grocery</h2>
+        <div class="product-card">
+            <a href="https://www.flipkart.com/producer-premium-1st-grade-sharbati-whole-wheat-1kg-wheat/p/itmbdee1b5b56617?pid=GNMG39XRZHX84PV7&lid=LSTGNMG39XRZHX84PV76IHIRZ&marketplace=FLIPKART&store=eat%2Fznz%2F0js&spotlightTagId=TrendingId_eat%2Fznz%2F0js&srno=b_1_2&otracker=product_breadCrumbs_Wheat&fm=organic&iid=4453f56b-0160-475e-8039-3c14b82fb7d4.GNMG39XRZHX84PV7.SEARCH&ppt=browse&ppn=browse&ssid=2ol7n95a680000001737305630169">
+                <img src="/images/wheat.webp" alt="Product 1">
+            </a>
+            <h4>Wheat</h4>
+        </div>
+        <div class="product-card">
+            <a href="https://www.flipkart.com/fresh-fruit/pr?sid=eat,w2q,b0g">
+                <img src="/images/fruits.jpeg" alt="Product 3">
+            </a>
+            <h4>Fruits</h4>
+        </div>
+        <div class="product-card">
+            <a href="https://www.flipkart.com/india-gate-classic-extra-long-grains-basmati-rice-polished/p/itm42b5a349ee41f?pid=RICEUC2YT8KRYTM6&lid=LSTRICEUC2YT8KRYTM6S2XDO0&marketplace=FLIPKART&store=eat%2Fyul&srno=b_1_10&otracker=browse&fm=organic&iid=b3c9708d-3650-40ab-97f9-917b5b3c05a9.RICEUC2YT8KRYTM6.SEARCH&ppt=None&ppn=None&ssid=ia69j6muo00000001737305747350">
+                <img src="/images/rice.webp" alt="Product 2">
+            </a>
+            <h4>Rice</h4> 
+        </div>
+    </section>
+
+    <footer class="footer">
+        <ul>
+            <li><a href="/aboutus">About Us</a></li>
+            <li><a href="/help">Help</a></li>
+            <li><a href="/terms">Terms & Conditions</a></li>
+            <li><a href="/privacypolicy">Privacy Policy</a></li>
+        </ul>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help</title>
+    <style>/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #2874f0;
+    color: white;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.brand-name {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Main Section Styling */
+main {
+    padding: 40px 20px;
+    background-color: #fff;
+}
+
+/* Terms, Privacy, About Sections */
+section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+/* Heading Styles */
+h1 {
+    font-size: 2.5em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.8em;
+    color: #2874f0;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+/* Paragraph Styling */
+p {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+/* List Styling */
+ul {
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+ul li {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+/* Footer Styling */
+.footer {
+    background-color: #2874f0;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer ul li {
+    display: inline;
+    margin: 0 10px;
+}
+
+.footer ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.1em;
+}
+
+.footer ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Links */
+a {
+    color: #2874f0;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar-left {
+        margin-bottom: 10px;
+    }
+
+    section {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    p, ul li {
+        font-size: 1em;
+    }
+}
+</style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="/templates/logo.png" alt="Logo" class="logo">
+            <span class="brand-name">SwiftCart</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="help-section">
+            <h1>Help & Support</h1>
+
+            <p>If you need assistance, you've come to the right place! Below you'll find answers to frequently asked questions (FAQ) as well as other ways to contact us.</p>
+
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq">
+                <h3>1. How can I place an order?</h3>
+                <p>To place an order, browse through our products, select the items you'd like to purchase, add them to your cart, and proceed to checkout. Follow the on-screen instructions to complete your order.</p>
+            </div>
+
+            <div class="faq">
+                <h3>2. What payment methods do you accept?</h3>
+                <p>We accept credit cards, debit cards, PayPal, and other secure payment methods. All payment transactions are encrypted for your security.</p>
+            </div>
+
+            <div class="faq">
+                <h3>3. How do I track my order?</h3>
+                <p>You can track your order status by visiting the 'My Orders' section in your account. You will also receive an email notification with the tracking details once your order ships.</p>
+            </div>
+
+            <div class="faq">
+                <h3>4. What is your return and refund policy?</h3>
+                <p>We offer a 30-day return policy on most products. Please refer to our Returns Policy page for more details on how to return an item and request a refund.</p>
+            </div>
+
+            <div class="faq">
+                <h3>5. How do I contact customer support?</h3>
+                <p>You can reach us through email at support@flipkartclone.com or call us at +123 456 7890. Our support team is available 24/7 to assist you.</p>
+            </div>
+
+            <h2>Contact Us</h2>
+            <p>If you still have questions or need more help, don't hesitate to contact our customer support team.</p>
+
+            <h3>Email Support</h3>
+            <p>Email us directly at <a href="mailto:support@alpha.com">support@alpha.com</a> and we'll get back to you as soon as possible.</p>
+
+            <h3>Phone Support</h3>
+            <p>Call us at +123 456 7890. Our customer service representatives are available 24/7 to help you with any issues.</p>
+
+            <h3>Live Chat</h3>
+            <p>For instant assistance, click the "Live Chat" button at the bottom of the page to chat with one of our support agents directly.</p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <ul>
+            <li><a href="/aboutus">About Us</a></li>
+            <li><a href="/help">Help</a></li>
+            <li><a href="/terms">Terms & Conditions</a></li>
+            <li><a href="/privacypolicy">Privacy Policy</a></li>
+        </ul>
+    </footer>
+</body>
+</html>
