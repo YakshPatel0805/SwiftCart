@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreditCard, Truck, Lock } from 'lucide-react';
+import { CreditCard, Truck, Lock, Smartphone, Banknote } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI } from '../services/api';
@@ -261,32 +261,53 @@ export default function Checkout({ onPageChange }: CheckoutProps) {
             {step === 2 && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Information</h2>
-                <div className="mb-4">
-                  <div className="flex items-center space-x-4">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        value="credit-card"
-                        checked={paymentMethod.type === 'credit-card'}
-                        onChange={(e) => setPaymentMethod({type: e.target.value as any})}
-                        className="text-blue-600"
-                      />
-                      <span className="ml-2">Credit Card</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        value="paypal"
-                        checked={paymentMethod.type === 'paypal'}
-                        onChange={(e) => setPaymentMethod({type: e.target.value as any})}
-                        className="text-blue-600"
-                      />
-                      <span className="ml-2">PayPal</span>
-                    </label>
-                  </div>
+                
+                {/* Payment Method Selection */}
+                <div className="mb-6 space-y-3">
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    style={{ borderColor: paymentMethod.type === 'credit-card' ? '#2563eb' : '#e5e7eb' }}>
+                    <input
+                      type="radio"
+                      value="credit-card"
+                      checked={paymentMethod.type === 'credit-card'}
+                      onChange={(e) => setPaymentMethod({type: e.target.value as any})}
+                      className="text-blue-600 focus:ring-blue-500"
+                    />
+                    <CreditCard className="ml-3 h-5 w-5 text-gray-600" />
+                    <span className="ml-3 font-medium">Credit/Debit Card</span>
+                  </label>
+
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    style={{ borderColor: paymentMethod.type === 'google-pay' ? '#2563eb' : '#e5e7eb' }}>
+                    <input
+                      type="radio"
+                      value="google-pay"
+                      checked={paymentMethod.type === 'google-pay'}
+                      onChange={(e) => setPaymentMethod({type: e.target.value as any})}
+                      className="text-blue-600 focus:ring-blue-500"
+                    />
+                    <Smartphone className="ml-3 h-5 w-5 text-gray-600" />
+                    <span className="ml-3 font-medium">Google Pay</span>
+                    <span className="ml-auto text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Fast & Secure</span>
+                  </label>
+
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    style={{ borderColor: paymentMethod.type === 'cash-on-delivery' ? '#2563eb' : '#e5e7eb' }}>
+                    <input
+                      type="radio"
+                      value="cash-on-delivery"
+                      checked={paymentMethod.type === 'cash-on-delivery'}
+                      onChange={(e) => setPaymentMethod({type: e.target.value as any})}
+                      className="text-blue-600 focus:ring-blue-500"
+                    />
+                    <Banknote className="ml-3 h-5 w-5 text-gray-600" />
+                    <span className="ml-3 font-medium">Cash on Delivery</span>
+                    <span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Pay Later</span>
+                  </label>
                 </div>
 
                 <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                  {/* Credit Card Form */}
                   {paymentMethod.type === 'credit-card' && (
                     <>
                       <div>
@@ -339,20 +360,42 @@ export default function Checkout({ onPageChange }: CheckoutProps) {
                     </>
                   )}
 
-                  {paymentMethod.type === 'paypal' && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        PayPal Email
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      />
+                  {/* Google Pay */}
+                  {paymentMethod.type === 'google-pay' && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                      <Smartphone className="h-12 w-12 text-blue-600 mx-auto mb-3" />
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Pay with Google Pay</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        You'll be redirected to complete your payment securely with Google Pay
+                      </p>
+                      <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                        <Lock className="h-4 w-4" />
+                        <span>Secured by Google</span>
+                      </div>
                     </div>
                   )}
 
-                  <div className="flex items-center space-x-2">
+                  {/* Cash on Delivery */}
+                  {paymentMethod.type === 'cash-on-delivery' && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                      <div className="flex items-start space-x-3">
+                        <Banknote className="h-6 w-6 text-green-600 mt-1" />
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">Cash on Delivery</h3>
+                          <p className="text-sm text-gray-600 mb-3">
+                            Pay with cash when your order is delivered to your doorstep.
+                          </p>
+                          <ul className="text-sm text-gray-600 space-y-1">
+                            <li>• Have exact change ready</li>
+                            <li>• Payment accepted in cash only</li>
+                            <li>• Delivery person will provide receipt</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center space-x-2 pt-2">
                     <Lock className="h-4 w-4 text-gray-500" />
                     <span className="text-sm text-gray-500">Your payment information is secure and encrypted</span>
                   </div>
@@ -369,7 +412,7 @@ export default function Checkout({ onPageChange }: CheckoutProps) {
                       type="submit"
                       className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                     >
-                      Place Order
+                      {paymentMethod.type === 'cash-on-delivery' ? 'Confirm Order' : 'Place Order'}
                     </button>
                   </div>
                 </form>

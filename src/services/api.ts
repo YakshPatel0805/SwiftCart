@@ -84,6 +84,26 @@ export const ordersAPI = {
       console.error('Orders API create error:', error);
       throw error;
     }
+  },
+
+  cancel: async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/orders/${id}/cancel`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Orders API cancel error:', error);
+      throw error;
+    }
   }
 };
 

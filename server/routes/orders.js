@@ -86,4 +86,31 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
+// Cancel order endpoint
+router.patch('/:id/cancel', authenticateToken, async (req, res) => {
+  try {
+    const order = await Order.findOne({ 
+      _id: req.params.id, 
+      userId: req.user.userId 
+    });
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    
+    // Only allow cancellation if order is not shipped or delivered
+    if (order.status === 'shipped' || order.status === 'delivered') {
+      return res.status(400).json({ message: 'Cannot cancel order that is already shipped or delivered' });
+    }
+    
+    order.status = 'cancelled';
+    await order.save();
+    
+    res.json(order);
+  } catch (error) {
+    console.error('Error cancelling order:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 export default router;

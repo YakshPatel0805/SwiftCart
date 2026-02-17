@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle } from 'lucide-react';
+import { Package, Truck, CheckCircle, MoreVertical, XCircle } from 'lucide-react';
 import { ordersAPI } from '../services/api';
 
 interface OrdersProps {
@@ -9,6 +9,7 @@ interface OrdersProps {
 export default function Orders({ onPageChange }: OrdersProps) {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('Orders page mounted, loading orders...');
@@ -28,12 +29,34 @@ export default function Orders({ onPageChange }: OrdersProps) {
     }
   };
 
+  const handleCancelOrder = async (orderId: string) => {
+    if (!confirm('Are you sure you want to cancel this order?')) {
+      return;
+    }
+
+    try {
+      await ordersAPI.cancel(orderId);
+      // Reload orders to reflect the change
+      await loadOrders();
+      setOpenDropdown(null);
+      alert('Order cancelled successfully');
+    } catch (error: any) {
+      alert(error.message || 'Failed to cancel order');
+    }
+  };
+
+  const toggleDropdown = (orderId: string) => {
+    setOpenDropdown(openDropdown === orderId ? null : orderId);
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'delivered':
         return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'shipped':
         return <Truck className="h-5 w-5 text-blue-600" />;
+      case 'cancelled':
+        return <XCircle className="h-5 w-5 text-red-600" />;
       default:
         return <Package className="h-5 w-5 text-gray-600" />;
     }
@@ -47,9 +70,15 @@ export default function Orders({ onPageChange }: OrdersProps) {
         return 'bg-blue-100 text-blue-800';
       case 'processing':
         return 'bg-yellow-100 text-yellow-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const canCancelOrder = (status: string) => {
+    return status !== 'shipped' && status !== 'delivered' && status !== 'cancelled';
   };
 
   if (loading) {
@@ -97,6 +126,48 @@ export default function Orders({ onPageChange }: OrdersProps) {
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </span>
+                      
+                      {/* Dropdown Menu */}
+                      <div className="relative dropdown-container">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleDropdown(order._id);
+                          }}
+                          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        >
+                          <MoreVertical className="h-5 w-5 text-gray-600" />
+                        </button>
+                        
+                        {openDropdown === order._id && (
+                          <>
+                            {/* Invisible overlay to catch outside clicks */}
+                            <div 
+                              className="fixed inset-0 z-40" 
+                              onClick={() => setOpenDropdown(null)}
+                            />
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                              <button
+                                onClick={() => {
+                                  alert('View details functionality coming soon!');
+                                  setOpenDropdown(null);
+                                }}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                View Details
+                              </button>
+                              {canCancelOrder(order.status) && (
+                                <button
+                                  onClick={() => handleCancelOrder(order._id)}
+                                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                >
+                                  Cancel Order
+                                </button>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
 

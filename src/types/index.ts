@@ -51,12 +51,9 @@ export interface ShippingAddress {
 }
 
 export interface PaymentMethod {
-  type: 'credit-card' | 'paypal' | 'bank-transfer';
+  type: 'credit-card' | 'google-pay' | 'cash-on-delivery';
   cardholderName?: string;
   cardNumber?: string;
   expiryDate?: string;
   cvv?: string;
-  paypalEmail?: string;
-  accountNumber?: string;
-  routingNumber?: string;
 }

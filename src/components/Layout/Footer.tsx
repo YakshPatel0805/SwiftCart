@@ -1,3 +1,4 @@
+import { Facebook, Twitter, Instagram } from 'lucide-react';
 
 interface FooterProps {
   onPageChange: (page: string) => void;
@@ -16,17 +17,32 @@ export default function Footer({ onPageChange }: FooterProps) {
               electronics, and furniture. Shop with confidence and style.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-blue-400 hover:text-white transition-colors">
+              <a 
+                href="https://facebook.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-blue-400 transition-colors"
+              >
+                <Facebook className="w-6 h-6" />
                 <span className="sr-only">Facebook</span>
-                <div className="w-6 h-6 bg-blue-400 hover:bg-white rounded transition-colors"></div>
               </a>
-              <a href="#" className="text-blue-400 hover:text-white transition-colors">
+              <a 
+                href="https://twitter.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-blue-400 transition-colors"
+              >
+                <Twitter className="w-6 h-6" />
                 <span className="sr-only">Twitter</span>
-                <div className="w-6 h-6 bg-blue-400 hover:bg-white rounded transition-colors"></div>
               </a>
-              <a href="#" className="text-blue-400 hover:text-white transition-colors">
+              <a 
+                href="https://instagram.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-blue-400 transition-colors"
+              >
+                <Instagram className="w-6 h-6" />
                 <span className="sr-only">Instagram</span>
-                <div className="w-6 h-6 bg-blue-400 hover:bg-white rounded transition-colors"></div>
               </a>
             </div>
           </div>

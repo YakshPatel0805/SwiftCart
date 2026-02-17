@@ -14,6 +14,7 @@ import Contact from './pages/Contact';
 import AdminPanel from './pages/Admin/AdminPanel';
 import Orders from './pages/Orders';
 import CategoryPage from './pages/CategoryPage';
+import SearchResults from './pages/SearchResults';
 import Debug from './pages/Debug';
 
 function App() {
@@ -24,6 +25,12 @@ function App() {
   }, [currentPage]);
 
   const renderPage = () => {
+    // Handle search with query parameter
+    if (currentPage.startsWith('search?q=')) {
+      const searchQuery = decodeURIComponent(currentPage.replace('search?q=', ''));
+      return <SearchResults searchQuery={searchQuery} />;
+    }
+
     switch (currentPage) {
       case 'home':
         return <Home onPageChange={setCurrentPage} />;
