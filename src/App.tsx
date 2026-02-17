@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import Home from './pages/Home';
@@ -10,8 +11,10 @@ import Dashboard from './pages/Dashboard';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Contact from './pages/Contact';
-import ProductGrid from './components/Product/ProductGrid';
-import { products } from './data/products';
+import AdminPanel from './pages/Admin/AdminPanel';
+import Orders from './pages/Orders';
+import CategoryPage from './pages/CategoryPage';
+import Debug from './pages/Debug';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -32,27 +35,16 @@ function App() {
         return <Checkout onPageChange={setCurrentPage} />;
       case 'contact':
         return <Contact />;
+      case 'admin':
+        return <AdminPanel onPageChange={setCurrentPage} />;
       case 'clothing':
-        return (
-          <ProductGrid
-            products={products.filter(p => p.category === 'clothing')}
-            title="Clothing"
-          />
-        );
+        return <CategoryPage category="clothing" title="Clothing" />;
       case 'electronics':
-        return (
-          <ProductGrid
-            products={products.filter(p => p.category === 'electronics')}
-            title="Electronics"
-          />
-        );
+        return <CategoryPage category="electronics" title="Electronics" />;
       case 'furniture':
-        return (
-          <ProductGrid
-            products={products.filter(p => p.category === 'furniture')}
-            title="Furniture"
-          />
-        );
+        return <CategoryPage category="furniture" title="Furniture" />;
+      case 'debug':
+        return <Debug />;
       case 'profile':
         return (
           <div className="min-h-screen bg-gray-50 py-12">
@@ -65,24 +57,7 @@ function App() {
           </div>
         );
       case 'orders':
-        return (
-          <div className="min-h-screen bg-gray-50 py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">My Orders</h1>
-                <div className="text-center py-8">
-                  <p className="text-gray-500">You haven't placed any orders yet.</p>
-                  <button
-                    onClick={() => setCurrentPage('home')}
-                    className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Start Shopping
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <Orders onPageChange={setCurrentPage} />;
       case 'about':
         return (
           <div className="min-h-screen bg-gray-50 py-12">
@@ -176,15 +151,17 @@ function App() {
 
   return (
     <AuthProvider>
-      <CartProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Header currentPage={currentPage} onPageChange={setCurrentPage} />
-          <main>
-            {renderPage()}
-          </main>
-          <Footer onPageChange={setCurrentPage} />
-        </div>
-      </CartProvider>
+      <WishlistProvider>
+        <CartProvider>
+          <div className="min-h-screen bg-gray-50">
+            <Header currentPage={currentPage} onPageChange={setCurrentPage} />
+            <main>
+              {renderPage()}
+            </main>
+            <Footer onPageChange={setCurrentPage} />
+          </div>
+        </CartProvider>
+      </WishlistProvider>
     </AuthProvider>
   );
 }

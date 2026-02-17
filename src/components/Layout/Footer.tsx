@@ -10,23 +10,23 @@ export default function Footer({ onPageChange }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl font-bold text-blue-400 mb-4">ShopAlpha</h3>
+            <h3 className="text-2xl font-bold text-blue-400 mb-4">SwiftCart</h3>
             <p className="text-gray-300 mb-4 max-w-md">
               Your trusted e-commerce destination for quality products across clothing, 
               electronics, and furniture. Shop with confidence and style.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-blue-400 hover:text-white transition-colors">
                 <span className="sr-only">Facebook</span>
-                <div className="w-6 h-6 bg-gray-400 hover:bg-white rounded transition-colors"></div>
+                <div className="w-6 h-6 bg-blue-400 hover:bg-white rounded transition-colors"></div>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-blue-400 hover:text-white transition-colors">
                 <span className="sr-only">Twitter</span>
-                <div className="w-6 h-6 bg-gray-400 hover:bg-white rounded transition-colors"></div>
+                <div className="w-6 h-6 bg-blue-400 hover:bg-white rounded transition-colors"></div>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-blue-400 hover:text-white transition-colors">
                 <span className="sr-only">Instagram</span>
-                <div className="w-6 h-6 bg-gray-400 hover:bg-white rounded transition-colors"></div>
+                <div className="w-6 h-6 bg-blue-400 hover:bg-white rounded transition-colors"></div>
               </a>
             </div>
           </div>

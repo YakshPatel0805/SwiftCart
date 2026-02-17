@@ -1,6 +1,8 @@
 // import React from 'react';
+import { useState, useEffect } from 'react';
 import { ShoppingBag, Truck, Shield, HeartHandshake } from 'lucide-react';
-import { products } from '../data/products';
+import { productsAPI } from '../services/api';
+import { Product } from '../types';
 import ProductCard from '../components/Product/ProductCard';
 
 interface HomeProps {
@@ -8,6 +10,28 @@ interface HomeProps {
 }
 
 export default function Home({ onPageChange }: HomeProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    try {
+      const data = await productsAPI.getAll();
+      const normalizedData = data.map((p: any) => ({
+        ...p,
+        id: p._id || p.id
+      }));
+      setProducts(normalizedData);
+    } catch (error) {
+      console.error('Error loading products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const featuredProducts = products.slice(0, 8);
 
   const features = [
@@ -132,19 +156,25 @@ export default function Home({ onPageChange }: HomeProps) {
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
             Featured Products
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <button
-              onClick={() => onPageChange('clothing')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              View All Products
-            </button>
-          </div>
+          {loading ? (
+            <div className="text-center py-12">Loading products...</div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+              <div className="text-center mt-8">
+                <button
+                  onClick={() => onPageChange('clothing')}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  View All Products
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </section>
     </div>

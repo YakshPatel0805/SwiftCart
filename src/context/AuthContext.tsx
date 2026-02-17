@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types';
+import { authAPI } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -28,9 +29,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
     const savedUser = localStorage.getItem('user');
-    if (savedUser) {
+    const token = localStorage.getItem('token');
+    if (savedUser && token) {
       setUser(JSON.parse(savedUser));
     }
     setIsLoading(false);
@@ -38,18 +39,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // In a real app, this would be an API call
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const foundUser = users.find((u: any) => u.email === email && u.password === password);
+      const data = await authAPI.login(email, password);
       
-      if (foundUser) {
+      if (data.token && data.user) {
         const userProfile: User = {
-          id: foundUser.id,
-          email: foundUser.email,
-          username: foundUser.username,
+          id: data.user.id,
+          email: data.user.email,
+          username: data.user.username,
+          role: data.user.role || 'user',
         };
         setUser(userProfile);
         localStorage.setItem('user', JSON.stringify(userProfile));
+        localStorage.setItem('token', data.token);
         return true;
       }
       return false;
@@ -61,33 +62,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signup = async (email: string, username: string, password: string): Promise<boolean> => {
     try {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const data = await authAPI.signup(email, username, password);
       
-      // Check if user already exists
-      const existingUser = users.find((u: any) => u.email === email || u.username === username);
-      if (existingUser) {
-        return false;
+      if (data.token && data.user) {
+        const userProfile: User = {
+          id: data.user.id,
+          email: data.user.email,
+          username: data.user.username,
+          role: data.user.role || 'user',
+        };
+        setUser(userProfile);
+        localStorage.setItem('user', JSON.stringify(userProfile));
+        localStorage.setItem('token', data.token);
+        return true;
       }
-
-      const newUser = {
-        id: Date.now().toString(),
-        email,
-        username,
-        password, // In production, this would be hashed
-      };
-
-      users.push(newUser);
-      localStorage.setItem('users', JSON.stringify(users));
-      
-      const userProfile: User = {
-        id: newUser.id,
-        email: newUser.email,
-        username: newUser.username,
-      };
-      
-      setUser(userProfile);
-      localStorage.setItem('user', JSON.stringify(userProfile));
-      return true;
+      return false;
     } catch (error) {
       console.error('Signup error:', error);
       return false;
@@ -97,6 +86,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   const value: AuthContextType = {

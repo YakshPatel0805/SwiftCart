@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CreditCard, Truck, Lock } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { ordersAPI } from '../services/api';
 import { ShippingAddress, PaymentMethod } from '../types';
 
 interface CheckoutProps {
@@ -35,10 +36,35 @@ export default function Checkout({ onPageChange }: CheckoutProps) {
     setStep(2);
   };
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would process the payment
-    setStep(3);
+    
+    try {
+      console.log('Creating order with items:', items);
+      
+      const orderData = {
+        items: items.map(item => {
+          const productId = item.product.id || (item.product as any)._id;
+          console.log('Product ID:', productId, 'Product:', item.product);
+          return {
+            productId: productId,
+            quantity: item.quantity
+          };
+        }),
+        total,
+        shippingAddress,
+        paymentMethod: paymentMethod
+      };
+
+      console.log('Sending order data:', orderData);
+      const response = await ordersAPI.create(orderData);
+      console.log('Order created successfully:', response);
+      setStep(3);
+    } catch (error: any) {
+      console.error('Error creating order:', error);
+      console.error('Error details:', error.response || error.message);
+      alert(`Failed to place order: ${error.message || 'Please try again.'}`);
+    }
   };
 
   const handleOrderComplete = () => {
@@ -270,6 +296,8 @@ export default function Checkout({ onPageChange }: CheckoutProps) {
                         <input
                           type="text"
                           required
+                          value={paymentMethod.cardholderName || ''}
+                          onChange={(e) => setPaymentMethod({...paymentMethod, cardholderName: e.target.value})}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>

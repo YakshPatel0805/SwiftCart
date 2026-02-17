@@ -1,9 +1,11 @@
-import { Product } from '../types';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Product from '../models/Product.js';
 
-export const products: Product[] = [
-  // Clothing
+dotenv.config();
+
+const products = [
   {
-    id: '1',
     name: 'Premium Cotton T-Shirt',
     price: 29.99,
     image: 'https://images.pexels.com/photos/1021693/pexels-photo-1021693.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -14,7 +16,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '2',
     name: 'Designer Jeans',
     price: 89.99,
     image: 'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -25,7 +26,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '3',
     name: 'Elegant Dress',
     price: 149.99,
     image: 'https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -36,7 +36,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '4',
     name: 'Casual Hoodie',
     price: 59.99,
     image: 'https://images.pexels.com/photos/994517/pexels-photo-994517.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -46,10 +45,7 @@ export const products: Product[] = [
     reviews: 156,
     inStock: true,
   },
-
-  // Electronics
   {
-    id: '5',
     name: 'Wireless Bluetooth Headphones',
     price: 199.99,
     image: 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -60,7 +56,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '6',
     name: 'Smart Watch',
     price: 299.99,
     image: 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -71,7 +66,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '7',
     name: 'Laptop Computer',
     price: 999.99,
     image: 'https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=500',
@@ -82,7 +76,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '8',
     name: 'Smartphone',
     price: 699.99,
     image: 'https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -92,10 +85,7 @@ export const products: Product[] = [
     reviews: 312,
     inStock: true,
   },
-
-  // Furniture
   {
-    id: '9',
     name: 'Modern Sofa',
     price: 899.99,
     image: 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -106,7 +96,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '10',
     name: 'Office Chair',
     price: 249.99,
     image: 'https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -117,7 +106,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '11',
     name: 'Dining Table',
     price: 599.99,
     image: 'https://images.pexels.com/photos/1395967/pexels-photo-1395967.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -128,7 +116,6 @@ export const products: Product[] = [
     inStock: true,
   },
   {
-    id: '12',
     name: 'Bookshelf',
     price: 179.99,
     image: 'https://images.pexels.com/photos/1090638/pexels-photo-1090638.jpeg?auto=compress&cs=tinysrgb&w=500',
@@ -139,3 +126,23 @@ export const products: Product[] = [
     inStock: true,
   },
 ];
+
+async function seedProducts() {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to MongoDB');
+
+    await Product.deleteMany({});
+    console.log('Cleared existing products');
+
+    await Product.insertMany(products);
+    console.log('Products seeded successfully');
+
+    mongoose.connection.close();
+  } catch (error) {
+    console.error('Error seeding products:', error);
+    process.exit(1);
+  }
+}
+
+seedProducts();

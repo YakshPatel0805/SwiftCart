@@ -2,12 +2,14 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  role?: 'user' | 'admin';
   name?: string;
   address?: string;
   city?: string;
   state?: string;
   zipcode?: string;
   country?: string;
+  wishlist?: string[];
 }
 
 export interface Product {

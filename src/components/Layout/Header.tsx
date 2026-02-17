@@ -26,6 +26,7 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
     { name: 'Dashboard', page: 'dashboard' },
     { name: 'Profile', page: 'profile' },
     { name: 'Orders', page: 'orders' },
+    ...(user.role === 'admin' ? [{ name: 'Admin Panel', page: 'admin' }] : []),
   ] : [];
 
   const handleLogout = () => {
@@ -39,13 +40,16 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          {/* <div className="flex-shrink-0">
             <button
               onClick={() => onPageChange('home')}
-              className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
+              className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors mr-10"
             >
               SwiftCart
             </button>
+          </div> */}
+          <div className='text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors mr-10'>
+              SwiftCart
           </div>
 
           {/* Desktop Navigation */}
