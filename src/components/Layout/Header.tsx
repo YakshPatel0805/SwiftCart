@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, ShoppingCart, User, Search } from 'lucide-react';
+import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 
@@ -11,14 +11,25 @@ interface HeaderProps {
 export default function Header({ currentPage, onPageChange }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const { getTotalItems } = useCart();
 
-  const navigation = [
-    { name: 'Home', page: 'home' },
+  const categories = [
     { name: 'Clothing', page: 'clothing' },
     { name: 'Electronics', page: 'electronics' },
     { name: 'Furniture', page: 'furniture' },
+    { name: 'Appliances', page: 'appliances' },
+    { name: 'Beauty', page: 'beauty' },
+    { name: 'Accessories', page: 'accessories' },
+    { name: 'Stationery', page: 'stationery' },
+    { name: 'Books', page: 'books' },
+    { name: 'Sports', page: 'sports' },
+    { name: 'Baby', page: 'baby' },
+  ];
+
+  const navigation = [
+    { name: 'Home', page: 'home' },
     { name: 'Contact', page: 'contact' },
   ];
 
@@ -53,7 +64,7 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-8 items-center">
             {navigation.map((item) => (
               <button
                 key={item.name}
@@ -67,6 +78,42 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
                 {item.name}
               </button>
             ))}
+            
+            {/* Categories Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  categories.some(cat => currentPage === cat.page)
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+              >
+                Categories
+                <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isCategoryMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isCategoryMenuOpen && (
+                <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  {categories.map((category) => (
+                    <button
+                      key={category.name}
+                      onClick={() => {
+                        onPageChange(category.page);
+                        setIsCategoryMenuOpen(false);
+                      }}
+                      className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
+                        currentPage === category.page
+                          ? 'text-blue-600 bg-blue-50'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Search Bar */}
@@ -190,6 +237,29 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
                   {item.name}
                 </button>
               ))}
+              
+              {/* Mobile Categories */}
+              <div className="pt-2">
+                <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Categories
+                </div>
+                {categories.map((category) => (
+                  <button
+                    key={category.name}
+                    onClick={() => {
+                      onPageChange(category.page);
+                      setIsMenuOpen(false);
+                    }}
+                    className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                      currentPage === category.page
+                        ? 'text-blue-600 bg-blue-50'
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}

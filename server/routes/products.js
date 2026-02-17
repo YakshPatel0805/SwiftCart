@@ -66,7 +66,7 @@ router.post('/upload-csv', authenticateToken, isAdmin, upload.single('file'), as
             inStock: (row.inStock || row.InStock || 'true').toLowerCase() === 'true'
           };
 
-          if (!['clothing', 'electronics', 'furniture'].includes(product.category)) {
+          if (!['clothing', 'electronics', 'furniture', 'appliances', 'beauty', 'accessories', 'stationery', 'books', 'sports', 'baby'].includes(product.category)) {
             errors.push(`Invalid category for product: ${product.name}`);
             return;
           }

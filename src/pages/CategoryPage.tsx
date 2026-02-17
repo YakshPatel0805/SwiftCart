@@ -4,7 +4,7 @@ import { Product } from '../types';
 import ProductGrid from '../components/Product/ProductGrid';
 
 interface CategoryPageProps {
-  category: 'clothing' | 'electronics' | 'furniture';
+  category: 'clothing' | 'electronics' | 'furniture' | 'appliances' | 'beauty' | 'accessories' | 'stationery' | 'books' | 'sports' | 'baby' | 'all';
   title: string;
 }
 
@@ -25,7 +25,7 @@ export default function CategoryPage({ category, title }: CategoryPageProps) {
           ...p,
           id: p._id || p.id
         }))
-        .filter((p: Product) => p.category === category);
+        .filter((p: Product) => category === 'all' || p.category === category);
       setProducts(normalizedData);
     } catch (error) {
       console.error('Error loading products:', error);

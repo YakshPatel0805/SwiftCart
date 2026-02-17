@@ -99,51 +99,194 @@ export default function Home({ onPageChange }: HomeProps) {
       </section>
 
       {/* Categories Section */}
-      <section className="py-16">
+      <section className="py-16 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
             Shop by Category
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div 
-              onClick={() => onPageChange('clothing')}
-              className="relative overflow-hidden rounded-lg cursor-pointer group"
-            >
-              <img
-                src="https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Clothing"
-                className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Clothing</h3>
+          <div className="relative">
+            <div className="flex gap-8 animate-scroll hover:pause-animation">
+              <div 
+                onClick={() => onPageChange('clothing')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Clothing"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Clothing</h3>
+                </div>
               </div>
-            </div>
-            
-            <div 
-              onClick={() => onPageChange('electronics')}
-              className="relative overflow-hidden rounded-lg cursor-pointer group"
-            >
-              <img
-                src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800"
-                alt="Electronics"
-                className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Electronics</h3>
+              
+              <div 
+                onClick={() => onPageChange('electronics')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Electronics"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Electronics</h3>
+                </div>
               </div>
-            </div>
-            
-            <div 
-              onClick={() => onPageChange('furniture')}
-              className="relative overflow-hidden rounded-lg cursor-pointer group"
-            >
-              <img
-                src="https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="Furniture"
-                className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Furniture</h3>
+              
+              <div 
+                onClick={() => onPageChange('furniture')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Furniture"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Furniture</h3>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => onPageChange('appliances')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/4686822/pexels-photo-4686822.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Appliances"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Appliances</h3>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => onPageChange('beauty')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Beauty"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Beauty</h3>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => onPageChange('accessories')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Accessories"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Accessories</h3>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => onPageChange('stationery')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/6373305/pexels-photo-6373305.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Stationery"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Stationery</h3>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => onPageChange('books')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Books"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Books</h3>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => onPageChange('sports')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/3764011/pexels-photo-3764011.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Sports"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Sports</h3>
+                </div>
+              </div>
+
+              <div 
+                onClick={() => onPageChange('baby')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/1648375/pexels-photo-1648375.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Baby"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Baby</h3>
+                </div>
+              </div>
+
+              {/* Duplicate items for seamless loop */}
+              <div 
+                onClick={() => onPageChange('clothing')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Clothing"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Clothing</h3>
+                </div>
+              </div>
+              
+              <div 
+                onClick={() => onPageChange('electronics')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Electronics"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Electronics</h3>
+                </div>
+              </div>
+              
+              <div 
+                onClick={() => onPageChange('furniture')}
+                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+              >
+                <img
+                  src="https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Furniture"
+                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h3 className="text-white text-2xl font-bold">Furniture</h3>
+                </div>
               </div>
             </div>
           </div>
@@ -167,7 +310,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
               <div className="text-center mt-8">
                 <button
-                  onClick={() => onPageChange('clothing')}
+                  onClick={() => onPageChange('all-products')}
                   className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   View All Products

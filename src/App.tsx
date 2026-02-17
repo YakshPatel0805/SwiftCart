@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -18,6 +18,10 @@ import Debug from './pages/Debug';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage]);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -43,6 +47,22 @@ function App() {
         return <CategoryPage category="electronics" title="Electronics" />;
       case 'furniture':
         return <CategoryPage category="furniture" title="Furniture" />;
+      case 'appliances':
+        return <CategoryPage category="appliances" title="Appliances" />;
+      case 'beauty':
+        return <CategoryPage category="beauty" title="Beauty" />;
+      case 'accessories':
+        return <CategoryPage category="accessories" title="Accessories" />;
+      case 'stationery':
+        return <CategoryPage category="stationery" title="Stationery" />;
+      case 'books':
+        return <CategoryPage category="books" title="Books" />;
+      case 'sports':
+        return <CategoryPage category="sports" title="Sports" />;
+      case 'baby':
+        return <CategoryPage category="baby" title="Baby" />;
+      case 'all-products':
+        return <CategoryPage category="all" title="All Products" />;
       case 'debug':
         return <Debug />;
       case 'profile':
