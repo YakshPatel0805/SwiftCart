@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { productsAPI } from '../services/api';
 import { Product } from '../types';
 import ProductGrid from '../components/Product/ProductGrid';
 
-interface SearchResultsProps {
-  searchQuery: string;
-}
-
-export default function SearchResults({ searchQuery }: SearchResultsProps) {
+export default function SearchResults() {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 

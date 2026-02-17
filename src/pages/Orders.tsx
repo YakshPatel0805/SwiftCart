@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, Truck, CheckCircle, MoreVertical, XCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
 
-interface OrdersProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function Orders({ onPageChange }: OrdersProps) {
+export default function Orders() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -102,7 +100,7 @@ export default function Orders({ onPageChange }: OrdersProps) {
               <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">You haven't placed any orders yet.</p>
               <button
-                onClick={() => onPageChange('home')}
+                onClick={() => navigate('/')}
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Start Shopping

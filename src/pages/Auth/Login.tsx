@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-interface LoginProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function Login({ onPageChange }: LoginProps) {
+export default function Login() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,7 +22,7 @@ export default function Login({ onPageChange }: LoginProps) {
     try {
       const success = await login(formData.email, formData.password);
       if (success) {
-        onPageChange('dashboard');
+        navigate('/dashboard');
       } else {
         setError('Invalid email or password');
       }
@@ -51,7 +49,7 @@ export default function Login({ onPageChange }: LoginProps) {
         <p className="mt-2 text-center text-sm text-gray-600">
           Or{' '}
           <button
-            onClick={() => onPageChange('signup')}
+            onClick={() => navigate('/signup')}
             className="font-medium text-blue-600 hover:text-blue-500"
           >
             create a new account
@@ -131,7 +129,7 @@ export default function Login({ onPageChange }: LoginProps) {
               <div className="text-sm">
                 <button
                   type="button"
-                  onClick={() => onPageChange('forgot-password')}
+                  onClick={() => alert('Password reset functionality coming soon!')}
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   Forgot your password?

@@ -1,90 +1,84 @@
 import { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 
-interface HeaderProps {
-  currentPage: string;
-  onPageChange: (page: string) => void;
-}
-
-export default function Header({ currentPage, onPageChange }: HeaderProps) {
+export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAuth();
   const { getTotalItems } = useCart();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const categories = [
-    { name: 'Clothing', page: 'clothing' },
-    { name: 'Electronics', page: 'electronics' },
-    { name: 'Furniture', page: 'furniture' },
-    { name: 'Appliances', page: 'appliances' },
-    { name: 'Beauty', page: 'beauty' },
-    { name: 'Accessories', page: 'accessories' },
-    { name: 'Stationery', page: 'stationery' },
-    { name: 'Books', page: 'books' },
-    { name: 'Sports', page: 'sports' },
-    { name: 'Baby', page: 'baby' },
+    { name: 'Clothing', path: '/category/clothing' },
+    { name: 'Electronics', path: '/category/electronics' },
+    { name: 'Furniture', path: '/category/furniture' },
+    { name: 'Appliances', path: '/category/appliances' },
+    { name: 'Beauty', path: '/category/beauty' },
+    { name: 'Accessories', path: '/category/accessories' },
+    { name: 'Stationery', path: '/category/stationery' },
+    { name: 'Books', path: '/category/books' },
+    { name: 'Sports', path: '/category/sports' },
+    { name: 'Baby', path: '/category/baby' },
   ];
 
   const navigation = [
-    { name: 'Home', page: 'home' },
-    { name: 'Contact', page: 'contact' },
+    { name: 'Home', path: '/' },
+    { name: 'Contact', path: '/contact' },
   ];
 
   const userMenuItems = user ? [
-    { name: 'Dashboard', page: 'dashboard' },
-    { name: 'Profile', page: 'profile' },
-    { name: 'Orders', page: 'orders' },
-    ...(user.role === 'admin' ? [{ name: 'Admin Panel', page: 'admin' }] : []),
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Profile', path: '/profile' },
+    { name: 'Orders', path: '/orders' },
+    ...(user.role === 'admin' ? [{ name: 'Admin Panel', path: '/admin' }] : []),
   ] : [];
 
   const handleLogout = () => {
     logout();
     setIsUserMenuOpen(false);
-    onPageChange('home');
+    navigate('/');
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      onPageChange(`search?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
     }
   };
+
+  const isActive = (path: string) => location.pathname === path;
+  const isCategoryActive = () => categories.some(cat => location.pathname === cat.path);
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          {/* <div className="flex-shrink-0">
-            <button
-              onClick={() => onPageChange('home')}
-              className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors mr-10"
-            >
-              SwiftCart
-            </button>
-          </div> */}
-          <div className='text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors mr-10'>
-              SwiftCart
-          </div>
+          <Link to="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors mr-10">
+            SwiftCart
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8 items-center">
             {navigation.map((item) => (
-              <button
+              <Link
                 key={item.name}
-                onClick={() => onPageChange(item.page)}
+                to={item.path}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  currentPage === item.page
+                  isActive(item.path)
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                 }`}
               >
                 {item.name}
-              </button>
+              </Link>
             ))}
             
             {/* Categories Dropdown */}
@@ -92,7 +86,7 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
               <button
                 onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
                 className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  categories.some(cat => currentPage === cat.page)
+                  isCategoryActive()
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                 }`}
@@ -104,20 +98,18 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
               {isCategoryMenuOpen && (
                 <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                   {categories.map((category) => (
-                    <button
+                    <Link
                       key={category.name}
-                      onClick={() => {
-                        onPageChange(category.page);
-                        setIsCategoryMenuOpen(false);
-                      }}
+                      to={category.path}
+                      onClick={() => setIsCategoryMenuOpen(false)}
                       className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
-                        currentPage === category.page
+                        isActive(category.path)
                           ? 'text-blue-600 bg-blue-50'
                           : 'text-gray-700 hover:bg-gray-100'
                       }`}
                     >
                       {category.name}
-                    </button>
+                    </Link>
                   ))}
                 </div>
               )}
@@ -141,8 +133,8 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
           {/* Right Side */}
           <div className="flex items-center space-x-4">
             {/* Cart */}
-            <button
-              onClick={() => onPageChange('cart')}
+            <Link
+              to="/cart"
               className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors"
             >
               <ShoppingCart className="h-6 w-6" />
@@ -151,7 +143,7 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
                   {getTotalItems()}
                 </span>
               )}
-            </button>
+            </Link>
 
             {/* User Menu */}
             <div className="relative">
@@ -172,16 +164,14 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
                   {user ? (
                     <>
                       {userMenuItems.map((item) => (
-                        <button
+                        <Link
                           key={item.name}
-                          onClick={() => {
-                            onPageChange(item.page);
-                            setIsUserMenuOpen(false);
-                          }}
+                          to={item.path}
+                          onClick={() => setIsUserMenuOpen(false)}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           {item.name}
-                        </button>
+                        </Link>
                       ))}
                       <hr className="my-1" />
                       <button
@@ -193,24 +183,20 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
                     </>
                   ) : (
                     <>
-                      <button
-                        onClick={() => {
-                          onPageChange('login');
-                          setIsUserMenuOpen(false);
-                        }}
+                      <Link
+                        to="/login"
+                        onClick={() => setIsUserMenuOpen(false)}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         Login
-                      </button>
-                      <button
-                        onClick={() => {
-                          onPageChange('signup');
-                          setIsUserMenuOpen(false);
-                        }}
+                      </Link>
+                      <Link
+                        to="/signup"
+                        onClick={() => setIsUserMenuOpen(false)}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         Sign Up
-                      </button>
+                      </Link>
                     </>
                   )}
                 </div>
@@ -232,20 +218,18 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
               {navigation.map((item) => (
-                <button
+                <Link
                   key={item.name}
-                  onClick={() => {
-                    onPageChange(item.page);
-                    setIsMenuOpen(false);
-                  }}
+                  to={item.path}
+                  onClick={() => setIsMenuOpen(false)}
                   className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    currentPage === item.page
+                    isActive(item.path)
                       ? 'text-blue-600 bg-blue-50'
                       : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                   }`}
                 >
                   {item.name}
-                </button>
+                </Link>
               ))}
               
               {/* Mobile Categories */}
@@ -254,20 +238,18 @@ export default function Header({ currentPage, onPageChange }: HeaderProps) {
                   Categories
                 </div>
                 {categories.map((category) => (
-                  <button
+                  <Link
                     key={category.name}
-                    onClick={() => {
-                      onPageChange(category.page);
-                      setIsMenuOpen(false);
-                    }}
+                    to={category.path}
+                    onClick={() => setIsMenuOpen(false)}
                     className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                      currentPage === category.page
+                      isActive(category.path)
                         ? 'text-blue-600 bg-blue-50'
                         : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                     }`}
                   >
                     {category.name}
-                  </button>
+                  </Link>
                 ))}
               </div>
             </div>

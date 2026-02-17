@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { CreditCard, Truck, Lock, Smartphone, Banknote } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI } from '../services/api';
 import { ShippingAddress, PaymentMethod } from '../types';
 
-interface CheckoutProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function Checkout({ onPageChange }: CheckoutProps) {
+export default function Checkout() {
+  const navigate = useNavigate();
   const { items, getTotalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const [step, setStep] = useState(1);
@@ -70,7 +68,7 @@ export default function Checkout({ onPageChange }: CheckoutProps) {
   const handleOrderComplete = () => {
     // Clear the cart and redirect to orders
     clearCart();
-    onPageChange('orders');
+    navigate('/orders');
   };
 
   if (!user) {
@@ -79,7 +77,7 @@ export default function Checkout({ onPageChange }: CheckoutProps) {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Please sign in to checkout</h2>
           <button
-            onClick={() => onPageChange('login')}
+            onClick={() => navigate('/login')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Sign In
@@ -95,7 +93,7 @@ export default function Checkout({ onPageChange }: CheckoutProps) {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
           <button
-            onClick={() => onPageChange('home')}
+            onClick={() => navigate('/')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Continue Shopping

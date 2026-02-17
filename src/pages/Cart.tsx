@@ -1,13 +1,11 @@
 // import React from 'react';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
-interface CartProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function Cart({ onPageChange }: CartProps) {
+export default function Cart() {
+  const navigate = useNavigate();
   const { items, updateQuantity, removeFromCart, getTotalPrice } = useCart();
   const { user } = useAuth();
 
@@ -18,10 +16,10 @@ export default function Cart({ onPageChange }: CartProps) {
 
   const handleCheckout = () => {
     if (!user) {
-      onPageChange('login');
+      navigate('/login');
       return;
     }
-    onPageChange('checkout');
+    navigate('/checkout');
   };
 
   if (items.length === 0) {
@@ -36,7 +34,7 @@ export default function Cart({ onPageChange }: CartProps) {
             </p>
             <div className="mt-6">
               <button
-                onClick={() => onPageChange('home')}
+                onClick={() => navigate('/')}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Continue Shopping
@@ -164,7 +162,7 @@ export default function Cart({ onPageChange }: CartProps) {
               </button>
 
               <button
-                onClick={() => onPageChange('home')}
+                onClick={() => navigate('/')}
                 className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg mt-3 hover:bg-gray-50 transition-colors font-medium"
               >
                 Continue Shopping

@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Upload, Plus, Package } from 'lucide-react';
+import { Upload, Package } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-interface AdminPanelProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function AdminPanel({ onPageChange }: AdminPanelProps) {
+export default function AdminPanel() {
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -191,20 +189,20 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
-                onClick={() => onPageChange('home')}
+                onClick={() => navigate('/')}
                 className="flex items-center justify-center py-3 px-4 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
               >
                 <Package className="h-5 w-5 mr-2" />
                 View All Products
               </button>
               <button
-                onClick={() => onPageChange('dashboard')}
+                onClick={() => navigate('/dashboard')}
                 className="flex items-center justify-center py-3 px-4 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
               >
                 Dashboard
               </button>
               <button
-                onClick={() => onPageChange('orders')}
+                onClick={() => navigate('/orders')}
                 className="flex items-center justify-center py-3 px-4 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
               >
                 View Orders

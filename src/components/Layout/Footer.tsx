@@ -1,10 +1,7 @@
 import { Facebook, Twitter, Instagram } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-interface FooterProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function Footer({ onPageChange }: FooterProps) {
+export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -52,36 +49,24 @@ export default function Footer({ onPageChange }: FooterProps) {
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <button
-                  onClick={() => onPageChange('home')}
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
+                <Link to="/" className="text-gray-300 hover:text-white transition-colors">
                   Home
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => onPageChange('about')}
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
+                <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
                   About Us
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => onPageChange('contact')}
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
+                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
                   Contact
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => onPageChange('help')}
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
+                <Link to="/help" className="text-gray-300 hover:text-white transition-colors">
                   Help
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -91,20 +76,14 @@ export default function Footer({ onPageChange }: FooterProps) {
             <h4 className="text-lg font-semibold mb-4">Legal</h4>
             <ul className="space-y-2">
               <li>
-                <button
-                  onClick={() => onPageChange('privacy')}
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
+                <Link to="/privacy" className="text-gray-300 hover:text-white transition-colors">
                   Privacy Policy
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => onPageChange('terms')}
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
+                <Link to="/terms" className="text-gray-300 hover:text-white transition-colors">
                   Terms of Service
-                </button>
+                </Link>
               </li>
               <li>
                 <a href="#" className="text-gray-300 hover:text-white transition-colors">

@@ -1,19 +1,16 @@
-// import React from 'react';
 import { useState, useEffect } from 'react';
-import { Package, ShoppingCart, Heart, User, CreditCard } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Package, ShoppingCart, Heart, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ordersAPI } from '../services/api';
 
-interface DashboardProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function Dashboard({ onPageChange }: DashboardProps) {
+export default function Dashboard() {
   const { user } = useAuth();
   const { getTotalItems } = useCart();
   const { wishlist } = useWishlist();
+  const navigate = useNavigate();
   const [orderCount, setOrderCount] = useState(0);
   const [totalOrderItems, setTotalOrderItems] = useState(0);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
@@ -73,29 +70,29 @@ export default function Dashboard({ onPageChange }: DashboardProps) {
       label: 'View Cart',
       description: 'Review items in your shopping cart',
       icon: ShoppingCart,
-      action: () => onPageChange('cart'),
+      action: () => navigate('/cart'),
       color: 'blue',
     },
     {
       label: 'My Orders',
       description: 'Track your order history',
       icon: Package,
-      action: () => onPageChange('orders'),
+      action: () => navigate('/orders'),
       color: 'green',
+    },
+    {
+      label: 'My Wishlist',
+      description: 'View your saved items',
+      icon: Heart,
+      action: () => navigate('/wishlist'),
+      color: 'red',
     },
     {
       label: 'Profile Settings',
       description: 'Update your personal information',
       icon: User,
-      action: () => onPageChange('profile'),
+      action: () => navigate('/profile'),
       color: 'purple',
-    },
-    {
-      label: 'Payment Methods',
-      description: 'Manage your payment options',
-      icon: CreditCard,
-      action: () => onPageChange('profile'),
-      color: 'orange',
     },
   ];
 
@@ -165,7 +162,7 @@ export default function Dashboard({ onPageChange }: DashboardProps) {
               <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">No orders yet.</p>
               <button
-                onClick={() => onPageChange('home')}
+                onClick={() => navigate('/')}
                 className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Start Shopping
@@ -203,7 +200,7 @@ export default function Dashboard({ onPageChange }: DashboardProps) {
                 </div>
               ))}
               <button
-                onClick={() => onPageChange('orders')}
+                onClick={() => navigate('/orders')}
                 className="w-full text-center text-blue-600 hover:text-blue-700 font-medium py-2"
               >
                 View All Orders →

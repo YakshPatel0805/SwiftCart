@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-interface SignupProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function Signup({ onPageChange }: SignupProps) {
+export default function Signup() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -38,7 +36,7 @@ export default function Signup({ onPageChange }: SignupProps) {
     try {
       const success = await signup(formData.email, formData.username, formData.password);
       if (success) {
-        onPageChange('dashboard');
+        navigate('/dashboard');
       } else {
         setError('Username or email already exists');
       }
@@ -65,7 +63,7 @@ export default function Signup({ onPageChange }: SignupProps) {
         <p className="mt-2 text-center text-sm text-gray-600">
           Or{' '}
           <button
-            onClick={() => onPageChange('login')}
+            onClick={() => navigate('/login')}
             className="font-medium text-blue-600 hover:text-blue-500"
           >
             sign in to your existing account

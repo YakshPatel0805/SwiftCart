@@ -1,38 +1,8 @@
-// import React from 'react';
-import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Truck, Shield, HeartHandshake } from 'lucide-react';
-import { productsAPI } from '../services/api';
-import { Product } from '../types';
-// import ProductCard from '../components/Product/ProductCard';
 
-interface HomeProps {
-  onPageChange: (page: string) => void;
-}
-
-export default function Home({ onPageChange }: HomeProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
-    try {
-      const data = await productsAPI.getAll();
-      const normalizedData = data.map((p: any) => ({
-        ...p,
-        id: p._id || p.id
-      }));
-      setProducts(normalizedData);
-    } catch (error) {
-      console.error('Error loading products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // const featuredProducts = products.slice(0, 8);
+export default function Home() {
+  const navigate = useNavigate();
 
   const features = [
     {
@@ -70,7 +40,7 @@ export default function Home({ onPageChange }: HomeProps) {
               Discover amazing products across clothing, electronics, and many more...
             </p>
             <button
-              onClick={() => onPageChange('clothing')}
+              onClick={() => navigate('/category/clothing')}
               className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               Shop Now
@@ -108,7 +78,7 @@ export default function Home({ onPageChange }: HomeProps) {
             <div className="flex gap-8 animate-scroll">
               {/* First set of categories */}
               <div
-                onClick={() => onPageChange('clothing')}
+                onClick={() => navigate('/category/clothing')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -122,7 +92,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('electronics')}
+                onClick={() => navigate('/category/electronics')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -136,7 +106,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('furniture')}
+                onClick={() => navigate('/category/furniture')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -150,7 +120,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('appliances')}
+                onClick={() => navigate('/category/appliances')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -164,7 +134,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('beauty')}
+                onClick={() => navigate('/category/beauty')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -178,7 +148,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('accessories')}
+                onClick={() => navigate('/category/accessories')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -192,7 +162,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('stationery')}
+                onClick={() => navigate('/category/stationery')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -206,7 +176,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('books')}
+                onClick={() => navigate('/category/books')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -220,7 +190,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('sports')}
+                onClick={() => navigate('/category/sports')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -234,7 +204,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('baby')}
+                onClick={() => navigate('/category/baby')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -249,7 +219,7 @@ export default function Home({ onPageChange }: HomeProps) {
 
               {/* Duplicate all categories for seamless infinite loop */}
               <div
-                onClick={() => onPageChange('clothing')}
+                onClick={() => navigate('/category/clothing')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -263,7 +233,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('electronics')}
+                onClick={() => navigate('/category/electronics')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -277,7 +247,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('furniture')}
+                onClick={() => navigate('/category/furniture')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -291,7 +261,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('appliances')}
+                onClick={() => navigate('/category/appliances')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -305,7 +275,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('beauty')}
+                onClick={() => navigate('/category/beauty')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -319,7 +289,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('accessories')}
+                onClick={() => navigate('/category/accessories')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -333,7 +303,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('stationery')}
+                onClick={() => navigate('/category/stationery')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -347,7 +317,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('books')}
+                onClick={() => navigate('/category/books')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -361,7 +331,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('sports')}
+                onClick={() => navigate('/category/sports')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -375,7 +345,7 @@ export default function Home({ onPageChange }: HomeProps) {
               </div>
 
               <div
-                onClick={() => onPageChange('baby')}
+                onClick={() => navigate('/category/baby')}
                 className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
               >
                 <img
@@ -395,7 +365,7 @@ export default function Home({ onPageChange }: HomeProps) {
 
       <div className="text-center mb-10">
         <button
-          onClick={() => onPageChange('all-products')}
+          onClick={() => navigate('/category/all')}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
         >
           View All Products
