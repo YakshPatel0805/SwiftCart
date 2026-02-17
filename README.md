@@ -7,10 +7,14 @@ Full-stack e-commerce application with React frontend and Node.js/Express backen
 - User authentication with bcrypt password hashing
 - JWT token-based authorization
 - Product catalog stored in MongoDB
+- Shopping cart and checkout functionality
 - User wishlist functionality
+- Order management with status tracking
+- Email notifications for orders, payments, and cancellations
 - Admin panel with CSV product upload
 - Role-based access control (Admin/User)
 - Secure API endpoints
+- React Router for proper URL-based navigation
 
 ## Prerequisites
 
@@ -33,12 +37,25 @@ Create a `.env` file in the server directory:
 MONGODB_URI=mongodb://localhost:27017/ecommerce
 JWT_SECRET=your_secure_jwt_secret_key_here
 PORT=5000
+
+# Email Configuration (for order notifications)
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
 ```
 
 For MongoDB Atlas, use your connection string:
 ```env
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ecommerce
 ```
+
+#### Email Setup (Gmail)
+
+1. Enable 2-Step Verification on your Google Account
+2. Generate an App Password at https://myaccount.google.com/apppasswords
+3. Use the App Password in EMAIL_PASSWORD (not your regular password)
+4. Set ADMIN_EMAIL to the email address where you want to receive admin notifications
+
+See `server/EMAIL_COMPLETE_GUIDE.md` for detailed email configuration instructions.
 
 ### 2. Create Admin User
 
@@ -54,14 +71,23 @@ npm run create-admin admin@example.com admin admin123
 
 This creates an admin user who can upload products via CSV.
 
-### 3. Seed Database (Optional)
+### 3. Test Email Configuration (Optional)
+
+```bash
+cd server
+npm run test-email
+```
+
+This will verify your email configuration is working correctly.
+
+### 4. Seed Database (Optional)
 
 ```bash
 cd server
 npm run seed
 ```
 
-### 4. Start Backend Server
+### 5. Start Backend Server
 
 ```bash
 cd server
@@ -70,7 +96,7 @@ npm run dev
 
 Server will run on http://localhost:5000
 
-### 5. Frontend Setup
+### 6. Frontend Setup
 
 ```bash
 npm install
@@ -127,13 +153,62 @@ Premium T-Shirt,29.99,https://example.com/img.jpg,clothing,Comfortable shirt,4.5
 - `POST /api/wishlist/:productId` - Add product to wishlist
 - `DELETE /api/wishlist/:productId` - Remove product from wishlist
 
+### Orders (Protected)
+- `GET /api/orders` - Get user orders
+- `GET /api/orders/:id` - Get order by ID
+- `POST /api/orders` - Create new order (sends confirmation email)
+- `PATCH /api/orders/:id/cancel` - Cancel order (sends cancellation email)
+
+## Email Notifications
+
+The application automatically sends emails for:
+
+### Customer Emails:
+
+1. **Order Confirmation** - When a new order is placed
+   - Includes order details, items, shipping address
+   - Sent to the email provided in shipping address
+
+2. **Payment Confirmation** - When payment is processed
+   - Sent for Credit Card and Google Pay payments
+   - Not sent for Cash on Delivery
+
+3. **Order Cancellation** - When an order is cancelled
+   - Includes refund information
+   - Sent to the customer's email
+
+### Admin Notifications:
+
+4. **New Order Alert** - When a customer places an order
+   - Sent to admin email (ADMIN_EMAIL in .env)
+   - Includes complete order details, customer info, and shipping address
+   - Helps admin track and process orders immediately
+
+5. **Order Cancellation Alert** - When a customer cancels an order
+   - Sent to admin email
+   - Includes cancellation details and required actions
+   - Helps admin stop processing and handle refunds
+
+### Email Configuration
+
+- Uses Nodemailer with Gmail SMTP
+- Requires Gmail App Password (not regular password)
+- HTML-formatted responsive emails
+- Professional templates with branding
+- Admin email configurable via ADMIN_EMAIL environment variable
+
+See `server/EMAIL_COMPLETE_GUIDE.md` for detailed setup instructions.
+
 ## User Roles
 
 ### Regular User
-- Browse products
+- Browse products by category
+- Search products
 - Add to cart/wishlist
-- Place orders
+- Place orders with multiple payment methods
+- Receive email notifications
 - View profile and order history
+- Cancel orders (before shipping)
 
 ### Admin
 - All user permissions
@@ -141,6 +216,7 @@ Premium T-Shirt,29.99,https://example.com/img.jpg,clothing,Comfortable shirt,4.5
 - Upload products via CSV
 - Add/Edit/Delete products
 - View all orders
+- Manage user accounts
 
 ## Database Collections
 
@@ -156,11 +232,20 @@ Premium T-Shirt,29.99,https://example.com/img.jpg,clothing,Comfortable shirt,4.5
 - name
 - price
 - image
-- category
+- category (clothing, electronics, furniture, appliances, beauty, accessories, stationery, books, sports, baby)
 - description
 - rating
 - reviews
 - inStock
+
+### Orders
+- userId (reference to User)
+- items (array of products with quantities)
+- total
+- status (pending, processing, shipped, delivered, cancelled)
+- shippingAddress
+- paymentMethod (credit-card, google-pay, cash-on-delivery)
+- createdAt
 
 ## Security Features
 

@@ -1,7 +1,15 @@
 import express from 'express';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import User from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { 
+  sendOrderConfirmationEmail, 
+  sendOrderCancellationEmail, 
+  sendPaymentConfirmationEmail,
+  sendAdminOrderNotification,
+  sendAdminCancellationNotification
+} from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -44,6 +52,12 @@ router.post('/', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'No items in order' });
     }
 
+    // Get user details for email
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     const orderItems = await Promise.all(
       items.map(async (item) => {
         console.log('Processing item:', item);
@@ -79,6 +93,30 @@ router.post('/', authenticateToken, async (req, res) => {
     
     await order.populate('items.product');
     
+    // Send order confirmation email
+    const emailSent = await sendOrderConfirmationEmail(order, shippingAddress.email || user.email);
+    if (emailSent) {
+      console.log('Order confirmation email sent successfully');
+    }
+    
+    // Send payment confirmation email (for immediate payment methods)
+    if (paymentMethod.type === 'credit-card' || paymentMethod.type === 'google-pay') {
+      const paymentEmailSent = await sendPaymentConfirmationEmail(order, shippingAddress.email || user.email);
+      if (paymentEmailSent) {
+        console.log('Payment confirmation email sent successfully');
+      }
+    }
+    
+    // Send admin notification about new order
+    const adminNotificationSent = await sendAdminOrderNotification(
+      order, 
+      shippingAddress.email || user.email,
+      shippingAddress.name || user.username
+    );
+    if (adminNotificationSent) {
+      console.log('Admin order notification sent successfully');
+    }
+    
     res.status(201).json(order);
   } catch (error) {
     console.error('Error creating order:', error);
@@ -103,10 +141,35 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'Cannot cancel order that is already shipped or delivered' });
     }
     
-    order.status = 'cancelled';
-    await order.save();
+    // Get user details for email
+    const user = await User.findById(req.user.userId);
     
-    res.json(order);
+    // Use findByIdAndUpdate to avoid validation issues with old payment methods
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: 'cancelled' },
+      { new: true, runValidators: false }
+    ).populate('items.product');
+    
+    // Send order cancellation email
+    if (user) {
+      const emailSent = await sendOrderCancellationEmail(updatedOrder, order.shippingAddress.email || user.email);
+      if (emailSent) {
+        console.log('Order cancellation email sent successfully');
+      }
+      
+      // Send admin notification about order cancellation
+      const adminNotificationSent = await sendAdminCancellationNotification(
+        updatedOrder,
+        order.shippingAddress.email || user.email,
+        order.shippingAddress.name || user.username
+      );
+      if (adminNotificationSent) {
+        console.log('Admin cancellation notification sent successfully');
+      }
+    }
+    
+    res.json(updatedOrder);
   } catch (error) {
     console.error('Error cancelling order:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
