@@ -42,6 +42,47 @@ export const productsAPI = {
   getCategories: async () => {
     const response = await fetch(`${API_URL}/products/categories`);
     return response.json();
+  },
+
+  update: async (id: string, productData: any) => {
+    try {
+      const response = await fetch(`${API_URL}/products/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(productData)
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Products API update error:', error);
+      throw error;
+    }
+  },
+
+  delete: async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/products/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Products API delete error:', error);
+      throw error;
+    }
   }
 };
 

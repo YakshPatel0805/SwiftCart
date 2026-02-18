@@ -27,6 +27,59 @@ export default function Home() {
     },
   ];
 
+  const categories = [
+    {
+      name: 'Clothing',
+      slug: 'clothing',
+      image: 'https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Electronics',
+      slug: 'electronics',
+      image: 'https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Furniture',
+      slug: 'furniture',
+      image: 'https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Appliances',
+      slug: 'appliances',
+      image: 'https://images.pexels.com/photos/4686822/pexels-photo-4686822.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Beauty',
+      slug: 'beauty',
+      image: 'https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Accessories',
+      slug: 'accessories',
+      image: 'https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Stationery',
+      slug: 'stationery',
+      image: 'https://images.pexels.com/photos/6373305/pexels-photo-6373305.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Books',
+      slug: 'books',
+      image: 'https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Sports',
+      slug: 'sports',
+      image: 'https://images.pexels.com/photos/3764011/pexels-photo-3764011.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+    {
+      name: 'Baby',
+      slug: 'baby',
+      image: 'https://images.pexels.com/photos/1648375/pexels-photo-1648375.jpeg?auto=compress&cs=tinysrgb&w=800',
+    },
+  ];
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -76,287 +129,23 @@ export default function Home() {
           </h2>
           <div className="relative">
             <div className="flex gap-8 animate-scroll">
-              {/* First set of categories */}
-              <div
-                onClick={() => navigate('/category/clothing')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Clothing"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Clothing</h3>
+              {/* Render categories twice for seamless infinite loop */}
+              {[...categories, ...categories].map((category, index) => (
+                <div
+                  key={index}
+                  onClick={() => navigate(`/category/${category.slug}`)}
+                  className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+                >
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                    <h3 className="text-white text-2xl font-bold">{category.name}</h3>
+                  </div>
                 </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/electronics')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Electronics"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Electronics</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/furniture')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Furniture"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Furniture</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/appliances')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/4686822/pexels-photo-4686822.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Appliances"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Appliances</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/beauty')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Beauty"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Beauty</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/accessories')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Accessories"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Accessories</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/stationery')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/6373305/pexels-photo-6373305.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Stationery"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Stationery</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/books')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Books"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Books</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/sports')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/3764011/pexels-photo-3764011.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Sports"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Sports</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/baby')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1648375/pexels-photo-1648375.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Baby"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Baby</h3>
-                </div>
-              </div>
-
-              {/* Duplicate all categories for seamless infinite loop */}
-              <div
-                onClick={() => navigate('/category/clothing')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Clothing"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Clothing</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/electronics')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Electronics"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Electronics</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/furniture')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Furniture"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Furniture</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/appliances')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/4686822/pexels-photo-4686822.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Appliances"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Appliances</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/beauty')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Beauty"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Beauty</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/accessories')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Accessories"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Accessories</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/stationery')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/6373305/pexels-photo-6373305.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Stationery"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Stationery</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/books')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1370295/pexels-photo-1370295.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Books"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Books</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/sports')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/3764011/pexels-photo-3764011.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Sports"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Sports</h3>
-                </div>
-              </div>
-
-              <div
-                onClick={() => navigate('/category/baby')}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
-              >
-                <img
-                  src="https://images.pexels.com/photos/1648375/pexels-photo-1648375.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Baby"
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">Baby</h3>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

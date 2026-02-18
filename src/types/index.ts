@@ -17,7 +17,7 @@ export interface Product {
   name: string;
   price: number;
   image: string;
-  category: 'clothing' | 'electronics' | 'furniture';
+  category: string;
   description: string;
   rating: number;
   reviews: number;
