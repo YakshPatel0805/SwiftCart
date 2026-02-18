@@ -25,6 +25,20 @@ export const authAPI = {
       body: JSON.stringify({ email, password })
     });
     return response.json();
+  },
+
+  verifyResetToken: async (token: string) => {
+    const response = await fetch(`${API_URL}/auth/verify-reset-token/${token}`);
+    return response.json();
+  },
+
+  changePassword: async (email: string, oldPassword: string, newPassword: string, confirmPassword: string) => {
+    const response = await fetch(`${API_URL}/auth/change-password`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email, oldPassword, newPassword, confirmPassword })
+    });
+    return response.json();
   }
 };
 

@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { User, Shield, Mail, Crown } from 'lucide-react';
+import ChangePassword from './Auth/ChangePassword';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -35,7 +36,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-8">
@@ -100,6 +101,9 @@ export default function Profile() {
             </div>
           </div>
         </div>
+
+        {/* Change Password Section */}
+        <ChangePassword />
       </div>
     </div>
   );

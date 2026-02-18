@@ -25,6 +25,7 @@ import Help from './pages/Help.tsx';
 import Privacy from './pages/Privacy.tsx';
 import Terms from './pages/Terms.tsx';
 import Wishlist from './pages/Wishlist';
+import ChangePassword from './pages/Auth/ChangePassword.tsx';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -57,7 +58,8 @@ function AppLayout() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/wishlist" element={<Wishlist />} />
-          
+          <Route path="/change-password" element={<ChangePassword/> } />
+
           {/* Admin */}
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/admin/products" element={<AdminProductsView />} />

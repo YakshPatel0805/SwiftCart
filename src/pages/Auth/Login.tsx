@@ -133,7 +133,7 @@ export default function Login() {
               <div className="text-sm">
                 <button
                   type="button"
-                  onClick={() => alert('Password reset functionality coming soon!')}
+                  onClick={() => navigate('/change-password')}
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   Forgot your password?
