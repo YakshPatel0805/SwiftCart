@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Package, Truck, CheckCircle, MoreVertical, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
@@ -8,11 +8,29 @@ export default function Orders() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     console.log('Orders page mounted, loading orders...');
     loadOrders();
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openDropdown) {
+        const dropdownElement = dropdownRefs.current[openDropdown];
+        if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+          setOpenDropdown(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openDropdown]);
 
   const loadOrders = async () => {
     try {
@@ -126,7 +144,10 @@ export default function Orders() {
                       </span>
                       
                       {/* Dropdown Menu */}
-                      <div className="relative dropdown-container">
+                      <div 
+                        className="relative dropdown-container"
+                        ref={(el) => (dropdownRefs.current[order._id] = el)}
+                      >
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -138,32 +159,25 @@ export default function Orders() {
                         </button>
                         
                         {openDropdown === order._id && (
-                          <>
-                            {/* Invisible overlay to catch outside clicks */}
-                            <div 
-                              className="fixed inset-0 z-40" 
-                              onClick={() => setOpenDropdown(null)}
-                            />
-                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                            <button
+                              onClick={() => {
+                                alert('View details functionality coming soon!');
+                                setOpenDropdown(null);
+                              }}
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              View Details
+                            </button>
+                            {canCancelOrder(order.status) && (
                               <button
-                                onClick={() => {
-                                  alert('View details functionality coming soon!');
-                                  setOpenDropdown(null);
-                                }}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleCancelOrder(order._id)}
+                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                               >
-                                View Details
+                                Cancel Order
                               </button>
-                              {canCancelOrder(order.status) && (
-                                <button
-                                  onClick={() => handleCancelOrder(order._id)}
-                                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                >
-                                  Cancel Order
-                                </button>
-                              )}
-                            </div>
-                          </>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>

@@ -37,6 +37,11 @@ export const productsAPI = {
   getById: async (id: string) => {
     const response = await fetch(`${API_URL}/products/${id}`);
     return response.json();
+  },
+
+  getCategories: async () => {
+    const response = await fetch(`${API_URL}/products/categories`);
+    return response.json();
   }
 };
 
@@ -54,6 +59,23 @@ export const ordersAPI = {
       return response.json();
     } catch (error) {
       console.error('Orders API getAll error:', error);
+      throw error;
+    }
+  },
+
+  getAllAdmin: async () => {
+    try {
+      const response = await fetch(`${API_URL}/orders/admin/all`, {
+        headers: getAuthHeaders()
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return response.json();
+    } catch (error) {
+      console.error('Orders API getAllAdmin error:', error);
       throw error;
     }
   },
@@ -102,6 +124,27 @@ export const ordersAPI = {
       return data;
     } catch (error) {
       console.error('Orders API cancel error:', error);
+      throw error;
+    }
+  },
+
+  updateStatus: async (id: string, status: string) => {
+    try {
+      const response = await fetch(`${API_URL}/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Orders API updateStatus error:', error);
       throw error;
     }
   }

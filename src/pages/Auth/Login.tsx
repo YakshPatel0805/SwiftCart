@@ -20,9 +20,10 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const success = await login(formData.email, formData.password);
-      if (success) {
-        navigate('/dashboard');
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        // Redirect admin to admin panel, regular users to dashboard
+        navigate(result.isAdmin ? '/admin' : '/dashboard');
       } else {
         setError('Invalid email or password');
       }

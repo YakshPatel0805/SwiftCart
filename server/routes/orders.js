@@ -3,6 +3,7 @@ import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { isAdmin } from '../middleware/adminAuth.js';
 import { 
   sendOrderConfirmationEmail, 
   sendOrderCancellationEmail, 
@@ -13,6 +14,20 @@ import {
 
 const router = express.Router();
 
+// Admin route - Get all orders
+router.get('/admin/all', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate('items.product')
+      .populate('userId', 'email username')
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// User route - Get user's own orders
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user.userId })
@@ -172,6 +187,37 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error cancelling order:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Admin route - Update order status
+router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { status } = req.body;
+    
+    if (!status) {
+      return res.status(400).json({ message: 'Status is required' });
+    }
+    
+    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+    
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true, runValidators: false }
+    ).populate('items.product').populate('userId', 'email username');
+    
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error updating order status:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

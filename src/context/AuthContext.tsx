@@ -4,7 +4,7 @@ import { authAPI } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; isAdmin: boolean }>;
   signup: (email: string, username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
@@ -37,7 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; isAdmin: boolean }> => {
     try {
       const data = await authAPI.login(email, password);
       
@@ -51,12 +51,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(userProfile);
         localStorage.setItem('user', JSON.stringify(userProfile));
         localStorage.setItem('token', data.token);
-        return true;
+        return { success: true, isAdmin: userProfile.role === 'admin' };
       }
-      return false;
+      return { success: false, isAdmin: false };
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      return { success: false, isAdmin: false };
     }
   };
 

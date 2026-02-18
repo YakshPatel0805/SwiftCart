@@ -1,31 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
+import { Menu, X, ShoppingCart, User, Search, ChevronDown, Grid3x3 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { productsAPI } from '../../services/api';
+
+interface Category {
+  category: string;
+  count: number;
+}
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categorySearch, setCategorySearch] = useState('');
   const { user, logout } = useAuth();
   const { getTotalItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const categoryMenuRef = useRef<HTMLDivElement>(null);
 
-  const categories = [
-    { name: 'Clothing', path: '/category/clothing' },
-    { name: 'Electronics', path: '/category/electronics' },
-    { name: 'Furniture', path: '/category/furniture' },
-    { name: 'Appliances', path: '/category/appliances' },
-    { name: 'Beauty', path: '/category/beauty' },
-    { name: 'Accessories', path: '/category/accessories' },
-    { name: 'Stationery', path: '/category/stationery' },
-    { name: 'Books', path: '/category/books' },
-    { name: 'Sports', path: '/category/sports' },
-    { name: 'Baby', path: '/category/baby' },
-  ];
+  // Fetch categories from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await productsAPI.getCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+      if (categoryMenuRef.current && !categoryMenuRef.current.contains(event.target as Node)) {
+        setIsCategoryMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const navigation = [
     { name: 'Home', path: '/' },
@@ -33,11 +61,22 @@ export default function Header() {
   ];
 
   const userMenuItems = user ? [
-    { name: 'Dashboard', path: '/dashboard' },
+    ...(user.role !== 'admin' ? [{ name: 'Dashboard', path: '/dashboard' }] : []),
     { name: 'Profile', path: '/profile' },
     { name: 'Orders', path: '/orders' },
     ...(user.role === 'admin' ? [{ name: 'Admin Panel', path: '/admin' }] : []),
   ] : [];
+
+  // Filter categories based on search
+  const filteredCategories = categories.filter(cat =>
+    cat.category.toLowerCase().includes(categorySearch.toLowerCase())
+  );
+
+  const handleCategoryClick = (category: string) => {
+    setIsCategoryMenuOpen(false);
+    setCategorySearch('');
+    navigate(`/category/${category}`);
+  };
 
   const handleLogout = () => {
     logout();
@@ -54,7 +93,8 @@ export default function Header() {
   };
 
   const isActive = (path: string) => location.pathname === path;
-  const isCategoryActive = () => categories.some(cat => location.pathname === cat.path);
+  const isCategoryActive = () => categories.some(cat => location.pathname === `/category/${cat.category}`);
+  const isAdminPage = location.pathname === '/admin';
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
@@ -67,68 +107,113 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8 items-center">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(item.path)
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-            
-            {/* Categories Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isCategoryActive()
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                }`}
-              >
-                Categories
-                <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isCategoryMenuOpen ? 'rotate-180' : ''}`} />
-              </button>
+            {!isAdminPage && (
+              <>
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive(item.path)
+                        ? 'text-blue-600 bg-blue-50'
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+                
+                {/* Categories Dropdown */}
+                <div className="relative" ref={categoryMenuRef}>
+                  <button
+                    onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isCategoryActive()
+                        ? 'text-blue-600 bg-blue-50'
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Grid3x3 className="h-4 w-4 mr-1" />
+                    Categories
+                    <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isCategoryMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
 
-              {isCategoryMenuOpen && (
-                <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  {categories.map((category) => (
-                    <Link
-                      key={category.name}
-                      to={category.path}
-                      onClick={() => setIsCategoryMenuOpen(false)}
-                      className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
-                        isActive(category.path)
-                          ? 'text-blue-600 bg-blue-50'
-                          : 'text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      {category.name}
-                    </Link>
-                  ))}
+                  {isCategoryMenuOpen && (
+                    <div className="absolute left-0 mt-2 w-80 bg-white rounded-md shadow-lg py-2 z-50 border border-gray-200">
+                      {/* Search box for categories */}
+                      <div className="px-3 pb-2">
+                        <input
+                          type="text"
+                          placeholder="Search categories..."
+                          value={categorySearch}
+                          onChange={(e) => setCategorySearch(e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </div>
+
+                      {/* Categories Grid */}
+                      <div className="max-h-96 overflow-y-auto px-2">
+                        {filteredCategories.length > 0 ? (
+                          <div className="grid grid-cols-2 gap-1">
+                            {filteredCategories.map((cat) => (
+                              <button
+                                key={cat.category}
+                                onClick={() => handleCategoryClick(cat.category)}
+                                className={`text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                                  location.pathname === `/category/${cat.category}`
+                                    ? 'text-blue-600 bg-blue-50 font-medium'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="capitalize">{cat.category}</span>
+                                  <span className="text-xs text-gray-500 ml-2">({cat.count})</span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                            No categories found
+                          </div>
+                        )}
+                      </div>
+
+                      {/* View All Categories Link */}
+                      {categories.length > 0 && (
+                        <div className="border-t mt-2 pt-2 px-3">
+                          <Link
+                            to="/"
+                            onClick={() => setIsCategoryMenuOpen(false)}
+                            className="block text-sm text-blue-600 hover:text-blue-700 font-medium text-center py-1"
+                          >
+                            View All Products
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
           </nav>
 
           {/* Search Bar */}
-          <div className="hidden lg:flex flex-1 max-w-md mx-8">
-            <form onSubmit={handleSearch} className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </form>
-          </div>
+          {!isAdminPage && (
+            <div className="hidden lg:flex flex-1 max-w-md mx-8">
+              <form onSubmit={handleSearch} className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </form>
+            </div>
+          )}
 
           {/* Right Side */}
           <div className="flex items-center space-x-4">
@@ -146,7 +231,7 @@ export default function Header() {
             </Link>
 
             {/* User Menu */}
-            <div className="relative">
+            <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
@@ -217,41 +302,61 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    isActive(item.path)
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              
-              {/* Mobile Categories */}
-              <div className="pt-2">
-                <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Categories
-                </div>
-                {categories.map((category) => (
-                  <Link
-                    key={category.name}
-                    to={category.path}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                      isActive(category.path)
-                        ? 'text-blue-600 bg-blue-50'
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    {category.name}
-                  </Link>
-                ))}
-              </div>
+              {!isAdminPage && (
+                <>
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                        isActive(item.path)
+                          ? 'text-blue-600 bg-blue-50'
+                          : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                  
+                  {/* Mobile Categories */}
+                  <div className="pt-2">
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Categories
+                    </div>
+                    <div className="px-3 pb-2">
+                      <input
+                        type="text"
+                        placeholder="Search categories..."
+                        value={categorySearch}
+                        onChange={(e) => setCategorySearch(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {filteredCategories.map((cat) => (
+                        <button
+                          key={cat.category}
+                          onClick={() => {
+                            handleCategoryClick(cat.category);
+                            setIsMenuOpen(false);
+                          }}
+                          className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                            location.pathname === `/category/${cat.category}`
+                              ? 'text-blue-600 bg-blue-50'
+                              : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="capitalize">{cat.category}</span>
+                            <span className="text-xs text-gray-500">({cat.count})</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

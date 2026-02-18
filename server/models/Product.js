@@ -15,8 +15,9 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['clothing', 'electronics', 'furniture', 'appliances', 'beauty', 'accessories', 'stationery', 'books', 'sports', 'baby'],
-    required: true
+    required: true,
+    lowercase: true,
+    trim: true
   },
   description: {
     type: String,

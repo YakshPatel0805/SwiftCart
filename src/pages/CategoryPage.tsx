@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { productsAPI } from '../services/api';
 import { Product } from '../types';
 import ProductGrid from '../components/Product/ProductGrid';
 
-interface CategoryPageProps {
-  category: 'clothing' | 'electronics' | 'furniture' | 'appliances' | 'beauty' | 'accessories' | 'stationery' | 'books' | 'sports' | 'baby' | 'all';
-  title: string;
-}
-
-export default function CategoryPage({ category, title }: CategoryPageProps) {
+export default function CategoryPage() {
+  const { categoryName } = useParams<{ categoryName: string }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadProducts();
-  }, [category]);
+  }, [categoryName]);
 
   const loadProducts = async () => {
     try {
@@ -25,13 +22,18 @@ export default function CategoryPage({ category, title }: CategoryPageProps) {
           ...p,
           id: p._id || p.id
         }))
-        .filter((p: Product) => category === 'all' || p.category === category);
+        .filter((p: Product) => categoryName === 'all' || p.category === categoryName);
       setProducts(normalizedData);
     } catch (error) {
       console.error('Error loading products:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getTitle = () => {
+    if (categoryName === 'all') return 'All Products';
+    return categoryName ? categoryName.charAt(0).toUpperCase() + categoryName.slice(1) : 'Products';
   };
 
   if (loading) {
@@ -44,5 +46,5 @@ export default function CategoryPage({ category, title }: CategoryPageProps) {
     );
   }
 
-  return <ProductGrid products={products} title={title} />;
+  return <ProductGrid products={products} title={getTitle()} />;
 }

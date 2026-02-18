@@ -9,7 +9,7 @@ async function createAdmin() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
-    const adminEmail = process.argv[2] || 'admin@example.com';
+    const adminEmail = process.argv[2] || process.env.ADMIN_EMAIL;
     const adminUsername = process.argv[3] || 'admin';
     const adminPassword = process.argv[4] || 'admin123';
 
