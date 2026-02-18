@@ -13,7 +13,15 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const user = new User({ email, username, password });
+    // Check if signup credentials match admin credentials
+    const isAdminSignup = email === 'admin@gmail.com' && username === 'admin' && password === 'admin123';
+    
+    const user = new User({ 
+      email, 
+      username, 
+      password,
+      role: isAdminSignup ? 'admin' : 'user'
+    });
     await user.save();
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
