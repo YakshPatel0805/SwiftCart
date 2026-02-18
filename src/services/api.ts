@@ -215,3 +215,14 @@ export const wishlistAPI = {
     return response.json();
   }
 };
+
+export const contactAPI = {
+  submit: async (contactData: { name: string; email: string; subject: string; message: string }) => {
+    const response = await fetch(`${API_URL}/contact/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contactData)
+    });
+    return response.json();
+  }
+};

@@ -435,3 +435,138 @@ export const sendAdminCancellationNotification = async (order, customerEmail, cu
     return false;
   }
 };
+
+export const sendContactEmail = async (contactData) => {
+  try {
+    const transporter = createTransporter();
+    
+    // Send confirmation email to customer
+    const customerMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: contactData.email,
+      subject: `We received your message - ${contactData.subject}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; }
+            .content { padding: 20px; background-color: #f9fafb; }
+            .message-box { background-color: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #2563eb; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Thank You for Contacting Us!</h1>
+            </div>
+            <div class="content">
+              <p>Hi ${contactData.name},</p>
+              
+              <p>We have received your message and appreciate you reaching out to us. Our support team will review your inquiry and get back to you as soon as possible.</p>
+              
+              <div class="message-box">
+                <h3>Your Message Details:</h3>
+                <p><strong>Subject:</strong> ${contactData.subject}</p>
+                <p><strong>Received:</strong> ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                <p><strong>Your Message:</strong></p>
+                <p style="white-space: pre-wrap; background-color: #f3f4f6; padding: 10px; border-radius: 4px;">${contactData.message}</p>
+              </div>
+              
+              <p><strong>Expected Response Time:</strong> We typically respond within 24-48 business hours.</p>
+              
+              <p>If your inquiry is urgent, please contact us directly:</p>
+              <ul>
+                <li><strong>Email:</strong> support@swiftcart.com</li>
+                <li><strong>Phone:</strong> +1 (555) 123-4567</li>
+                <li><strong>Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM EST</li>
+              </ul>
+            </div>
+            <div class="footer">
+              <p>© 2024 SwiftCart. All rights reserved.</p>
+              <p>This is an automated email. Please do not reply to this message.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    // Send notification email to admin
+    const adminMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      subject: `📧 New Contact Form Submission - ${contactData.subject}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #7c3aed; color: white; padding: 20px; text-align: center; }
+            .content { padding: 20px; background-color: #f9fafb; }
+            .details-box { background-color: white; padding: 20px; margin: 20px 0; border-radius: 8px; }
+            .message-box { background-color: #f3f4f6; padding: 15px; border-radius: 4px; margin: 15px 0; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+            .action-btn { display: inline-block; background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>📧 New Contact Form Submission</h1>
+            </div>
+            <div class="content">
+              <p>A new contact form submission has been received.</p>
+              
+              <div class="details-box">
+                <h3>Customer Information:</h3>
+                <p><strong>Name:</strong> ${contactData.name}</p>
+                <p><strong>Email:</strong> <a href="mailto:${contactData.email}">${contactData.email}</a></p>
+                <p><strong>Subject:</strong> ${contactData.subject}</p>
+                <p><strong>Submitted:</strong> ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+              </div>
+              
+              <div class="details-box">
+                <h3>Message:</h3>
+                <div class="message-box">
+                  ${contactData.message.replace(/\n/g, '<br>')}
+                </div>
+              </div>
+              
+              <p><strong>Action Required:</strong></p>
+              <ul>
+                <li>Review the customer's inquiry</li>
+                <li>Respond to ${contactData.email} within 24-48 hours</li>
+                <li>Mark as resolved once addressed</li>
+              </ul>
+              
+              <a href="mailto:${contactData.email}?subject=Re: ${contactData.subject}" class="action-btn">Reply to Customer</a>
+            </div>
+            <div class="footer">
+              <p>© 2024 SwiftCart Admin Notification</p>
+              <p>This is an automated admin notification.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    // Send both emails
+    await transporter.sendMail(customerMailOptions);
+    console.log('Contact confirmation email sent to:', contactData.email);
+    
+    await transporter.sendMail(adminMailOptions);
+    console.log('Contact notification email sent to admin');
+    
+    return true;
+  } catch (error) {
+    console.error('Error sending contact email:', error);
+    return false;
+  }
+};
