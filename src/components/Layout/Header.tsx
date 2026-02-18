@@ -133,7 +133,6 @@ export default function Header() {
                         : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                     }`}
                   >
-                    <Grid3x3 className="h-4 w-4 mr-1" />
                     Categories
                     <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isCategoryMenuOpen ? 'rotate-180' : ''}`} />
                   </button>

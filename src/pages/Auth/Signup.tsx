@@ -36,7 +36,7 @@ export default function Signup() {
     try {
       const success = await signup(formData.email, formData.username, formData.password);
       if (success) {
-        navigate('/dashboard');
+        navigate('/login');
       } else {
         setError('Username or email already exists');
       }
