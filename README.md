@@ -134,6 +134,35 @@ name,price,image,category,description,rating,reviews,inStock
 Premium T-Shirt,29.99,https://example.com/img.jpg,clothing,Comfortable shirt,4.5,100,true
 ```
 
+## Unit Testing 🚨
+
+The front‑end uses **Vitest + Testing Library** for unit tests.
+
+### Getting started
+1. install dependencies if you haven't already:
+   ```bash
+   npm install -D vitest @testing-library/react \
+     @testing-library/jest-dom @testing-library/user-event jsdom
+   ```
+2. add the new scripts (already present in `package.json`):
+   - `npm run test` – start the interactive runner
+   - `npm run test:coverage` – run once and collect coverage data
+
+Place each component, context, or utility’s tests alongside one another in
+that hierarchy, or next to the implementation (e.g. `ProductCard.test.tsx`
+alongside `ProductCard.tsx`).  The example above shows both patterns.
+
+
+### Example
+See `src/components/Product/ProductCard.test.tsx` for a basic render test
+that wraps the component with the various context providers.
+
+### Tips
+- mock API calls with `vi.mock(...)` or use `msw` for requests
+- add typings for `vi` in `tsconfig.app.json` if needed
+
+---
+
 ## API Endpoints
 
 ### Authentication

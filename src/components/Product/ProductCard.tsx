@@ -1,4 +1,4 @@
-// import React from 'react';
+import React from 'react';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { Product } from '../../types';
 import { useCart } from '../../context/CartContext';
