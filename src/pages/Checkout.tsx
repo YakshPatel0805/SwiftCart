@@ -157,11 +157,12 @@ export default function Checkout() {
                 <form onSubmit={handleShippingSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
                         Full Name
                       </label>
                       <input
                         type="text"
+                        id="fullName"
                         required
                         value={shippingAddress.name}
                         onChange={(e) => setShippingAddress({...shippingAddress, name: e.target.value})}
@@ -169,11 +170,12 @@ export default function Checkout() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                         Email Address
                       </label>
                       <input
                         type="email"
+                        id="email"
                         required
                         value={shippingAddress.email}
                         onChange={(e) => setShippingAddress({...shippingAddress, email: e.target.value})}
@@ -182,11 +184,12 @@ export default function Checkout() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                       Address
                     </label>
                     <input
                       type="text"
+                      id="address"
                       required
                       value={shippingAddress.address}
                       onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
@@ -195,11 +198,12 @@ export default function Checkout() {
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                         City
                       </label>
                       <input
                         type="text"
+                        id="city"
                         required
                         value={shippingAddress.city}
                         onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
@@ -207,11 +211,12 @@ export default function Checkout() {
                       />
                     </div>
                     <div className="col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
                         State
                       </label>
                       <input
                         type="text"
+                        id="state"
                         required
                         value={shippingAddress.state}
                         onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
@@ -219,11 +224,12 @@ export default function Checkout() {
                       />
                     </div>
                     <div className="col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="zipcode" className="block text-sm font-medium text-gray-700 mb-1">
                         ZIP Code
                       </label>
                       <input
                         type="text"
+                        id="zipcode"
                         required
                         value={shippingAddress.zipcode}
                         onChange={(e) => setShippingAddress({...shippingAddress, zipcode: e.target.value})}
@@ -231,10 +237,11 @@ export default function Checkout() {
                       />
                     </div>
                     <div className="col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
                         Country
                       </label>
                       <select
+                        id="country"
                         value={shippingAddress.country}
                         onChange={(e) => setShippingAddress({...shippingAddress, country: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -242,6 +249,8 @@ export default function Checkout() {
                         <option value="United States">United States</option>
                         <option value="Canada">Canada</option>
                         <option value="United Kingdom">United Kingdom</option>
+                        <option value="Australia">Australia</option>
+                        <option value="India">India</option>
                       </select>
                     </div>
                   </div>

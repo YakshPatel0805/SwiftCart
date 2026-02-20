@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 // import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { productsAPI } from '../services/api';
 import { Product } from '../types';
 import { Package, Filter, Search, Edit, Trash2 } from 'lucide-react';

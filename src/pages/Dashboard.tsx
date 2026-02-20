@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ordersAPI } from '../services/api';
+import React from 'react';
 
 export default function Dashboard() {
   const { user } = useAuth();

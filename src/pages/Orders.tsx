@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Package, Truck, CheckCircle, MoreVertical, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
+import React from 'react';
 
 export default function Orders() {
   const navigate = useNavigate();

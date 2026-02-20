@@ -1,4 +1,4 @@
-// import React from 'react';
+import React from 'react';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -78,6 +78,7 @@ export default function Cart() {
 
                     <div className="flex items-center space-x-3">
                       <button
+                        data-testid={`decrease-${item.product.id}`}
                         onClick={() => handleQuantityChange(item.product.id, item.quantity - 1)}
                         className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                       >
@@ -89,6 +90,7 @@ export default function Cart() {
                       </span>
                       
                       <button
+                        data-testid={`increase-${item.product.id}`}
                         onClick={() => handleQuantityChange(item.product.id, item.quantity + 1)}
                         className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                       >
@@ -97,6 +99,7 @@ export default function Cart() {
                     </div>
 
                     <button
+                      data-testid={`remove-${item.product.id}`}
                       onClick={() => removeFromCart(item.product.id)}
                       className="p-2 text-red-600 hover:text-red-800 transition-colors"
                     >

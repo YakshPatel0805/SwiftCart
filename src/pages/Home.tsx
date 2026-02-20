@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Truck, Shield, HeartHandshake } from 'lucide-react';
+import React from 'react';
 
 export default function Home() {
   const navigate = useNavigate();

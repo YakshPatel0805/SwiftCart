@@ -1,4 +1,36 @@
-In "WishlistContext.test.txt" file "addtoWishlist" and "removeFromWishlist" is not passing because of backend response is not giving.
-but here all functions are correct.
+COMPLETE PASSED TESTCASE:
+src -> components
+    -> context
+    -> services
+    -> App.tsx
+    -> Types (No need)
+    -> pages
+        -> About.tsx (No need)
+        -> Terms.tsx (No need)
+        -> Help.tsx (No need)
+        -> Privacy.tsx (No need)
+        -> AdminOrdersView.tsx
+        -> AdminProductsView.tsx
+        -> Cart.tsx
+        -> CategoryPage.tsx
+        -> Contact.tsx
+        -> Dashboard.tsx
+        -> Home.tsx
+        -> Orders.tsx
+        -> Profile.tsx
+        -> SearchReults.tsx
+        -> Wishlist.tsx
+
+
+
+ERROR IN TESTCASE:
+
+1)  src -> context -> WishlistContext
+
+    In "WishlistContext.test.txt" file "addtoWishlist" and "removeFromWishlist" is not passing because of backend response is not giving.
+    but here all functions are correct.
+
+2)  CheckoutPage -> payment information, placeorder
+    in backend functionality is not implemented properly.
 
 

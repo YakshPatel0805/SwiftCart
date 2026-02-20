@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import React from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -27,7 +28,6 @@ import Terms from './pages/Terms.tsx';
 import Wishlist from './pages/Wishlist';
 import ChangePassword from './pages/Auth/ChangePassword.tsx';
 
-// Scroll to top on route change
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -38,7 +38,6 @@ function ScrollToTop() {
   return null;
 }
 
-// Layout wrapper to conditionally render header based on user role
 function AppLayout() {
   const { user } = useAuth();
   
@@ -47,7 +46,6 @@ function AppLayout() {
       {user?.role === 'admin' ? <AdminHeader /> : <Header />}
       <main>
         <Routes>
-          {/* Main Pages */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -60,18 +58,12 @@ function AppLayout() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/change-password" element={<ChangePassword/> } />
 
-          {/* Admin */}
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/admin/products" element={<AdminProductsView />} />
           <Route path="/admin/orders" element={<AdminOrdersView />} />
           
-          {/* Categories - Dynamic route */}
           <Route path="/category/:categoryName" element={<CategoryPage />} />
-          
-          {/* Search */}
           <Route path="/search" element={<SearchResults />} />
-          
-          {/* Info Pages */}
           <Route path="/about" element={<About />} />
           <Route path="/help" element={<Help />} />
           <Route path="/privacy" element={<Privacy />} />

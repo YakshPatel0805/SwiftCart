@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { productsAPI } from '../services/api';
 import { Product } from '../types';
 import ProductGrid from '../components/Product/ProductGrid';
+import React from 'react';
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams();

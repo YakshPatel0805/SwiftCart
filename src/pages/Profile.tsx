@@ -1,6 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import { User, Shield, Mail, Crown } from 'lucide-react';
 import ChangePassword from './Auth/ChangePassword';
+import React from 'react';
 
 export default function Profile() {
   const { user } = useAuth();

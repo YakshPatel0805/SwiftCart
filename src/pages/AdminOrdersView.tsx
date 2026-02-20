@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Package, Truck, CheckCircle, XCircle, Clock, User, Mail, MapPin, Calendar, DollarSign } from 'lucide-react';
 import { ordersAPI } from '../services/api';
+import React from 'react';
 
 export default function AdminOrdersView() {
   const [orders, setOrders] = useState<any[]>([]);

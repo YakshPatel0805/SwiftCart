@@ -60,6 +60,7 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
     }
   };
 
+
   const removeFromWishlist = async (productId: string) => {
     try {
       const data = await wishlistAPI.remove(productId);

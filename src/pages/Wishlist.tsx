@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import React from 'react';
 
 export default function Wishlist() {
   const navigate = useNavigate();
