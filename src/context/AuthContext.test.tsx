@@ -10,6 +10,7 @@ vi.mock('../services/api', () => ({
   authAPI: {
     login: vi.fn(),
     signup: vi.fn(),
+    logout: vi.fn(),
   },
 }))
 
@@ -23,7 +24,7 @@ function TestComponent() {
 
       <button onClick={() => login('test@mail.com', '123456')}>login</button>
       <button onClick={() => signup('new@mail.com', 'newuser', '123456')}>signup</button>
-      <button onClick={logout}>logout</button>
+      <button onClick={() => logout()}>logout</button>
     </div>
   )
 }

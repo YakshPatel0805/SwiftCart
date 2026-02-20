@@ -25,12 +25,18 @@ src -> components
 
 ERROR IN TESTCASE:
 
-1)  src -> context -> WishlistContext
-
-    In "WishlistContext.test.txt" file "addtoWishlist" and "removeFromWishlist" is not passing because of backend response is not giving.
+1.  src -> context -> WishlistContex
+    In "WishlistContext.test.txt" file "addtoWishlist" and "removeFromWishlist" is not passing because of backend response is not recieving.
     but here all functions are correct.
 
-2)  CheckoutPage -> payment information, placeorder
+2.  CheckoutPage -> payment information, placeorder
     in backend functionality is not implemented properly.
 
 
+
+Missing Function
+1. ProductCard.tsx
+2. CardContext.tsx
+
+
+start from api...
