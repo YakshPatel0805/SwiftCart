@@ -1,6 +1,6 @@
-COMPLETE PASSED TESTCASE:
-src ->
-    ->
+COMPLETE PASSED TESTCASE: (FRONTEND)
+src -> product
+    -> 
     -> services
     -> App.tsx
     -> Types (No need)
@@ -16,6 +16,7 @@ src ->
         -> Cart.tsx
         -> CategoryPage.tsx
         -> Contact.tsx
+        -> checkout.tsx
         -> Dashboard.tsx
         -> Home.tsx
         -> Orders.tsx
@@ -31,11 +32,15 @@ ERROR IN TESTCASE:
     In "WishlistContext.test.txt" file "addtoWishlist" and "removeFromWishlist" is not passing because of backend response is not recieving.
     but here all functions are correct.
 
-2.  CheckoutPage -> payment information, placeorder
-    in backend functionality is not implemented properly.
+
 
 
 
 Missing Function
-1. ProductCard.tsx  (components -> product -> ProductCard)
-2. CardContext.tsx  (components -> context -> CardContext)
+1.  CheckoutPage -> payment information, placeorder
+    in backend functionality is not implemented properly.
+
+
+
+
+COMPLETE PASSED TESTCASE: (BACKEND)
