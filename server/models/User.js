@@ -24,12 +24,6 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
-  name: String,
-  address: String,
-  city: String,
-  state: String,
-  zipcode: String,
-  country: String,
   wishlist: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product'

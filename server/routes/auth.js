@@ -2,25 +2,27 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
+import bcrypt from 'bcrypt';
 
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {
   try {
-    const { email, username, password } = req.body;
+    const { email, username, password, role } = req.body;
 
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Check if signup credentials match admin credentials
     const isAdminSignup = email === 'admin@gmail.com' && username === 'admin' && password === 'admin123';
     
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = new User({ 
       email, 
       username, 
-      password,
+      password: hashedPassword,
       role: isAdminSignup ? 'admin' : 'user'
     });
     await user.save();
@@ -52,12 +54,12 @@ router.post('/login', async (req, res) => {
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid Password' });
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    res.json({
+    res.status(200).json({
       token,
       user: {
         id: user._id,

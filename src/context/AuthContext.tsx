@@ -46,11 +46,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
           id: data.user.id,
           email: data.user.email,
           username: data.user.username,
-          role: data.user.role || 'user',
+          role: data.user.role,
         };
         setUser(userProfile);
         localStorage.setItem('user', JSON.stringify(userProfile));
         localStorage.setItem('token', data.token);
+        // console.log('Login successful:', userProfile);
         return true;
       }
       return false;
