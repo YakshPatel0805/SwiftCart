@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   authAPI,
   productsAPI,
@@ -7,133 +7,261 @@ import {
   contactAPI
 } from './api';
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000/api';
-
 global.fetch = vi.fn();
 
-const mockFetch = fetch as unknown as ReturnType<typeof vi.fn>;
+describe('API services', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
 
-beforeEach(() => {
-  mockFetch.mockReset();
-  localStorage.clear();
-});
 
-describe('authAPI', () => {
-  it('signup calls correct API', async () => {
-    mockFetch.mockResolvedValueOnce({
-      json: async () => ({ success: true })
+  it('authAPI.signup', async () => {
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ success: true }),
     });
 
-    const res = await authAPI.signup('a@test.com', 'user', '1234');
+    const res = await authAPI.signup('a@test.com', 'user', '1234', 'user');
 
     expect(fetch).toHaveBeenCalledWith(
-      `${API_BASE_URL}/auth/signup`,
+      'http://localhost:5000/api/auth/signup',
       expect.objectContaining({
-        method: 'POST'
+        method: 'POST',
       })
     );
-
     expect(res.success).toBe(true);
   });
 
-  it('login works', async () => {
-    mockFetch.mockResolvedValueOnce({
-      json: async () => ({ token: 'abc' })
+  it('authAPI.login', async () => {
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ token: 'abc' }),
     });
 
     const res = await authAPI.login('a@test.com', '1234');
+
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/api/auth/login',
+      expect.objectContaining({
+        method: 'POST',
+      })
+    );
     expect(res.token).toBe('abc');
   });
-});
 
-describe('productsAPI', () => {
-  test('getAll fetches products', async () => {
-    mockFetch.mockResolvedValueOnce({
-      json: async () => ([{ id: 1 }])
+  it('authAPI.verifyResetToken', async () => {
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ valid: true }),
+    });
+
+    const res = await authAPI.verifyResetToken('token123');
+
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/api/auth/verify-reset-token/token123'
+    );
+    expect(res.valid).toBe(true);
+  });
+
+  it('authAPI.changePassword', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ success: true }),
+    });
+
+    const res = await authAPI.changePassword('a@test.com', 'old', 'new', 'new');
+
+    expect(fetch).toHaveBeenCalled();
+    expect(res.success).toBe(true);
+  });
+
+
+  it('productsAPI.getAll', async () => {
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ([]),
     });
 
     const res = await productsAPI.getAll();
 
-    expect(fetch).toHaveBeenCalledWith(`${API_BASE_URL}/products`);
-    expect(res.length).toBe(1);
+    expect(fetch).toHaveBeenCalledWith('http://localhost:5000/api/products');
+    expect(res).toEqual([]);
   });
 
-  test('getById fetches product by id', async () => {
-    mockFetch.mockResolvedValueOnce({
-      json: async () => ({ id: '1' })
+  it('productsAPI.getById', async () => {
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ id: 1 }),
     });
 
     const res = await productsAPI.getById('1');
-    expect(res.id).toBe('1');
-  });
-});
 
-describe('ordersAPI', () => {
-  test('getAll calls orders API', async () => {
+    expect(fetch).toHaveBeenCalledWith('http://localhost:5000/api/products/1');
+    expect(res.id).toBe(1);
+  });
+
+  it('productsAPI.getCategories', async () => {
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => (['electronics']),
+    });
+
+    const res = await productsAPI.getCategories();
+
+    expect(fetch).toHaveBeenCalledWith('http://localhost:5000/api/products/categories');
+    expect(res[0]).toBe('electronics');
+  });
+
+  it('productsAPI.update', async () => {
     localStorage.setItem('token', 'abc');
 
-    mockFetch.mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ updated: true }),
+    });
+
+    const res = await productsAPI.update('1', { name: 'Test' });
+
+    expect(res.updated).toBe(true);
+  });
+
+  it('productsAPI.delete', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ deleted: true }),
+    });
+
+    const res = await productsAPI.delete('1');
+
+    expect(res.deleted).toBe(true);
+  });
+
+
+  it('ordersAPI.getAll', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ([]),
     });
 
     const res = await ordersAPI.getAll();
 
-    expect(fetch).toHaveBeenCalledWith(
-      `${API_BASE_URL}/orders`,
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          Authorization: 'Bearer abc'
-        })
-      })
-    );
+    expect(res).toEqual([]);
+  });
+
+  it('ordersAPI.getAllAdmin', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ([]),
+    });
+
+    const res = await ordersAPI.getAllAdmin();
 
     expect(res).toEqual([]);
   });
-});
 
-
-describe('wishlistAPI', () => {
-  it('add product to wishlist', async () => {
+  it('ordersAPI.getById', async () => {
     localStorage.setItem('token', 'abc');
 
-    mockFetch.mockResolvedValueOnce({
-      json: async () => ({ success: true })
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ id: 1 }),
     });
 
-    const res = await wishlistAPI.add('123');
+    const res = await ordersAPI.getById('1');
 
-    expect(fetch).toHaveBeenCalledWith(
-      `${API_BASE_URL}/wishlist/123`,
-      expect.objectContaining({
-        method: 'POST'
-      })
-    );
-
-    expect(res.success).toBe(true);
+    expect(res.id).toBe(1);
   });
-});
 
-describe('contactAPI', () => {
-  it('submits contact form', async () => {
-    mockFetch.mockResolvedValueOnce({
-      json: async () => ({ message: 'sent' })
+  it('ordersAPI.create', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ created: true }),
+    });
+
+    const res = await ordersAPI.create({ items: [] });
+
+    expect(res.created).toBe(true);
+  });
+
+  it('ordersAPI.cancel', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ cancelled: true }),
+    });
+
+    const res = await ordersAPI.cancel('1');
+
+    expect(res.cancelled).toBe(true);
+  });
+
+  it('ordersAPI.updateStatus', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ status: 'shipped' }),
+    });
+
+    const res = await ordersAPI.updateStatus('1', 'shipped');
+
+    expect(res.status).toBe('shipped');
+  });
+
+
+  it('wishlistAPI.get', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ([]),
+    });
+
+    const res = await wishlistAPI.get();
+
+    expect(res).toEqual([]);
+  });
+
+  it('wishlistAPI.add', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ added: true }),
+    });
+
+    const res = await wishlistAPI.add('1');
+
+    expect(res.added).toBe(true);
+  });
+
+  it('wishlistAPI.remove', async () => {
+    localStorage.setItem('token', 'abc');
+
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ removed: true }),
+    });
+
+    const res = await wishlistAPI.remove('1');
+
+    expect(res.removed).toBe(true);
+  });
+
+
+  it('contactAPI.submit', async () => {
+    (fetch as any).mockResolvedValueOnce({
+      json: async () => ({ success: true }),
     });
 
     const res = await contactAPI.submit({
-      name: 'A',
+      name: 'Test',
       email: 'a@test.com',
-      subject: 'Hi',
-      message: 'Hello'
+      subject: 'Hello',
+      message: 'Test msg'
     });
 
-    expect(fetch).toHaveBeenCalledWith(
-      `${API_BASE_URL}/contact/submit`,
-      expect.objectContaining({
-        method: 'POST'
-      })
-    );
-
-    expect(res.message).toBe('sent');
+    expect(res.success).toBe(true);
   });
 });

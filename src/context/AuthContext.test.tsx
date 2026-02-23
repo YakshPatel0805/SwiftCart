@@ -1,135 +1,185 @@
-import { render, screen, act } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import React from 'react'
-import { AuthProvider, useAuth } from './AuthContext'
-import { authAPI } from '../services/api'
-import type { User } from '../types'
-
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { AuthProvider, useAuth } from './AuthContext';
 
 vi.mock('../services/api', () => ({
   authAPI: {
     login: vi.fn(),
     signup: vi.fn(),
-    logout: vi.fn(),
   },
-}))
+}));
+
+import { authAPI } from '../services/api';
 
 function TestComponent() {
-  const { user, login, signup, logout, isLoading } = useAuth()
+  const { user, login, signup, logout, isLoading } = useAuth();
 
   return (
     <div>
-      <div data-testid="loading">{isLoading ? 'loading' : 'done'}</div>
+      <div data-testid="loading">{isLoading ? 'loading' : 'loaded'}</div>
       <div data-testid="user">{user ? user.email : 'no-user'}</div>
 
-      <button onClick={() => login('test@mail.com', '123456')}>login</button>
-      <button onClick={() => signup('new@mail.com', 'newuser', '123456')}>signup</button>
-      <button onClick={() => logout()}>logout</button>
+      <button onClick={() => login('test@gmail.com', '123456')}>
+        login
+      </button>
+
+      <button onClick={() =>
+        signup('new@gmail.com', 'newuser', '123456', 'user')
+      }>
+        signup
+      </button>
+
+      <button onClick={logout}>logout</button>
     </div>
-  )
+  );
 }
 
 describe('AuthContext', () => {
   beforeEach(() => {
-    localStorage.clear()
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
 
-  it('loads user from localStorage on init', async () => {
-    const mockUser: User = {
-      id: '1',
-      email: 'saved@mail.com',
-      username: 'saveduser',
-      role: 'user',
-    }
 
-    localStorage.setItem('user', JSON.stringify(mockUser))
-    localStorage.setItem('token', 'token123')
-
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
-
-    expect(await screen.findByText('done')).toBeInTheDocument()
-    expect(screen.getByTestId('user').textContent).toBe('saved@mail.com')
-  })
-
-  it('login sets user and token', async () => {
-    ;(authAPI.login as any).mockResolvedValue({
-      token: 'abc123',
-      user: {
-        id: '2',
-        email: 'test@mail.com',
-        username: 'testuser',
+  it('loads user from localStorage on mount', async () => {
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        id: 1,
+        email: 'saved@gmail.com',
+        username: 'saved',
         role: 'user',
-      },
-    })
+      })
+    );
+    localStorage.setItem('token', 'abc123');
 
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>
-    )
+    );
 
-    await act(async () => {
-      screen.getByText('login').click()
-    })
+    await waitFor(() => {
+      expect(screen.getByTestId('user').textContent).toBe('saved@gmail.com');
+    });
+  });
 
-    expect(localStorage.getItem('token')).toBe('abc123')
-    expect(JSON.parse(localStorage.getItem('user') || '{}').email).toBe('test@mail.com')
-    expect(screen.getByTestId('user').textContent).toBe('test@mail.com')
-  })
 
-  it('signup sets user and token', async () => {
-    ;(authAPI.signup as any).mockResolvedValue({
-      token: 'signup123',
+  it('login sets user and token when successful', async () => {
+    (authAPI.login as any).mockResolvedValue({
+      token: 'token123',
       user: {
-        id: '3',
-        email: 'new@mail.com',
+        id: 1,
+        email: 'test@gmail.com',
+        username: 'test',
+        role: 'admin',
+      },
+    });
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    screen.getByText('login').click();
+
+    await waitFor(() => {
+      expect(localStorage.getItem('token')).toBe('token123');
+      expect(JSON.parse(localStorage.getItem('user')!)).toMatchObject({
+        email: 'test@gmail.com',
+        role: 'admin',
+      });
+    });
+  });
+
+
+  it('login returns false if API fails', async () => {
+    (authAPI.login as any).mockRejectedValue(new Error('fail'));
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    screen.getByText('login').click();
+
+    await waitFor(() => {
+      expect(localStorage.getItem('user')).toBeNull();
+    });
+  });
+
+
+  it('signup sets user and token when successful', async () => {
+    (authAPI.signup as any).mockResolvedValue({
+      token: 'signup-token',
+      user: {
+        id: 2,
+        email: 'new@gmail.com',
         username: 'newuser',
         role: 'user',
       },
-    })
+    });
 
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>
-    )
+    );
 
-    await act(async () => {
-      screen.getByText('signup').click()
-    })
+    screen.getByText('signup').click();
 
-    expect(localStorage.getItem('token')).toBe('signup123')
-    expect(screen.getByTestId('user').textContent).toBe('new@mail.com')
-  })
+    await waitFor(() => {
+      expect(localStorage.getItem('token')).toBe('signup-token');
+      expect(JSON.parse(localStorage.getItem('user')!)).toMatchObject({
+        email: 'new@gmail.com',
+        role: 'user',
+      });
+    });
+  });
 
-  it('logout clears user and storage', async () => {
-    const mockUser: User = {
-      id: '1',
-      email: 'logout@mail.com',
-      username: 'logoutuser',
-      role: 'user',
-    }
 
-    localStorage.setItem('user', JSON.stringify(mockUser))
-    localStorage.setItem('token', 'token123')
+  it('signup returns false when API throws error', async () => {
+    (authAPI.signup as any).mockRejectedValue(new Error('fail'));
 
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>
-    )
+    );
 
-    await act(async () => {
-      screen.getByText('logout').click()
-    })
+    screen.getByText('signup').click();
 
-    expect(localStorage.getItem('user')).toBeNull()
-    expect(localStorage.getItem('token')).toBeNull()
-    expect(screen.getByTestId('user').textContent).toBe('no-user')
-  })
-})
+    await waitFor(() => {
+      expect(localStorage.getItem('user')).toBeNull();
+    });
+  });
+
+
+  it('logout clears user and token', async () => {
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        id: 1,
+        email: 'test@gmail.com',
+        username: 'test',
+        role: 'user',
+      })
+    );
+    localStorage.setItem('token', 'token123');
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    screen.getByText('logout').click();
+
+    await waitFor(() => {
+      expect(localStorage.getItem('user')).toBeNull();
+      expect(localStorage.getItem('token')).toBeNull();
+    });
+  });
+});

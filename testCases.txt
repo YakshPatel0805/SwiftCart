@@ -1,10 +1,12 @@
 COMPLETE PASSED TESTCASE:
-src -> components
-    -> context
+src ->
+    ->
     -> services
     -> App.tsx
     -> Types (No need)
     -> pages
+        -> pages -> Admin
+        -> pages -> Auth
         -> About.tsx (No need)
         -> Terms.tsx (No need)
         -> Help.tsx (No need)
@@ -35,8 +37,5 @@ ERROR IN TESTCASE:
 
 
 Missing Function
-1. ProductCard.tsx
-2. CardContext.tsx
-
-
-start from api...
+1. ProductCard.tsx  (components -> product -> ProductCard)
+2. CardContext.tsx  (components -> context -> CardContext)

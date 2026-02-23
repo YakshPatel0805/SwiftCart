@@ -30,7 +30,6 @@ export default function ChangePassword() {
     setIsLoading(true);
 
     try {
-      // Trim whitespace from inputs
       const email = formData.email.trim();
       const oldPassword = formData.oldPassword.trim();
       const newPassword = formData.newPassword.trim();

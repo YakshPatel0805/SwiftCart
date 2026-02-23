@@ -17,7 +17,11 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const isAdminUser = (email: string, username: string) => {
+    return email === 'admin@gmail.com' && username === 'admin';
+  };
+
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -34,7 +38,17 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      const success = await signup(formData.email, formData.username, formData.password);
+      const role = isAdminUser(formData.email, formData.username)
+        ? 'admin'
+        : 'user';
+
+      const success = await signup(
+        formData.email,
+        formData.username,
+        formData.password,
+        role
+      );
+
       if (success) {
         navigate('/login');
       } else {

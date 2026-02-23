@@ -71,9 +71,9 @@ export default function AdminPanel() {
 
   const downloadTemplate = () => {
     const csvContent = `name,price,image,category,description,rating,reviews,inStock
-Sample T-Shirt,29.99,https://example.com/image.jpg,clothing,A comfortable cotton t-shirt,4.5,100,true
-Sample Laptop,999.99,https://example.com/laptop.jpg,electronics,Powerful laptop for work,4.7,50,true
-Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office chair,4.3,75,true`;
+                        Sample T-Shirt,29.99,https://example.com/image.jpg,clothing,A comfortable cotton t-shirt,4.5,100,true
+                        Sample Laptop,999.99,https://example.com/laptop.jpg,electronics,Powerful laptop for work,4.7,50,true
+                        Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office chair,4.3,75,true`;
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -157,12 +157,13 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
             {showAddProduct && (
               <form onSubmit={handleAddProduct} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label  htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-1">
                     Product Name *
                   </label>
                   <input
                     type="text"
                     required
+                    id = "productName"
                     value={productForm.name}
                     onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -172,12 +173,13 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor='productPrice' className="block text-sm font-medium text-gray-700 mb-1">
                       Price *
                     </label>
                     <input
                       type="number"
                       step="0.01"
+                      id='productPrice'
                       required
                       value={productForm.price}
                       onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
@@ -187,12 +189,13 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor='productCategory' className="block text-sm font-medium text-gray-700 mb-1">
                       Category *
                     </label>
                     <input
                       type="text"
                       required
+                      id='productCategory'
                       value={productForm.category}
                       onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -202,12 +205,13 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor='productImage' className="block text-sm font-medium text-gray-700 mb-1">
                     Image URL *
                   </label>
                   <input
                     type="url"
                     required
+                    id='productImage'
                     value={productForm.image}
                     onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -216,12 +220,13 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor='productDescription' className="block text-sm font-medium text-gray-700 mb-1">
                     Description *
                   </label>
                   <textarea
                     required
                     rows={3}
+                    id='productDescription'
                     value={productForm.description}
                     onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -231,7 +236,7 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor='productRating' className="block text-sm font-medium text-gray-700 mb-1">
                       Rating
                     </label>
                     <input
@@ -239,6 +244,7 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
                       step="0.1"
                       min="0"
                       max="5"
+                      id='productRating'
                       value={productForm.rating}
                       onChange={(e) => setProductForm({ ...productForm, rating: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -246,12 +252,13 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor='productReviews' className="block text-sm font-medium text-gray-700 mb-1">
                       Reviews
                     </label>
                     <input
                       type="number"
                       min="0"
+                      id='productReviews'
                       value={productForm.reviews}
                       onChange={(e) => setProductForm({ ...productForm, reviews: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -259,10 +266,11 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor='productInStock' className="block text-sm font-medium text-gray-700 mb-1">
                       In Stock
                     </label>
                     <select
+                      id='productInStock'
                       value={productForm.inStock ? 'true' : 'false'}
                       onChange={(e) => setProductForm({ ...productForm, inStock: e.target.value === 'true' })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -295,16 +303,16 @@ Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office cha
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center mb-4">
               <Upload className="h-6 w-6 text-blue-600 mr-2" />
-              <h2 className="text-xl font-semibold text-gray-900">Upload Products via CSV</h2>
+              <h2 id="upload-products" className="text-xl font-semibold text-gray-900">Upload Products</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2"  htmlFor="csvFile">
                   Select CSV File
                 </label>
                 <input
-                  id="csv-upload"
+                  id="csvFile"
                   type="file"
                   accept=".csv"
                   onChange={handleFileChange}

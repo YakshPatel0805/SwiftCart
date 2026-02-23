@@ -21,16 +21,21 @@ export default function Login() {
 
     try {
       const result = await login(formData.email, formData.password);
+
       if (result) {
-        // Get user from localStorage to check role
         const userStr = localStorage.getItem('user');
         const user = userStr ? JSON.parse(userStr) : null;
-        // Redirect admin to admin panel, regular users to dashboard
-        navigate(user?.role === 'admin' ? '/admin' : '/dashboard');
+      
+        if (user?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setError('Invalid email or password');
       }
-    } catch (err) {
+    } 
+    catch (err) {
       setError('An error occurred during login');
     } finally {
       setIsLoading(false);
