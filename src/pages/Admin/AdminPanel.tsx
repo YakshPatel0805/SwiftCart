@@ -258,11 +258,10 @@ export default function AdminPanel() {
                       Reviews
                     </label>
                     <input
-                      type="number"
-                      min="0"
+                      type="object"
                       id='productReviews'
                       // value={productForm.reviews}
-                      onChange={(e) => setProductForm({ ...productForm, reviews: e.target.value })}
+                      // onChange={(e) => setProductForm({ ...productForm, reviews: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
