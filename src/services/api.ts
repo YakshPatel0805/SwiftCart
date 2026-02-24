@@ -9,13 +9,17 @@ const getAuthHeaders = () => {
 };
 
 export const authAPI = {
-  signup: async (email: string, username: string, password: string, role:string) => {
+  signup: async (email: string, username: string, password: string, role: string) => {
     const response = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, username, password, role })
     });
-    return response.json();
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    }
+    return data;
   },
 
   login: async (email: string, password: string) => {
@@ -24,7 +28,11 @@ export const authAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-    return response.json();
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    }
+    return data;
   },
 
   verifyResetToken: async (token: string) => {
@@ -58,6 +66,31 @@ export const productsAPI = {
     return response.json();
   },
 
+  uploadCSV: async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/products/upload-csv`, {
+        method: 'POST',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Products API uploadCSV error:', error);
+      throw error;
+    }
+  },
+
   update: async (id: string, productData: any) => {
     try {
       const response = await fetch(`${API_URL}/products/${id}`, {
@@ -65,13 +98,10 @@ export const productsAPI = {
         headers: getAuthHeaders(),
         body: JSON.stringify(productData)
       });
-      
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
-      
       return data;
     } catch (error) {
       console.error('Products API update error:', error);
@@ -85,13 +115,10 @@ export const productsAPI = {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
-      
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
-      
       return data;
     } catch (error) {
       console.error('Products API delete error:', error);
@@ -106,11 +133,9 @@ export const ordersAPI = {
       const response = await fetch(`${API_URL}/orders`, {
         headers: getAuthHeaders()
       });
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       return response.json();
     } catch (error) {
       console.error('Orders API getAll error:', error);
@@ -123,11 +148,9 @@ export const ordersAPI = {
       const response = await fetch(`${API_URL}/orders/admin/all`, {
         headers: getAuthHeaders()
       });
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       return response.json();
     } catch (error) {
       console.error('Orders API getAllAdmin error:', error);
@@ -149,13 +172,10 @@ export const ordersAPI = {
         headers: getAuthHeaders(),
         body: JSON.stringify(orderData)
       });
-      
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
-      
       return data;
     } catch (error) {
       console.error('Orders API create error:', error);
@@ -169,13 +189,10 @@ export const ordersAPI = {
         method: 'PATCH',
         headers: getAuthHeaders()
       });
-      
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
-      
       return data;
     } catch (error) {
       console.error('Orders API cancel error:', error);
@@ -190,13 +207,10 @@ export const ordersAPI = {
         headers: getAuthHeaders(),
         body: JSON.stringify({ status })
       });
-      
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
-      
       return data;
     } catch (error) {
       console.error('Orders API updateStatus error:', error);

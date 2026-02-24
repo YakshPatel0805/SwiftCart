@@ -3,13 +3,7 @@ export interface User {
   email: string;
   username: string;
   role?: 'user' | 'admin';
-  name?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipcode?: string;
-  country?: string;
-  wishlist?: string[];
+  wishlist?: Product[];
 }
 
 export interface Product {

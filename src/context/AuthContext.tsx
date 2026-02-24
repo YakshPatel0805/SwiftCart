@@ -5,7 +5,7 @@ import { authAPI } from '../services/api';
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, username: string, password: string, role:string) => Promise<boolean>;
+  signup: (email: string, username: string, password: string, role: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const data = await authAPI.login(email, password);
-      
+
       if (data.token && data.user) {
         const userProfile: User = {
           id: data.user.id,
@@ -51,7 +51,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(userProfile);
         localStorage.setItem('user', JSON.stringify(userProfile));
         localStorage.setItem('token', data.token);
-        // console.log('Login successful:', userProfile);
         return true;
       }
       return false;
@@ -61,23 +60,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const signup = async (email: string, username: string, password: string, role: string): Promise<boolean> => {
+  const signup = async (
+    email: string,
+    username: string,
+    password: string,
+    role: string
+  ): Promise<boolean> => {
     try {
       const data = await authAPI.signup(email, username, password, role);
-      
-      if (data.token && data.user) {
-        const userProfile: User = {
-          id: data.user.id,
-          email: data.user.email,
-          username: data.user.username,
-          role: data.user.role,
-        };
-        setUser(userProfile);
-        localStorage.setItem('user', JSON.stringify(userProfile));
-        localStorage.setItem('token', data.token);
-        return true;
-      }
-      return false;
+      return data.success === true;
     } catch (error) {
       console.error('Signup error:', error);
       return false;

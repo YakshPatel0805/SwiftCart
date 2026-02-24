@@ -25,7 +25,7 @@ export default function Login() {
       if (result) {
         const userStr = localStorage.getItem('user');
         const user = userStr ? JSON.parse(userStr) : null;
-      
+
         if (user?.role === 'admin') {
           navigate('/admin');
         } else {
@@ -34,8 +34,7 @@ export default function Login() {
       } else {
         setError('Invalid email or password');
       }
-    } 
-    catch (err) {
+    } catch (err) {
       setError('An error occurred during login');
     } finally {
       setIsLoading(false);
@@ -122,28 +121,14 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <button
-                  type="button"
-                  onClick={() => navigate('/change-password')}
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
-                  Forgot your password?
-                </button>
-              </div>
+            <div className="text-sm justify-end flex">
+              <button
+                type="button"
+                onClick={() => navigate('/change-password')}
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Forgot your password?
+              </button>
             </div>
 
             <div>

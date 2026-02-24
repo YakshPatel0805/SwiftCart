@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, Package, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { productsAPI } from '../../services/api';
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function AdminPanel() {
     category: '',
     description: '',
     rating: '0',
-    reviews: '0',
+    reviews: {},
     inStock: true
   });
 
@@ -42,6 +43,7 @@ export default function AdminPanel() {
       formData.append('file', file);
 
       const token = localStorage.getItem('token');
+      // const result = await productsAPI.uploadCSV(file);
       const response = await fetch('http://localhost:5000/api/products/upload-csv', {
         method: 'POST',
         headers: {
@@ -57,7 +59,7 @@ export default function AdminPanel() {
         setUploadResult(data);
         setFile(null);
         
-        const fileInput = document.getElementById('csv-upload') as HTMLInputElement;
+        const fileInput = document.getElementById('csvFile') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
       } else {
         setMessage({ type: 'error', text: data.message || 'Upload failed' });
@@ -101,7 +103,7 @@ export default function AdminPanel() {
           ...productForm,
           price: parseFloat(productForm.price),
           rating: parseFloat(productForm.rating),
-          reviews: parseInt(productForm.reviews)
+          reviews: productForm.reviews,
         })
       });
 
@@ -116,7 +118,7 @@ export default function AdminPanel() {
           category: '',
           description: '',
           rating: '0',
-          reviews: '0',
+          reviews: {},
           inStock: true
         });
         setShowAddProduct(false);
@@ -259,7 +261,7 @@ export default function AdminPanel() {
                       type="number"
                       min="0"
                       id='productReviews'
-                      value={productForm.reviews}
+                      // value={productForm.reviews}
                       onChange={(e) => setProductForm({ ...productForm, reviews: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -327,7 +329,6 @@ export default function AdminPanel() {
 
               <button
                 onClick={handleUpload}
-                disabled={!file || uploading}
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {uploading ? 'Uploading...' : 'Upload Products'}

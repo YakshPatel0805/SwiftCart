@@ -79,9 +79,12 @@ export default function ProductCard({ product }: ProductCardProps) {
               />
             ))}
           </div>
-          <span className="text-sm text-gray-600 ml-2">
-            ({product.reviews} reviews)
+          <div>
+            <span className="text-sm text-gray-600 ml-2">
+            ({Object.keys(product.reviews || {}).length} reviews)
           </span>
+          </div>
+          
         </div>
         
         <div className="flex items-center justify-between">

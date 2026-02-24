@@ -54,76 +54,160 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-router.post('/upload-csv', authenticateToken, isAdmin, upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
+// router.post('/upload-csv', authenticateToken, isAdmin, upload.single('file'), async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ message: 'No file uploaded' });
+//     }
 
-    const products = [];
-    const errors = [];
-    
-    const stream = Readable.from(req.file.buffer.toString());
-    
-    stream
-      .pipe(csv())
-      .on('data', (row) => {
-        try {
-          const product = {
-            name: row.name || row.Name,
-            price: parseFloat(row.price || row.Price),
-            image: row.image || row.Image,
-            category: (row.category || row.Category).toLowerCase().trim(),
-            description: row.description || row.Description,
-            rating: parseFloat(row.rating || row.Rating || 0),
-            reviews: parseInt(row.reviews || row.Reviews || 0),
-            inStock: (row.inStock || row.InStock || 'true').toLowerCase() === 'true'
-          };
+//     const products = [];
+//     const errors = [];
 
-          if (!product.name || !product.price || !product.image || !product.description || !product.category) {
-            errors.push(`Missing required fields for product: ${product.name || 'Unknown'}`);
-            return;
+//     const stream = Readable.from(req.file.buffer);
+//     stream
+//       .pipe(csv())
+//       .on('data', (row) => {
+//         try {
+//           const product = {
+//             name: row.name || row.Name,
+//             price: parseFloat(row.price || row.Price),
+//             image: row.image || row.Image,
+//             category: row.category || row.Category || '',
+//             description: row.description || row.Description,
+//             rating: parseFloat(row.rating || row.Rating || 0),
+//             reviews: {}, // Object to hold reviews, can be extended later
+//             inStock: (row.inStock || row.InStock || 'true').toLowerCase() === 'true'
+//           };
+
+//           if (!product.name || isNaN(product.price) || !product.image || !product.description || !product.category){
+//             errors.push(`Missing required fields for product: ${product.name || 'Unknown'}`);
+//             return;
+//           }
+
+//           products.push(product);
+//         } catch (error) {
+//           errors.push(`Error parsing row: ${error.message}`);
+//         }
+//       })
+//       .on('end', async () => {
+//         try {
+//           if (products.length === 0) {
+//             return res.status(400).json({ 
+//               message: 'No valid products found in CSV',
+//               errors 
+//             });
+//           }
+
+//           const savedProducts = await Product.insertMany(products);
+
+//           res.json({
+//             message: `Successfully uploaded ${savedProducts.length} products`,
+//             count: savedProducts.length,
+//             products: savedProducts,
+//             errors: errors.length > 0 ? errors : undefined
+//           });
+//         } catch (error) {
+//           res.status(500).json({ 
+//             message: 'Error saving products to database', 
+//             error: error.message 
+//           });
+//         }
+//       })
+//       .on('error', (error) => {
+//         res.status(500).json({ 
+//           message: 'Error parsing CSV file', 
+//           error: error.message 
+//         });
+//       });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Server error', error: error.message });
+//   }
+// });
+
+router.post(
+  '/upload-csv',
+  authenticateToken,
+  isAdmin,
+  upload.single('file'),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+
+      const products = [];
+      const errors = [];
+
+      const stream = Readable.from(req.file.buffer);
+
+      stream
+        .pipe(csv())
+        .on('data', (row) => {
+          try {
+            const rawCategory = row.category || row.Category || '';
+
+            const product = {
+              name: row.name || row.Name,
+              price: parseFloat(row.price || row.Price),
+              image: row.image || row.Image,
+              category: rawCategory.toLowerCase().trim(),
+              description: row.description || row.Description,
+              rating: parseFloat(row.rating || row.Rating || 0),
+              reviews: {},
+              inStock: String(row.inStock || row.InStock || 'true').toLowerCase() === 'true'
+            };
+
+            if (
+              !product.name ||
+              isNaN(product.price) ||
+              !product.image ||
+              !product.description ||
+              !product.category
+            ) {
+              errors.push(`Missing/invalid fields for product: ${product.name || 'Unknown'}`);
+              return;
+            }
+
+            products.push(product);
+          } catch (err) {
+            errors.push(`Row error: ${err.message}`);
           }
+        })
+        .on('end', async () => {
+          try {
+            if (products.length === 0) {
+              return res.status(400).json({
+                message: 'No valid products found in CSV',
+                errors
+              });
+            }
 
-          products.push(product);
-        } catch (error) {
-          errors.push(`Error parsing row: ${error.message}`);
-        }
-      })
-      .on('end', async () => {
-        try {
-          if (products.length === 0) {
-            return res.status(400).json({ 
-              message: 'No valid products found in CSV',
-              errors 
+            const savedProducts = await Product.insertMany(products);
+
+            res.json({
+              message: `Successfully uploaded ${savedProducts.length} products`,
+              count: savedProducts.length,
+              products: savedProducts,
+              errors: errors.length ? errors : undefined
+            });
+          } catch (error) {
+            res.status(500).json({
+              message: 'Error saving products to database',
+              error: error.message
             });
           }
-
-          const savedProducts = await Product.insertMany(products);
-          
-          res.json({
-            message: `Successfully uploaded ${savedProducts.length} products`,
-            count: savedProducts.length,
-            products: savedProducts,
-            errors: errors.length > 0 ? errors : undefined
+        })
+        .on('error', (error) => {
+          res.status(500).json({
+            message: 'Error parsing CSV file',
+            error: error.message
           });
-        } catch (error) {
-          res.status(500).json({ 
-            message: 'Error saving products to database', 
-            error: error.message 
-          });
-        }
-      })
-      .on('error', (error) => {
-        res.status(500).json({ 
-          message: 'Error parsing CSV file', 
-          error: error.message 
         });
-      });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
   }
-});
+);
 
 router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
@@ -132,11 +216,11 @@ router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
-    
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    
+
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -146,11 +230,11 @@ router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
 router.delete('/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    
+
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

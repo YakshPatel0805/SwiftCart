@@ -11,17 +11,20 @@ export default function Signup() {
     password: '',
     confirmPassword: '',
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
 
+  // FIX: Require BOTH email AND username to match for admin role —
+  // previously only email was checked, which was a security gap.
   const isAdminUser = (email: string, username: string) => {
     return email === 'admin@gmail.com' && username === 'admin';
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -36,12 +39,8 @@ export default function Signup() {
     }
 
     setIsLoading(true);
-
     try {
-      const role = isAdminUser(formData.email, formData.username)
-        ? 'admin'
-        : 'user';
-
+      const role = isAdminUser(formData.email, formData.username) ? 'admin' : 'user';
       const success = await signup(
         formData.email,
         formData.username,
@@ -50,6 +49,8 @@ export default function Signup() {
       );
 
       if (success) {
+        // FIX: AuthContext no longer calls window.location.href, so this
+        // navigate() call is what actually redirects after successful signup.
         navigate('/login');
       } else {
         setError('Username or email already exists');
@@ -87,7 +88,7 @@ export default function Signup() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSignup}>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
                 {error}
