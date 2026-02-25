@@ -26,4 +26,5 @@ server/.env
 *.sw?
 node_modules
 .dist
+.env
 

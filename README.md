@@ -20,7 +20,7 @@ Full-stack e-commerce application with React frontend and Node.js/Express backen
 
 - Node.js (v16 or higher)
 - MongoDB (local or MongoDB Atlas)
-- npm or yarn
+- npm
 
 ## Setup Instructions
 
@@ -34,24 +34,20 @@ npm install
 Create a `.env` file in the server directory:
 
 ```env
-MONGODB_URI=mongodb://localhost:27017/ecommerce
+MONGODB_URI=mongodb://localhost:27017/database-name
 JWT_SECRET=your_secure_jwt_secret_key_here
 PORT=5000
 
 # Email Configuration (for order notifications)
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-app-password
-```
-
-For MongoDB Atlas, use your connection string:
-```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ecommerce
+ADMIN_EMAIL = your-admin-email@gmail.com
 ```
 
 #### Email Setup (Gmail)
 
 1. Enable 2-Step Verification on your Google Account
-2. Generate an App Password at https://myaccount.google.com/apppasswords
+2. Generate an App Password at https://myaccount.google.com/app-passwords
 3. Use the App Password in EMAIL_PASSWORD (not your regular password)
 4. Set ADMIN_EMAIL to the email address where you want to receive admin notifications
 
@@ -66,7 +62,7 @@ npm run create-admin
 
 Or with custom credentials:
 ```bash
-npm run create-admin admin@example.com admin admin123
+npm run create-admin admin@gmail.com admin admin123
 ```
 
 This creates an admin user who can upload products via CSV.
@@ -91,7 +87,7 @@ npm run seed
 
 ```bash
 cd server
-npm run dev
+npm start
 ```
 
 Server will run on http://localhost:5000
@@ -125,13 +121,13 @@ Required columns:
 
 Optional columns:
 - `rating` - Rating 0-5 (default: 0)
-- `reviews` - Number of reviews (default: 0)
+- `reviews` - Product Reviews
 - `inStock` - true/false (default: true)
 
 Example CSV:
 ```csv
 name,price,image,category,description,rating,reviews,inStock
-Premium T-Shirt,29.99,https://example.com/img.jpg,clothing,Comfortable shirt,4.5,100,true
+Premium T-Shirt,29.99,https://example.com/img.jpg,clothing,Comfortable shirt,4.5,good quality,true
 ```
 
 ## Unit Testing 🚨
@@ -240,7 +236,7 @@ See `server/EMAIL_COMPLETE_GUIDE.md` for detailed setup instructions.
 - Cancel orders (before shipping)
 
 ### Admin
-- All user permissions
+- All user permissions except cancel order
 - Access to Admin Panel
 - Upload products via CSV
 - Add/Edit/Delete products
@@ -261,7 +257,7 @@ See `server/EMAIL_COMPLETE_GUIDE.md` for detailed setup instructions.
 - name
 - price
 - image
-- category (clothing, electronics, furniture, appliances, beauty, accessories, stationery, books, sports, baby)
+- category 
 - description
 - rating
 - reviews
