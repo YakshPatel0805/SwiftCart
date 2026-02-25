@@ -9,7 +9,6 @@ import { isAdmin } from '../middleware/adminAuth.js';
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
-// Get all unique categories with product counts
 router.get('/categories', async (req, res) => {
   try {
     const categories = await Product.aggregate([
@@ -153,7 +152,7 @@ router.post(
               category: rawCategory.toLowerCase().trim(),
               description: row.description || row.Description,
               rating: parseFloat(row.rating || row.Rating || 0),
-              reviews: {},
+              reviews: row.reviews || row.Reviews || '', // Store reviews as a string, can be extended to an object later
               inStock: String(row.inStock || row.InStock || 'true').toLowerCase() === 'true'
             };
 

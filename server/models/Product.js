@@ -28,8 +28,8 @@ const productSchema = new mongoose.Schema({
     default: 0
   },
   reviews: {
-    type: Object,
-    default: {}
+    type: String,
+    default: ""
   },
   inStock: {
     type: Boolean,

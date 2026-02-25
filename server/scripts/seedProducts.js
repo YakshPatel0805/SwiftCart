@@ -12,7 +12,7 @@ const products = [
     category: 'clothing',
     description: 'Comfortable and stylish cotton t-shirt perfect for everyday wear.',
     rating: 4.5,
-    reviews: 128,
+    reviews: 'Good quality and comfortable fit.',
     inStock: true,
   },
   {
@@ -22,7 +22,7 @@ const products = [
     category: 'clothing',
     description: 'High-quality denim jeans with a perfect fit and modern design.',
     rating: 4.7,
-    reviews: 89,
+    reviews: 'Great fit and durable material.',
     inStock: true,
   },
   {
@@ -32,7 +32,7 @@ const products = [
     category: 'clothing',
     description: 'Beautiful and elegant dress suitable for special occasions.',
     rating: 4.8,
-    reviews: 67,
+    reviews: 'Beautiful and elegant dress suitable for special occasions.',
     inStock: true,
   },
   {
@@ -42,7 +42,7 @@ const products = [
     category: 'clothing',
     description: 'Cozy and comfortable hoodie perfect for casual outings.',
     rating: 4.3,
-    reviews: 156,
+    reviews: 'Good quality and comfortable fit.',
     inStock: true,
   },
   {
@@ -52,7 +52,7 @@ const products = [
     category: 'electronics',
     description: 'High-quality wireless headphones with excellent sound quality.',
     rating: 4.6,
-    reviews: 234,
+    reviews: 'Excellent sound quality and comfortable fit.',
     inStock: true,
   },
   {
@@ -62,7 +62,7 @@ const products = [
     category: 'electronics',
     description: 'Advanced smartwatch with health tracking and notification features.',
     rating: 4.4,
-    reviews: 178,
+    reviews: 'Great features and reliable performance.',
     inStock: true,
   },
   {
@@ -72,7 +72,7 @@ const products = [
     category: 'electronics',
     description: 'Powerful laptop computer perfect for work and entertainment.',
     rating: 4.7,
-    reviews: 145,
+    reviews: 'Excellent performance and build quality.',
     inStock: true,
   },
   {
@@ -82,7 +82,7 @@ const products = [
     category: 'electronics',
     description: 'Latest smartphone with advanced camera and processing power.',
     rating: 4.5,
-    reviews: 312,
+    reviews: 'Great camera and fast performance.',
     inStock: true,
   },
   {
@@ -92,7 +92,7 @@ const products = [
     category: 'furniture',
     description: 'Comfortable and stylish modern sofa perfect for your living room.',
     rating: 4.6,
-    reviews: 89,
+    reviews: 'Comfortable and stylish modern sofa perfect for your living room.',
     inStock: true,
   },
   {
@@ -102,7 +102,8 @@ const products = [
     category: 'furniture',
     description: 'Ergonomic office chair designed for comfort and productivity.',
     rating: 4.3,
-    reviews: 156,
+    reviews: 'Ergonomic design and comfortable seating.',
+
     inStock: true,
   },
   {
@@ -112,7 +113,7 @@ const products = [
     category: 'furniture',
     description: 'Beautiful wooden dining table perfect for family meals.',
     rating: 4.7,
-    reviews: 78,
+    reviews: 'Beautiful wooden dining table perfect for family meals.',
     inStock: true,
   },
   {
@@ -122,7 +123,7 @@ const products = [
     category: 'furniture',
     description: 'Spacious bookshelf perfect for organizing your books and decor.',
     rating: 4.4,
-    reviews: 92,
+    reviews: 'Spacious and well-built bookshelf.',
     inStock: true,
   },
 ];

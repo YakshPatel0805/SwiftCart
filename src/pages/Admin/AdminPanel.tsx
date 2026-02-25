@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, Package, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { productsAPI } from '../../services/api';
+// import { productsAPI } from '../../services/api';
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function AdminPanel() {
     category: '',
     description: '',
     rating: '0',
-    reviews: {},
+    reviews: '',
     inStock: true
   });
 
@@ -73,9 +73,9 @@ export default function AdminPanel() {
 
   const downloadTemplate = () => {
     const csvContent = `name,price,image,category,description,rating,reviews,inStock
-                        Sample T-Shirt,29.99,https://example.com/image.jpg,clothing,A comfortable cotton t-shirt,4.5,100,true
-                        Sample Laptop,999.99,https://example.com/laptop.jpg,electronics,Powerful laptop for work,4.7,50,true
-                        Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office chair,4.3,75,true`;
+                        Sample T-Shirt,29.99,https://example.com/image.jpg,clothing,A comfortable cotton t-shirt,4.5,good,true
+                        Sample Laptop,999.99,https://example.com/laptop.jpg,electronics,Powerful laptop for work,4.7,excellent choice,true
+                        Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office chair,4.3,reliable,true`;
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -118,7 +118,7 @@ export default function AdminPanel() {
           category: '',
           description: '',
           rating: '0',
-          reviews: {},
+          reviews: '',
           inStock: true
         });
         setShowAddProduct(false);
@@ -258,10 +258,10 @@ export default function AdminPanel() {
                       Reviews
                     </label>
                     <input
-                      type="object"
+                      type="text"
                       id='productReviews'
-                      // value={productForm.reviews}
-                      // onChange={(e) => setProductForm({ ...productForm, reviews: e.target.value })}
+                      value={productForm.reviews}
+                      onChange={(e) => setProductForm({ ...productForm, reviews: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
@@ -388,7 +388,7 @@ export default function AdminPanel() {
                 <h3 className="font-medium text-gray-900 mb-2">Optional Columns:</h3>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• <span className="font-medium">rating</span> - Rating (0-5, default: 0)</li>
-                  <li>• <span className="font-medium">reviews</span> - Number of reviews (default: 0)</li>
+                  <li>• <span className="font-medium">reviews</span> - Reviews text (default: empty string)</li>
                   <li>• <span className="font-medium">inStock</span> - true/false (default: true)</li>
                 </ul>
               </div>
@@ -396,7 +396,7 @@ export default function AdminPanel() {
               <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
                 <h3 className="text-sm font-semibold text-blue-900 mb-2">Example Row:</h3>
                 <code className="text-xs text-blue-800 break-all">
-                  Premium T-Shirt,29.99,https://...,clothing,Comfortable shirt,4.5,100,true
+                  Premium T-Shirt,29.99,https://...,clothing,Comfortable shirt,4.5,Good Quality,true
                 </code>
               </div>
             </div>

@@ -81,7 +81,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
           <div>
             <span className="text-sm text-gray-600 ml-2">
-            ({Object.keys(product.reviews || {}).length} reviews)
+            ({product.reviews} reviews)
           </span>
           </div>
           
