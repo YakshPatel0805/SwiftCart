@@ -95,7 +95,7 @@ export default function Orders() {
   };
 
   const canCancelOrder = (status: string) => {
-    return status !== 'shipped' && status !== 'delivered' && status !== 'cancelled';
+    return status !== 'delivered' && status !== 'cancelled';
   };
 
   if (loading) {

@@ -152,7 +152,7 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
     }
     
     // Only allow cancellation if order is not shipped or delivered
-    if (order.status === 'shipped' || order.status === 'delivered') {
+    if (order.status === 'delivered') {
       return res.status(400).json({ message: 'Cannot cancel order that is already shipped or delivered' });
     }
     
