@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, XCircle, Clock, User, Mail, MapPin, Calendar, DollarSign } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, User, Mail, MapPin, Calendar, DollarSign } from 'lucide-react';
 import { ordersAPI } from '../services/api';
 import React from 'react';
+import OrderPieChart from '../components/PieChart';
 
 export default function AdminOrdersView() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -76,7 +77,7 @@ export default function AdminOrdersView() {
     const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
     const userEmail = order.userId?.email || order.shippingAddress?.email || '';
     const userName = order.shippingAddress?.name || order.userId?.username || '';
-    const matchesSearch = 
+    const matchesSearch =
       order._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (order.userId?._id || order.userId || '').toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
       userEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -116,46 +117,63 @@ export default function AdminOrdersView() {
           <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
           <p className="mt-2 text-gray-600">View and manage all customer orders</p>
         </div>
+        
+        {/* Status Cards and Graphical Visualization */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-2 gap-4">
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Orders</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
+                </div>
+                <Package className="h-12 w-12 text-blue-600" />
               </div>
-              <Package className="h-12 w-12 text-blue-600" />
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Processing</p>
+                  <p className="text-3xl font-bold text-yellow-600 mt-2">{stats.processing}</p>
+                </div>
+                <Clock className="h-12 w-12 text-yellow-600" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Shipped</p>
+                  <p className="text-3xl font-bold text-blue-600 mt-2">{stats.shipped}</p>
+                </div>
+                <Truck className="h-12 w-12 text-blue-600" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                  <p className="text-2xl font-bold text-green-600 mt-2">
+                    ${stats.totalRevenue.toFixed(2)}
+                  </p>
+                </div>
+                <DollarSign className="h-12 w-12 text-green-600" />
+              </div>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Processing</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-2">{stats.processing}</p>
-              </div>
-              <Clock className="h-12 w-12 text-yellow-600" />
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Graph Analysis For Sale
+              </h2>
             </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Shipped</p>
-                <p className="text-3xl font-bold text-blue-600 mt-2">{stats.shipped}</p>
-              </div>
-              <Truck className="h-12 w-12 text-blue-600" />
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-green-600 mt-2">${stats.totalRevenue.toFixed(2)}</p>
-              </div>
-              <DollarSign className="h-12 w-12 text-green-600" />
+
+            <div className="h-full flex items-center justify-center text-gray-400">
+              <OrderPieChart orders={orders} />
             </div>
           </div>
         </div>
@@ -167,7 +185,7 @@ export default function AdminOrdersView() {
               <Package className="h-5 w-5 text-gray-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
             </div>
-            
+
             {/* Search Bar */}
             <div className="mb-4">
               <input
@@ -187,51 +205,46 @@ export default function AdminOrdersView() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedStatus('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedStatus === 'all'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'all'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   All ({stats.total})
                 </button>
                 <button
                   onClick={() => setSelectedStatus('pending')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedStatus === 'pending'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'pending'
                       ? 'bg-gray-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   Pending ({stats.pending})
                 </button>
                 <button
                   onClick={() => setSelectedStatus('processing')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedStatus === 'processing'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'processing'
                       ? 'bg-yellow-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   Processing ({stats.processing})
                 </button>
                 <button
                   onClick={() => setSelectedStatus('shipped')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedStatus === 'shipped'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'shipped'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   Shipped ({stats.shipped})
                 </button>
                 <button
                   onClick={() => setSelectedStatus('delivered')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedStatus === 'delivered'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'delivered'
                       ? 'bg-green-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   Delivered ({stats.delivered})
                 </button>
@@ -261,7 +274,7 @@ export default function AdminOrdersView() {
             filteredOrders.map((order) => (
               <div key={order._id} className="bg-white rounded-lg shadow overflow-hidden">
                 {/* Order Header */}
-                <div 
+                <div
                   className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
                   onClick={() => setExpandedOrder(expandedOrder === order._id ? null : order._id)}
                 >
@@ -370,7 +383,7 @@ export default function AdminOrdersView() {
                                 const productName = productData.name || 'Product Unavailable';
                                 const productImage = productData.image || 'https://via.placeholder.com/150';
                                 const productPrice = productData.price || 0;
-                                
+
                                 return (
                                   <tr key={index}>
                                     <td className="px-4 py-3">
@@ -416,13 +429,12 @@ export default function AdminOrdersView() {
                               key={status}
                               onClick={() => updateOrderStatus(order._id, status)}
                               disabled={updatingOrderId === order._id || order.status === status}
-                              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                order.status === status
+                              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${order.status === status
                                   ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                                   : updatingOrderId === order._id
-                                  ? 'bg-gray-200 text-gray-500 cursor-wait'
-                                  : 'bg-blue-600 text-white hover:bg-blue-700'
-                              }`}
+                                    ? 'bg-gray-200 text-gray-500 cursor-wait'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                                }`}
                             >
                               {updatingOrderId === order._id ? (
                                 <span className="flex items-center">

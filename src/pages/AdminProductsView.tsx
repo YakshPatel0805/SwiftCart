@@ -4,6 +4,7 @@ import React from 'react';
 import { productsAPI } from '../services/api';
 import { Product } from '../types';
 import { Package, Filter, Search, Edit, Trash2 } from 'lucide-react';
+import { ProductCategoryChart } from '../components/PieChart';
 
 interface Category {
   category: string;
@@ -32,12 +33,12 @@ export default function AdminProductsView() {
         productsAPI.getAll(),
         productsAPI.getCategories()
       ]);
-      
+
       const normalizedProducts = productsData.map((p: any) => ({
         ...p,
         id: p._id || p.id
       }));
-      
+
       setProducts(normalizedProducts);
       setCategories(categoriesData);
     } catch (error) {
@@ -88,7 +89,7 @@ export default function AdminProductsView() {
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      product.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -129,7 +130,7 @@ export default function AdminProductsView() {
           <p className="mt-2 text-gray-600">View and manage all products by category</p>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
@@ -140,7 +141,7 @@ export default function AdminProductsView() {
               <Package className="h-12 w-12 text-blue-600" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -152,7 +153,7 @@ export default function AdminProductsView() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -166,6 +167,56 @@ export default function AdminProductsView() {
           </div>
         </div>
 
+        {/* Pie Chart 
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <ProductCategoryChart products={products} />
+        </div> */}
+
+        {/* Product Cards and Graph Visualization */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+          <div className="flex flex-col gap-6 w-30">
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Products</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
+                </div>
+                <Package className="h-12 w-12 text-blue-600" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">In Stock</p>
+                  <p className="text-3xl font-bold text-green-600 mt-2">{stats.inStock}</p>
+                </div>
+                <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">✓</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Out of Stock</p>
+                  <p className="text-3xl font-bold text-red-600 mt-2">{stats.outOfStock}</p>
+                </div>
+                <div className="h-12 w-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">✗</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Graph */}
+          <div className="bg-white rounded-lg shadow-md p-6 flex items-center justify-center">
+            <ProductCategoryChart products={products} />
+          </div>
+        </div>
+
         {/* Filters Section */}
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="p-6">
@@ -173,7 +224,7 @@ export default function AdminProductsView() {
               <Filter className="h-5 w-5 text-gray-600 mr-2" />
               <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
             </div>
-            
+
             {/* Search Bar */}
             <div className="mb-4">
               <div className="relative">
@@ -196,11 +247,10 @@ export default function AdminProductsView() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedCategory('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedCategory === 'all'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'all'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
                 >
                   All ({products.length})
                 </button>
@@ -208,11 +258,10 @@ export default function AdminProductsView() {
                   <button
                     key={cat.category}
                     onClick={() => setSelectedCategory(cat.category)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
-                      selectedCategory === cat.category
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${selectedCategory === cat.category
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
                   >
                     {cat.category} ({cat.count})
                   </button>
@@ -230,7 +279,7 @@ export default function AdminProductsView() {
               <span className="text-gray-500 font-normal ml-2">({filteredProducts.length})</span>
             </h2>
           </div>
-          
+
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12">
               <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -291,11 +340,10 @@ export default function AdminProductsView() {
                         ${product.price.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          product.inStock
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${product.inStock
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                          }`}>
                           {product.inStock ? 'In Stock' : 'Out of Stock'}
                         </span>
                       </td>
@@ -306,14 +354,14 @@ export default function AdminProductsView() {
                         {product.reviews}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button 
+                        <button
                           onClick={() => handleEdit(product)}
                           className="text-blue-600 hover:text-blue-900 mr-3"
                           title="Edit product"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(product.id)}
                           disabled={deletingProductId === product.id}
                           className="text-red-600 hover:text-red-900 disabled:opacity-50"

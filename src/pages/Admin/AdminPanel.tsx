@@ -140,7 +140,7 @@ export default function AdminPanel() {
           <p className="mt-2 text-gray-600">Manage products and site content</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">    
           {/* Add Single Product Section */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
@@ -362,43 +362,6 @@ export default function AdminPanel() {
                   </ul>
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* CSV Format Guide */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center mb-4">
-              <Package className="h-6 w-6 text-blue-600 mr-2" />
-              <h2 className="text-xl font-semibold text-gray-900">CSV Format Guide</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium text-gray-900 mb-2">Required Columns:</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• <span className="font-medium">name</span> - Product name</li>
-                  <li>• <span className="font-medium">price</span> - Price (number)</li>
-                  <li>• <span className="font-medium">image</span> - Image URL</li>
-                  <li>• <span className="font-medium">category</span> - clothing, electronics, or furniture</li>
-                  <li>• <span className="font-medium">description</span> - Product description</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-gray-900 mb-2">Optional Columns:</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• <span className="font-medium">rating</span> - Rating (0-5, default: 0)</li>
-                  <li>• <span className="font-medium">reviews</span> - Reviews text (default: empty string)</li>
-                  <li>• <span className="font-medium">inStock</span> - true/false (default: true)</li>
-                </ul>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                <h3 className="text-sm font-semibold text-blue-900 mb-2">Example Row:</h3>
-                <code className="text-xs text-blue-800 break-all">
-                  Premium T-Shirt,29.99,https://...,clothing,Comfortable shirt,4.5,Good Quality,true
-                </code>
-              </div>
             </div>
           </div>
 
