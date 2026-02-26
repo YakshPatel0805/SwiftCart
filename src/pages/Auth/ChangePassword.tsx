@@ -88,7 +88,7 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="bg-white shadow-md min-h-screen flex items-center justify-center bg-gray-100 p-6">
+    <div className="bg-white shadow-md flex items-center justify-center bg-gray-100 p-6">
 
       {error && (
         <div className="mb-4 rounded-md bg-red-50 p-4 flex items-start">
