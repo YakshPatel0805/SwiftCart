@@ -184,7 +184,7 @@ export default function Header() {
                       {categories.length > 0 && (
                         <div className="border-t mt-2 pt-2 px-3">
                           <Link
-                            to="/"
+                            to="/category/all"
                             onClick={() => setIsCategoryMenuOpen(false)}
                             className="block text-sm text-blue-600 hover:text-blue-700 font-medium text-center py-1"
                           >

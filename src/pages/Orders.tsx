@@ -61,6 +61,17 @@ export default function Orders() {
       alert(error.message || 'Failed to cancel order');
     }
   };
+  
+  const trackOrder = async (orderId: string) => {
+    try{
+      await ordersAPI.getById(orderId);
+      navigate('/trackOrder')
+      setOpenDropdown(null);
+    }
+    catch (err: any) {
+      alert(err.message || 'Cannot Track Your Order')
+    }
+  }
 
   const toggleDropdown = (orderId: string) => {
     setOpenDropdown(openDropdown === orderId ? null : orderId);
@@ -97,6 +108,7 @@ export default function Orders() {
   const canCancelOrder = (status: string) => {
     return status !== 'delivered' && status !== 'cancelled';
   };
+
 
   if (loading) {
     return (
@@ -178,6 +190,12 @@ export default function Orders() {
                                 Cancel Order
                               </button>
                             )}
+                            <button
+                              onClick={() => trackOrder(order._id)}
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50"
+                            >
+                              Track Your Order
+                            </button>
                           </div>
                         )}
                       </div>

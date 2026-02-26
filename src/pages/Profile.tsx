@@ -1,6 +1,5 @@
 import { useAuth } from '../context/AuthContext';
 import { User, Shield, Mail, Crown } from 'lucide-react';
-import ChangePassword from './Auth/ChangePassword';
 import React from 'react';
 
 export default function Profile() {
@@ -102,9 +101,6 @@ export default function Profile() {
             </div>
           </div>
         </div>
-
-        {/* Change Password Section */}
-        <ChangePassword />
       </div>
     </div>
   );

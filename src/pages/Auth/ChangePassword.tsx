@@ -240,17 +240,6 @@ export default function ChangePassword() {
           </div>
         </form>
       </div>
-
-      <div className="mt-6 p-4 bg-blue-50 rounded-md border border-blue-200 pl-10 w-1/3">
-        <h3 className="text-sm font-medium text-blue-900 mb-2">Password Security Tips:</h3>
-        <ul className="text-sm text-blue-800 space-y-1">
-          <li>• Use a mix of uppercase, lowercase, numbers, and symbols</li>
-          <li>• Avoid using personal information or common words</li>
-          <li>• Never share your password with anyone</li>
-          <li>• Change your password regularly for better security</li>
-        </ul>
-      </div>
-
     </div>
   );
 }
