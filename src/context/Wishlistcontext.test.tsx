@@ -46,7 +46,7 @@ const mockProduct: Product = {
   category: 'electronics',
   description: 'desc',
   rating: 4,
-  reviews: 5,
+  reviews: "Good Quality",
   inStock: true,
 }
 

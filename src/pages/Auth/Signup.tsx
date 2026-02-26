@@ -18,8 +18,6 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
 
-  // FIX: Require BOTH email AND username to match for admin role —
-  // previously only email was checked, which was a security gap.
   const isAdminUser = (email: string, username: string) => {
     return email === 'admin@gmail.com' && username === 'admin';
   };
@@ -49,8 +47,6 @@ export default function Signup() {
       );
 
       if (success) {
-        // FIX: AuthContext no longer calls window.location.href, so this
-        // navigate() call is what actually redirects after successful signup.
         navigate('/login');
       } else {
         setError('Username or email already exists');
