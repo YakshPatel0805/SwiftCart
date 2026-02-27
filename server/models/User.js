@@ -7,12 +7,9 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-
-  bank: { type: mongoose.Schema.Types.ObjectId, ref: "Bank" },
   accountNumber: { type: String, unique: true, sparse: true },
   accountPIN : { type: String, required: true },
   balance: { type: Number, default: 0 },
-  
   createdAt: { type: Date, default: Date.now }
 });
 

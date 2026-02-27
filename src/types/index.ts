@@ -64,6 +64,5 @@ export type PaymentMethod =
       type: 'Account-Transfer';
       accHolderName?: string;
       accNumber?: string;
-      IFSCCode?: string;
       pin?: string;
     };

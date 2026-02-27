@@ -52,14 +52,13 @@ export default function Checkout() {
       console.log("Order created:", order._id);
 
       if (paymentMethod.type === "Account-Transfer") {
-        if (!paymentMethod.accNumber || !paymentMethod.pin || !paymentMethod.IFSCCode) {
-          alert("Please enter Account Number OR PIN Or IFSC CODE");
+        if (!paymentMethod.accNumber || !paymentMethod.pin) {
+          alert("Please enter Account Number OR PIN");
           return;
         }
         const paymentData = {
           orderId: order._id,
           accountNumber: paymentMethod.accNumber,
-          IFSCCode: paymentMethod.IFSCCode,
           pin: paymentMethod.pin
         };
         console.log("Processing Payment", paymentData);
@@ -418,21 +417,6 @@ export default function Checkout() {
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            IFSC Code
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={paymentMethod.IFSCCode || ""}
-                            onChange={(e) =>
-                              setPaymentMethod({ ...paymentMethod, IFSCCode: e.target.value })
-                            }
-                            placeholder="BOB0REYY34"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             PIN

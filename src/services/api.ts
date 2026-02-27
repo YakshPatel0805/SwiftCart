@@ -259,7 +259,6 @@ export const paymentAPI = {
   accountTransfer: async (data: {
     orderId: string;
     accountNumber: string;
-    IFSCCode: string;
     pin: string;
   }) => {
     const res = await fetch(`${API_URL}/payment/accounttransfer`, {

@@ -1,5 +1,4 @@
 import express from "express";
-import DummyBank from "../models/Bank.js";
 import Order from "../models/Order.js";
 import Payment from "../models/Payment.js";
 import { authenticateToken } from "../middleware/auth.js";
@@ -20,11 +19,10 @@ router.post("/accounttransfer", authenticateToken, async (req, res) => {
     const bankUser = await Bank.findOne({
       "userDetails.accountNumber": String(accountNumber),
       "userDetails.accountPIN": pin,
-      "bankDetails.IFSCCode": IFSCCode
     });
 
     if (!bankUser) {
-      return res.status(401).json({ message: "Invalid account number or PIN or IFSC CODE" });
+      return res.status(401).json({ message: "Invalid account number or PIN" });
     }
 
     if (bankUser.userDetails.balance < order.total) {
