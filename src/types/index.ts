@@ -44,10 +44,26 @@ export interface ShippingAddress {
   country: string;
 }
 
-export interface PaymentMethod {
-  type: 'credit-card' | 'google-pay' | 'cash-on-delivery';
-  cardholderName?: string;
-  cardNumber?: string;
-  expiryDate?: string;
-  cvv?: string;
-}
+// export interface PaymentMethod {
+//   type: 'credit-card' | 'google-pay' | 'cash-on-delivery' | 'Account-Transfer';
+//   cardholderName?: string;
+//   cardNumber?: string;
+//   expiryDate?: string;
+//   cvv?: string;
+//   accHolderName?: string,
+//   accNumber?: string,
+//   IFSCCode?: string
+//   pin?: string
+// }
+
+export type PaymentMethod =
+  | { type: 'credit-card'; cardholderName?: string; cardNumber?: string; expiryDate?: Date; cvv?: string }
+  | { type: 'google-pay' }
+  | { type: 'cash-on-delivery' }
+  | {
+      type: 'Account-Transfer';
+      accHolderName?: string;
+      accNumber?: string;
+      IFSCCode?: string;
+      pin?: string;
+    };

@@ -115,7 +115,7 @@ router.post('/', authenticateToken, async (req, res) => {
     }
     
     // Send payment confirmation email (for immediate payment methods)
-    if (paymentMethod.type === 'credit-card' || paymentMethod.type === 'google-pay') {
+    if (paymentMethod.type === 'credit-card' || paymentMethod.type === 'google-pay' || paymentMethod.type === 'Account-Transfer') {
       const paymentEmailSent = await sendPaymentConfirmationEmail(order, shippingAddress.email || user.email);
       if (paymentEmailSent) {
         console.log('Payment confirmation email sent successfully');

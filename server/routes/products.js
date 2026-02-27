@@ -53,76 +53,6 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-// router.post('/upload-csv', authenticateToken, isAdmin, upload.single('file'), async (req, res) => {
-//   try {
-//     if (!req.file) {
-//       return res.status(400).json({ message: 'No file uploaded' });
-//     }
-
-//     const products = [];
-//     const errors = [];
-
-//     const stream = Readable.from(req.file.buffer);
-//     stream
-//       .pipe(csv())
-//       .on('data', (row) => {
-//         try {
-//           const product = {
-//             name: row.name || row.Name,
-//             price: parseFloat(row.price || row.Price),
-//             image: row.image || row.Image,
-//             category: row.category || row.Category || '',
-//             description: row.description || row.Description,
-//             rating: parseFloat(row.rating || row.Rating || 0),
-//             reviews: {}, // Object to hold reviews, can be extended later
-//             inStock: (row.inStock || row.InStock || 'true').toLowerCase() === 'true'
-//           };
-
-//           if (!product.name || isNaN(product.price) || !product.image || !product.description || !product.category){
-//             errors.push(`Missing required fields for product: ${product.name || 'Unknown'}`);
-//             return;
-//           }
-
-//           products.push(product);
-//         } catch (error) {
-//           errors.push(`Error parsing row: ${error.message}`);
-//         }
-//       })
-//       .on('end', async () => {
-//         try {
-//           if (products.length === 0) {
-//             return res.status(400).json({ 
-//               message: 'No valid products found in CSV',
-//               errors 
-//             });
-//           }
-
-//           const savedProducts = await Product.insertMany(products);
-
-//           res.json({
-//             message: `Successfully uploaded ${savedProducts.length} products`,
-//             count: savedProducts.length,
-//             products: savedProducts,
-//             errors: errors.length > 0 ? errors : undefined
-//           });
-//         } catch (error) {
-//           res.status(500).json({ 
-//             message: 'Error saving products to database', 
-//             error: error.message 
-//           });
-//         }
-//       })
-//       .on('error', (error) => {
-//         res.status(500).json({ 
-//           message: 'Error parsing CSV file', 
-//           error: error.message 
-//         });
-//       });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Server error', error: error.message });
-//   }
-// });
-
 router.post(
   '/upload-csv',
   authenticateToken,
@@ -152,7 +82,7 @@ router.post(
               category: rawCategory.toLowerCase().trim(),
               description: row.description || row.Description,
               rating: parseFloat(row.rating || row.Rating || 0),
-              reviews: row.reviews || row.Reviews || '', // Store reviews as a string, can be extended to an object later
+              reviews: row.reviews || row.Reviews || '',
               inStock: String(row.inStock || row.InStock || 'true').toLowerCase() === 'true'
             };
 

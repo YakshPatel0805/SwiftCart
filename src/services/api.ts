@@ -254,3 +254,21 @@ export const contactAPI = {
     return response.json();
   }
 };
+
+export const paymentAPI = {
+  accountTransfer: async (data: {
+    orderId: string;
+    accountNumber: string;
+    IFSCCode: string;
+    pin: string;
+  }) => {
+    const res = await fetch(`${API_URL}/payment/accounttransfer`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) throw await res.json();
+    return res.json();
+  }
+};

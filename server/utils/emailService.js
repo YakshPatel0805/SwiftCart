@@ -267,7 +267,7 @@ export const sendAdminOrderNotification = async (order, customerEmail, customerN
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL,
       subject: `🔔 New Order Received - Order #${order._id}`,
       html: `
         <!DOCTYPE html>
@@ -301,7 +301,7 @@ export const sendAdminOrderNotification = async (order, customerEmail, customerN
                 <p><strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString()} ${new Date(order.createdAt).toLocaleTimeString()}</p>
                 <p><strong>Customer:</strong> ${customerName}</p>
                 <p><strong>Customer Email:</strong> ${customerEmail}</p>
-                <p><strong>Payment Method:</strong> ${order.paymentMethod.type.replace('-', ' ').toUpperCase()}</p>
+                <p><strong>Payment Method:</strong> ${order.paymentMethod.type.toUpperCase()}</p>
                 <p><strong>Status:</strong> ${order.status.toUpperCase()}</p>
                 
                 <h3>Items Ordered:</h3>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { CreditCard, Truck, Lock, Smartphone, Banknote } from 'lucide-react';
+import { CreditCard, Truck, Lock, Smartphone, Wallet, HandCoins } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { ordersAPI } from '../services/api';
+import { ordersAPI, paymentAPI } from '../services/api';
 import { ShippingAddress, PaymentMethod } from '../types';
 
 export default function Checkout() {
@@ -36,32 +36,39 @@ export default function Checkout() {
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      console.log('Creating order with items:', items);
-      
       const orderData = {
-        items: items.map(item => {
-          const productId = item.product.id || (item.product as any)._id;
-          console.log('Product ID:', productId, 'Product:', item.product);
-          return {
-            productId: productId,
-            quantity: item.quantity
-          };
-        }),
+        items: items.map(item => ({
+          productId: item.product.id || (item.product as any)._id,
+          quantity: item.quantity
+        })),
         total,
         shippingAddress,
-        paymentMethod: paymentMethod
+        paymentMethod: { type: paymentMethod.type }
       };
 
-      console.log('Sending order data:', orderData);
-      const response = await ordersAPI.create(orderData);
-      console.log('Order created successfully:', response);
+      const order = await ordersAPI.create(orderData);
+      console.log("Order created:", order._id);
+
+      if (paymentMethod.type === "Account-Transfer") {
+        if (!paymentMethod.accNumber || !paymentMethod.pin || !paymentMethod.IFSCCode) {
+          alert("Please enter Account Number OR PIN Or IFSC CODE");
+          return;
+        }
+        const paymentData = {
+          orderId: order._id,
+          accountNumber: paymentMethod.accNumber,
+          IFSCCode: paymentMethod.IFSCCode,
+          pin: paymentMethod.pin
+        };
+        console.log("Processing Payment", paymentData);
+        await paymentAPI.accountTransfer(paymentData);
+      }
       setStep(3);
     } catch (error: any) {
-      console.error('Error creating order:', error);
-      console.error('Error details:', error.response || error.message);
-      alert(`Failed to place order: ${error.message || 'Please try again.'}`);
+      console.error("Checkout error:", error);
+      alert(error.response?.data?.message || "Payment failed");
     }
   };
 
@@ -165,7 +172,7 @@ export default function Checkout() {
                         id="fullName"
                         required
                         value={shippingAddress.name}
-                        onChange={(e) => setShippingAddress({...shippingAddress, name: e.target.value})}
+                        onChange={(e) => setShippingAddress({ ...shippingAddress, name: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
@@ -178,7 +185,7 @@ export default function Checkout() {
                         id="email"
                         required
                         value={shippingAddress.email}
-                        onChange={(e) => setShippingAddress({...shippingAddress, email: e.target.value})}
+                        onChange={(e) => setShippingAddress({ ...shippingAddress, email: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
@@ -192,7 +199,7 @@ export default function Checkout() {
                       id="address"
                       required
                       value={shippingAddress.address}
-                      onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
+                      onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
@@ -206,7 +213,7 @@ export default function Checkout() {
                         id="city"
                         required
                         value={shippingAddress.city}
-                        onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
+                        onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
@@ -219,7 +226,7 @@ export default function Checkout() {
                         id="state"
                         required
                         value={shippingAddress.state}
-                        onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
+                        onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
@@ -232,7 +239,7 @@ export default function Checkout() {
                         id="zipcode"
                         required
                         value={shippingAddress.zipcode}
-                        onChange={(e) => setShippingAddress({...shippingAddress, zipcode: e.target.value})}
+                        onChange={(e) => setShippingAddress({ ...shippingAddress, zipcode: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
@@ -243,7 +250,7 @@ export default function Checkout() {
                       <select
                         id="country"
                         value={shippingAddress.country}
-                        onChange={(e) => setShippingAddress({...shippingAddress, country: e.target.value})}
+                        onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="United States">United States</option>
@@ -268,7 +275,7 @@ export default function Checkout() {
             {step === 2 && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Information</h2>
-                
+
                 {/* Payment Method Selection */}
                 <div className="mb-6 space-y-3">
                   <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
@@ -277,11 +284,24 @@ export default function Checkout() {
                       type="radio"
                       value="credit-card"
                       checked={paymentMethod.type === 'credit-card'}
-                      onChange={(e) => setPaymentMethod({type: e.target.value as any})}
+                      onChange={(e) => setPaymentMethod({ type: e.target.value as any })}
                       className="text-blue-600 focus:ring-blue-500"
                     />
                     <CreditCard className="ml-3 h-5 w-5 text-gray-600" />
                     <span className="ml-3 font-medium">Credit/Debit Card</span>
+                  </label>
+
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    style={{ borderColor: paymentMethod.type === 'Account-Transfer' ? '#2563eb' : '#e5e7eb' }}>
+                    <input
+                      type="radio"
+                      value="Account-Transfer"
+                      checked={paymentMethod.type === 'Account-Transfer'}
+                      onChange={(e) => setPaymentMethod({ type: e.target.value as any })}
+                      className="text-blue-600 focus:ring-blue-500"
+                    />
+                    <Wallet className="ml-3 h-5 w-5 text-gray-600" />
+                    <span className="ml-3 font-medium">Account Transfer</span>
                   </label>
 
                   <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
@@ -290,7 +310,7 @@ export default function Checkout() {
                       type="radio"
                       value="google-pay"
                       checked={paymentMethod.type === 'google-pay'}
-                      onChange={(e) => setPaymentMethod({type: e.target.value as any})}
+                      onChange={(e) => setPaymentMethod({ type: e.target.value as any })}
                       className="text-blue-600 focus:ring-blue-500"
                     />
                     <Smartphone className="ml-3 h-5 w-5 text-gray-600" />
@@ -304,10 +324,10 @@ export default function Checkout() {
                       type="radio"
                       value="cash-on-delivery"
                       checked={paymentMethod.type === 'cash-on-delivery'}
-                      onChange={(e) => setPaymentMethod({type: e.target.value as any})}
+                      onChange={(e) => setPaymentMethod({ type: e.target.value as any })}
                       className="text-blue-600 focus:ring-blue-500"
                     />
-                    <Banknote className="ml-3 h-5 w-5 text-gray-600" />
+                    <HandCoins className="ml-3 h-5 w-5 text-gray-600" />
                     <span className="ml-3 font-medium">Cash on Delivery</span>
                     <span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Pay Later</span>
                   </label>
@@ -325,7 +345,7 @@ export default function Checkout() {
                           type="text"
                           required
                           value={paymentMethod.cardholderName || ''}
-                          onChange={(e) => setPaymentMethod({...paymentMethod, cardholderName: e.target.value})}
+                          onChange={(e) => setPaymentMethod({ ...paymentMethod, cardholderName: e.target.value })}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
@@ -367,6 +387,71 @@ export default function Checkout() {
                     </>
                   )}
 
+                  {/* Account Transfer */}
+                  {paymentMethod.type === 'Account-Transfer' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Account Holder Name
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={paymentMethod.accHolderName || ''}
+                          onChange={(e) => setPaymentMethod({ ...paymentMethod, accHolderName: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Account Number
+                        </label>
+                        <input
+                          // type="text"
+                          required
+                          value={paymentMethod.accNumber || ""}
+                          onChange={(e) =>
+                            setPaymentMethod({ ...paymentMethod, accNumber: e.target.value })
+                          }
+                          placeholder="1234 5678 9012 34"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            IFSC Code
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={paymentMethod.IFSCCode || ""}
+                            onChange={(e) =>
+                              setPaymentMethod({ ...paymentMethod, IFSCCode: e.target.value })
+                            }
+                            placeholder="BOB0REYY34"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            PIN
+                          </label>
+                          <input
+                            type="password"
+                            required
+                            value={paymentMethod.pin || ''}
+                            onChange={(e) =>
+                              setPaymentMethod({ ...paymentMethod, pin: e.target.value })
+                            }
+                            placeholder="1234"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   {/* Google Pay */}
                   {paymentMethod.type === 'google-pay' && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
@@ -386,7 +471,7 @@ export default function Checkout() {
                   {paymentMethod.type === 'cash-on-delivery' && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-6">
                       <div className="flex items-start space-x-3">
-                        <Banknote className="h-6 w-6 text-green-600 mt-1" />
+                        <HandCoins className="h-6 w-6 text-green-600 mt-1" />
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900 mb-2">Cash on Delivery</h3>
                           <p className="text-sm text-gray-600 mb-3">
@@ -430,7 +515,7 @@ export default function Checkout() {
           {/* Order Summary */}
           <div className="bg-white p-6 rounded-lg shadow-md h-fit">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
-            
+
             <div className="space-y-3 mb-4">
               {items.map((item) => (
                 <div key={item.product.id} className="flex items-center space-x-3">

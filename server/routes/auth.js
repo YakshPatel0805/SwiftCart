@@ -14,7 +14,7 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username or email already exists' });
     }
 
-    const isAdminSignup = email === 'admin@gmail.com' && username === 'admin' && password === 'admin123';
+    const isAdminSignup = email === process.env.ADMIN_EMAIL && username === 'admin' && password === 'admin123';
 
     const user = new User({
       email,

@@ -2,36 +2,18 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
-  },
-  wishlist: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
-  }],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  username: { type: String, required: true, unique: true, trim: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+
+  bank: { type: mongoose.Schema.Types.ObjectId, ref: "Bank" },
+  accountNumber: { type: String, unique: true, sparse: true },
+  accountPIN : { type: String, required: true },
+  balance: { type: Number, default: 0 },
+  
+  createdAt: { type: Date, default: Date.now }
 });
 
 userSchema.pre('save', async function(next) {

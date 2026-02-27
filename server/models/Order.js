@@ -42,7 +42,7 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: {
     type: {
       type: String,
-      enum: ['credit-card', 'google-pay', 'cash-on-delivery']
+      enum: ['credit-card', 'google-pay', 'cash-on-delivery', 'Account-Transfer']
     },
     cardholderName: String
   },

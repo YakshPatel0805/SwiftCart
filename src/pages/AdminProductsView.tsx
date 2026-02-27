@@ -130,48 +130,6 @@ export default function AdminProductsView() {
           <p className="mt-2 text-gray-600">View and manage all products by category</p>
         </div>
 
-        {/* Stats Cards 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Products</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
-              </div>
-              <Package className="h-12 w-12 text-blue-600" />
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">In Stock</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">{stats.inStock}</p>
-              </div>
-              <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">✓</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Out of Stock</p>
-                <p className="text-3xl font-bold text-red-600 mt-2">{stats.outOfStock}</p>
-              </div>
-              <div className="h-12 w-12 bg-red-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">✗</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Pie Chart 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <ProductCategoryChart products={products} />
-        </div> */}
-
         {/* Product Cards and Graph Visualization */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
@@ -212,8 +170,16 @@ export default function AdminProductsView() {
           </div>
 
           {/* Graph */}
-          <div className="bg-white rounded-lg shadow-md p-6 flex items-center justify-center">
-            <ProductCategoryChart products={products} />
+          <div className="bg-white rounded-lg shadow-md">
+            <div className="flex items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900 ml-6 mt-3">
+                Graph Analysis For Sale
+              </h2>
+            </div>
+
+            <div className="flex items-center justify-center text-gray-400">
+              <ProductCategoryChart products={products} />
+            </div>
           </div>
         </div>
 
