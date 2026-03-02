@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Package, Truck, CheckCircle, MoreVertical, XCircle } from 'lucide-react';
+import { Package, CheckCircle, MoreVertical, XCircle, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
-import React from 'react';
 
 export default function Orders() {
   const navigate = useNavigate();
@@ -73,16 +72,21 @@ export default function Orders() {
     }
   };
   
-  const trackOrder = async (orderId: string) => {
-    try{
-      await ordersAPI.getById(orderId);
-      navigate('/trackOrder')
-      setOpenDropdown(null);
+
+
+  const handleClearOrders = async () => {
+    if (!confirm('Are you sure you want to clear all your orders? This action cannot be undone.')) {
+      return;
     }
-    catch (err: any) {
-      alert(err.message || 'Cannot Track Your Order')
+
+    try {
+      await ordersAPI.clearAll();
+      await loadOrders();
+      alert('All orders cleared successfully');
+    } catch (error: any) {
+      alert(error.message || 'Failed to clear orders');
     }
-  }
+  };
 
   const toggleDropdown = (orderId: string) => {
     setOpenDropdown(openDropdown === orderId ? null : orderId);
@@ -93,7 +97,7 @@ export default function Orders() {
       case 'delivered':
         return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'shipped':
-        return <Truck className="h-5 w-5 text-blue-600" />;
+        return <Package className="h-5 w-5 text-blue-600" />;
       case 'cancelled':
         return <XCircle className="h-5 w-5 text-red-600" />;
       default:
@@ -136,6 +140,18 @@ export default function Orders() {
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">My Orders</h1>
+          
+          {orders.length > 0 && (
+            <div className="mb-4">
+              <button
+                onClick={handleClearOrders}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear All Orders
+              </button>
+            </div>
+          )}
           
           {orders.length === 0 ? (
             <div className="text-center py-8">
@@ -202,7 +218,10 @@ export default function Orders() {
                               </button>
                             )}
                             <button
-                              onClick={() => trackOrder(order._id)}
+                              onClick={() => {
+                                alert('Order tracking feature removed');
+                                setOpenDropdown(null);
+                              }}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50"
                             >
                               Track Your Order
@@ -250,6 +269,8 @@ export default function Orders() {
                       </div>
                     </div>
                   </div>
+
+
                 </div>
               ))}
             </div>

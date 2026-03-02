@@ -215,12 +215,12 @@ export const ordersAPI = {
     }
   },
 
-  updateStatus: async (id: string, status: string) => {
+  updateStatus: async (id: string, status: string, shippingStatus?: string, trackingNumber?: string, estimatedDelivery?: string) => {
     try {
       const response = await fetch(`${API_URL}/orders/${id}/status`, {
         method: 'PATCH',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status, shippingStatus, trackingNumber, estimatedDelivery })
       });
       const data = await response.json();
       if (!response.ok) {
@@ -229,6 +229,23 @@ export const ordersAPI = {
       return data;
     } catch (error) {
       console.error('Orders API updateStatus error:', error);
+      throw error;
+    }
+  },
+
+  clearAll: async () => {
+    try {
+      const response = await fetch(`${API_URL}/orders/clear`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Orders API clearAll error:', error);
       throw error;
     }
   }

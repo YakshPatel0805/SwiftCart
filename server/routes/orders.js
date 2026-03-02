@@ -59,7 +59,6 @@ router.get('/:id', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
   try {
     console.log('Creating order for user:', req.user.userId);
-    console.log('Order data received:', req.body);
     
     const { items, total, shippingAddress, paymentMethod } = req.body;
 
@@ -106,6 +105,20 @@ router.post('/', authenticateToken, async (req, res) => {
 
     await order.save();
     console.log('Order saved successfully:', order._id);
+    
+    // Auto-update stock for each product
+    for (const item of orderItems) {
+      const product = await Product.findById(item.product);
+      if (product && product.stockQuantity !== undefined) {
+        product.stockQuantity -= item.quantity;
+        if (product.stockQuantity < 0) {
+          product.stockQuantity = 0;
+        }
+        product.inStock = product.stockQuantity > 0;
+        await product.save();
+        console.log(`Updated stock for product ${product.name}: ${product.stockQuantity} remaining`);
+      }
+    }
     
     await order.populate('items.product');
     
@@ -206,9 +219,11 @@ router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
       return res.status(400).json({ message: 'Invalid status' });
     }
     
+    const update = { status };
+    
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
-      { status },
+      update,
       { new: true, runValidators: false }
     ).populate('items.product').populate('userId', 'email username');
     
@@ -219,6 +234,17 @@ router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Clear all orders for user
+router.delete('/clear', authenticateToken, async (req, res) => {
+  try {
+    const result = await Order.deleteMany({ userId: req.user.userId });
+    res.json({ message: 'Orders cleared successfully', deletedCount: result.deletedCount });
+  } catch (error) {
+    console.error('Error clearing orders:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

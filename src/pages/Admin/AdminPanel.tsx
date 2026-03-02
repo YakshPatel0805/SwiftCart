@@ -19,6 +19,7 @@ export default function AdminPanel() {
     description: '',
     rating: '0',
     reviews: '',
+    stockQuantity: '0',
     inStock: true
   });
 
@@ -72,10 +73,10 @@ export default function AdminPanel() {
   };
 
   const downloadTemplate = () => {
-    const csvContent = `name,price,image,category,description,rating,reviews,inStock
-                        Sample T-Shirt,29.99,https://example.com/image.jpg,clothing,A comfortable cotton t-shirt,4.5,good,true
-                        Sample Laptop,999.99,https://example.com/laptop.jpg,electronics,Powerful laptop for work,4.7,excellent choice,true
-                        Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office chair,4.3,reliable,true`;
+    const csvContent = `name,price,image,category,description,rating,reviews,inStock,stockQuantity
+                        Sample T-Shirt,29.99,https://example.com/image.jpg,clothing,A comfortable cotton t-shirt,4.5,good,true,10
+                        Sample Laptop,999.99,https://example.com/laptop.jpg,electronics,Powerful laptop for work,4.7,excellent choice,true, 30
+                        Sample Chair,249.99,https://example.com/chair.jpg,furniture,Ergonomic office chair,4.3,reliable,true,55`;
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -119,6 +120,7 @@ export default function AdminPanel() {
           description: '',
           rating: '0',
           reviews: '',
+          stockQuantity:'0',
           inStock: true
         });
         setShowAddProduct(false);
@@ -236,14 +238,13 @@ export default function AdminPanel() {
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor='productRating' className="block text-sm font-medium text-gray-700 mb-1">
                       Rating
                     </label>
                     <input
                       type="number"
-                      step="0.1"
                       min="0"
                       max="5"
                       id='productRating'
@@ -263,6 +264,19 @@ export default function AdminPanel() {
                       value={productForm.reviews}
                       onChange={(e) => setProductForm({ ...productForm, reviews: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Quantity
+                    </label>
+                    <input
+                      type="string"
+                      value={productForm.stockQuantity}
+                      onChange={(e) => setProductForm({ ...productForm, stockQuantity: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
                     />
                   </div>
 

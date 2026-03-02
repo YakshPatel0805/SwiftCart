@@ -16,6 +16,7 @@ export interface Product {
   rating: number;
   reviews: string;
   inStock: boolean;
+  stockQuantity?: number;
 }
 
 export interface CartItem {

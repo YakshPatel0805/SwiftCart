@@ -1,4 +1,3 @@
-import React from 'react';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { Product } from '../../types';
 import { useCart } from '../../context/CartContext';
@@ -94,12 +93,34 @@ export default function ProductCard({ product }: ProductCardProps) {
           
           <button
             onClick={handleAddToCart}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            disabled={!product.inStock}
+            className={`px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
+              product.inStock
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
           >
             <ShoppingCart className="h-4 w-4" />
-            <span>Add to Cart</span>
+            <span>{product.inStock ? 'Add to Cart' : 'Out of Stock'}</span>
           </button>
         </div>
+        
+        {/* Stock Availability */}
+        {product.inStock && product.stockQuantity !== undefined && (
+          <div className="mt-2">
+            <span className={`text-sm font-medium ${
+              product.stockQuantity > 10 ? 'text-green-600' :
+              product.stockQuantity > 0 ? 'text-yellow-600' :
+              'text-red-500'
+            }`}>
+              {product.stockQuantity > 10 
+                ? `${product.stockQuantity} in stock` 
+                : product.stockQuantity > 0 
+                  ? 'Low stock!' 
+                  : 'Out of Stock'}
+            </span>
+          </div>
+        )}
         
         {!product.inStock && (
           <div className="mt-2">

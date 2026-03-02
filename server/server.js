@@ -7,7 +7,7 @@ import productRoutes from './routes/products.js';
 import wishlistRoutes from './routes/wishlist.js';
 import orderRoutes from './routes/orders.js';
 import contactRoutes from './routes/contact.js';
-import paymentRoutes from './routes/payment.js'
+import paymentRoutes from './routes/payment.js';
 
 dotenv.config();
 
@@ -25,7 +25,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
-app.use('/api/payments', paymentRoutes)
+app.use('/api/payments', paymentRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

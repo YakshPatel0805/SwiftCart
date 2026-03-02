@@ -83,7 +83,8 @@ router.post(
               description: row.description || row.Description,
               rating: parseFloat(row.rating || row.Rating || 0),
               reviews: row.reviews || row.Reviews || '',
-              inStock: String(row.inStock || row.InStock || 'true').toLowerCase() === 'true'
+              inStock: String(row.inStock || row.InStock || 'true').toLowerCase() === 'true',
+              stockQuantity: Number(row.stockQuantity || row.StockQuantity || 0)
             };
 
             if (

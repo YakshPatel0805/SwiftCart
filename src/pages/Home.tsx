@@ -1,16 +1,26 @@
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Truck, Shield, HeartHandshake } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { productsAPI } from '../services/api';
 
 interface Product {
   _id: string;
   image: string;
   category: string;
+  name: string;
+  price: number;
+  rating: number;
+  reviews: string;
+  inStock: boolean;
+  stockQuantity: number;
 }
 
 export default function Home() {
   const navigate = useNavigate();
+  const { recentlyViewed, addToRecentlyViewed } = useAuth();
   const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
+  const [recentlyViewedProducts, setRecentlyViewedProducts] = useState<Product[]>([]);
 
   const features = [
     { icon: ShoppingBag, title: 'Quality Products', description: 'Carefully curated selection of high-quality items' },
@@ -40,6 +50,29 @@ export default function Home() {
 
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const fetchRecentlyViewed = async () => {
+      if (recentlyViewed.length > 0) {
+        try {
+          const products = await Promise.all(
+            recentlyViewed.map(async (id) => {
+              try {
+                return await productsAPI.getById(id);
+              } catch {
+                return null;
+              }
+            })
+          );
+          setRecentlyViewedProducts(products.filter((p): p is Product => p !== null));
+        } catch (err) {
+          console.error('Failed to fetch recently viewed', err);
+        }
+      }
+    };
+
+    fetchRecentlyViewed();
+  }, [recentlyViewed]);
 
   return (
     <div>
@@ -103,6 +136,48 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Recently Viewed */}
+      {recentlyViewedProducts.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+              Recently Viewed
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {recentlyViewedProducts.map((product) => (
+                <div
+                  key={product._id}
+                  onClick={() => {
+                    addToRecentlyViewed(product._id);
+                    navigate(`/product/${product._id}`);
+                  }}
+                  className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                >
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-2xl font-bold text-blue-600 mb-2">
+                      ${product.price.toFixed(2)}
+                    </p>
+                    <div className="flex items-center">
+                      <span className="text-sm text-gray-600">
+                        ({product.reviews} reviews)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="text-center mb-10">
         <button

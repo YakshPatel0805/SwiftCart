@@ -8,6 +8,9 @@ interface AuthContextType {
   signup: (email: string, username: string, password: string, role: string) => Promise<boolean>;
   logout: () => void;
   updateProfile: (username: string, email: string) => Promise<void>;
+  recentlyViewed: string[];
+  addToRecentlyViewed: (productId: string) => void;
+  clearRecentlyViewed: () => void;
   isLoading: boolean;
 }
 
@@ -102,12 +105,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>(() => {
+    const saved = localStorage.getItem('recentlyViewed');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const addToRecentlyViewed = (productId: string) => {
+    setRecentlyViewed(prev => {
+      const updated = [productId, ...prev.filter(id => id !== productId)].slice(0, 10);
+      localStorage.setItem('recentlyViewed', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const clearRecentlyViewed = () => {
+    setRecentlyViewed([]);
+    localStorage.removeItem('recentlyViewed');
+  };
+
   const value: AuthContextType = {
     user,
     login,
     signup,
     logout,
     updateProfile,
+    recentlyViewed,
+    addToRecentlyViewed,
+    clearRecentlyViewed,
     isLoading,
   };
 

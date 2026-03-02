@@ -5,6 +5,7 @@ import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { productsAPI } from '../../services/api';
+import MobileMenu from './MobileMenu';
 
 interface Category {
   category: string;
@@ -361,6 +362,9 @@ export default function Header() {
           </div>
         )}
       </div>
+
+      {/* Mobile Menu Component */}
+      <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </header>
   );
 }
