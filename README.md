@@ -15,6 +15,9 @@ Full-stack e-commerce application with React frontend and Node.js/Express backen
 - Role-based access control (Admin/User)
 - Secure API endpoints
 - React Router for proper URL-based navigation
+- **Multiple payment methods**: Credit Card, Account Transfer, Google Pay, Cash on Delivery
+- **Profile management**: Edit username and email
+- **Real-time order status**: Orders show "processing" status for immediate payment methods
 
 ## Prerequisites
 
@@ -130,34 +133,6 @@ name,price,image,category,description,rating,reviews,inStock
 Premium T-Shirt,29.99,https://example.com/img.jpg,clothing,Comfortable shirt,4.5,good quality,true
 ```
 
-## Unit Testing 🚨
-
-The front‑end uses **Vitest + Testing Library** for unit tests.
-
-### Getting started
-1. install dependencies if you haven't already:
-   ```bash
-   npm install -D vitest @testing-library/react \
-     @testing-library/jest-dom @testing-library/user-event jsdom
-   ```
-2. add the new scripts (already present in `package.json`):
-   - `npm run test` – start the interactive runner
-   - `npm run test:coverage` – run once and collect coverage data
-
-Place each component, context, or utility’s tests alongside one another in
-that hierarchy, or next to the implementation (e.g. `ProductCard.test.tsx`
-alongside `ProductCard.tsx`).  The example above shows both patterns.
-
-
-### Example
-See `src/components/Product/ProductCard.test.tsx` for a basic render test
-that wraps the component with the various context providers.
-
-### Tips
-- mock API calls with `vi.mock(...)` or use `msw` for requests
-- add typings for `vi` in `tsconfig.app.json` if needed
-
----
 
 ## API Endpoints
 
@@ -183,6 +158,12 @@ that wraps the component with the various context providers.
 - `GET /api/orders/:id` - Get order by ID
 - `POST /api/orders` - Create new order (sends confirmation email)
 - `PATCH /api/orders/:id/cancel` - Cancel order (sends cancellation email)
+
+### Payments (Protected)
+- `POST /api/payments/accounttransfer` - Process account transfer payment
+- `POST /api/payments/creditcard` - Process credit card payment
+- `POST /api/payments/create-with-account-transfer` - Create order with account transfer payment
+- `POST /api/payments/create-with-credit-card` - Create order with credit card payment
 
 ## Email Notifications
 
@@ -230,10 +211,11 @@ See `server/EMAIL_COMPLETE_GUIDE.md` for detailed setup instructions.
 - Browse products by category
 - Search products
 - Add to cart/wishlist
-- Place orders with multiple payment methods
+- Place orders with multiple payment methods (Credit Card, Account Transfer, Google Pay, Cash on Delivery)
 - Receive email notifications
 - View profile and order history
 - Cancel orders (before shipping)
+- Edit profile (username and email)
 
 ### Admin
 - All user permissions except cancel order
@@ -251,6 +233,8 @@ See `server/EMAIL_COMPLETE_GUIDE.md` for detailed setup instructions.
 - password (bcrypt hashed)
 - role (user/admin)
 - wishlist (array of product IDs)
+- accountDetails (accountHolderName, accountNumber, accountPIN, balance)
+- creditCardDetails (cardHolderName, cardNumber, cardCVV, cardExpiry, cardBalance)
 - profile information
 
 ### Products
@@ -269,7 +253,7 @@ See `server/EMAIL_COMPLETE_GUIDE.md` for detailed setup instructions.
 - total
 - status (pending, processing, shipped, delivered, cancelled)
 - shippingAddress
-- paymentMethod (credit-card, google-pay, cash-on-delivery)
+- paymentMethod (credit-card, google-pay, cash-on-delivery, Account-Transfer)
 - createdAt
 
 ## Security Features
