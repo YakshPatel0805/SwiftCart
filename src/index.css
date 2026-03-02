@@ -54,3 +54,40 @@
 .hamburger.active .hamburger-line:nth-child(3) {
   @apply rotate-45 translate-y-2;
 }
+
+/* Universal Dark Mode Styles */
+.dark {
+  /* Background colors */
+  --bg-primary: #1f2937;
+  --bg-secondary: #374151;
+  --bg-tertiary: #4b5563;
+  
+  /* Text colors */
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  
+  /* Border colors */
+  --border-light: #374151;
+  --border-medium: #4b5563;
+  
+  /* Brand colors */
+  --blue-dark: #3b82f6;
+  --blue-dark-hover: #2563eb;
+}
+
+/* Apply dark mode styles globally */
+.dark body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+.dark .min-h-screen {
+  @apply bg-gray-900;
+}
+
+/* Dark mode transitions */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/Layout/Header';
 import AdminHeader from './components/Layout/AdminHeader';
 import Footer from './components/Layout/Footer';
@@ -41,7 +42,7 @@ function AppLayout() {
   const { user } = useAuth();
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {user?.role === 'admin' ? <AdminHeader /> : <Header />}
       <main>
         <Routes>
@@ -76,16 +77,18 @@ function AppLayout() {
 
 function App() {
   return (
-    <AuthProvider>
-      <WishlistProvider>
-        <CartProvider>
-          <Router>
-            <ScrollToTop />
-            <AppLayout />
-          </Router>
-        </CartProvider>
-      </WishlistProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <Router>
+              <ScrollToTop />
+              <AppLayout />
+            </Router>
+          </CartProvider>
+        </WishlistProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

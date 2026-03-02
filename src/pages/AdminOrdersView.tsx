@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Package, Truck, XCircle, CheckCircle, Clock, User, Mail, MapPin, Calendar, DollarSign } from 'lucide-react';
 import { ordersAPI } from '../services/api';
-import React from 'react';
 import OrderPieChart from '../components/PieChart';
 
 export default function AdminOrdersView() {
@@ -85,6 +84,7 @@ export default function AdminOrdersView() {
   });
 
   const getOrderStats = () => {
+    const deliveredOrders = orders.filter(o => o.status === 'delivered');
     return {
       total: orders.length,
       pending: orders.filter(o => o.status === 'pending').length,
@@ -92,7 +92,7 @@ export default function AdminOrdersView() {
       shipped: orders.filter(o => o.status === 'shipped').length,
       delivered: orders.filter(o => o.status === 'delivered').length,
       cancelled: orders.filter(o => o.status === 'cancelled').length,
-      totalRevenue: orders.reduce((sum, o) => sum + (o.total || 0), 0)
+      totalRevenue: deliveredOrders.reduce((sum, o) => sum + (o.total || 0), 0)
     };
   };
 
