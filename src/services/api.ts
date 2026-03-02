@@ -289,7 +289,26 @@ export const paymentAPI = {
     return res.json();
   },
 
-  createWithPayment: async (data: {
+  creditCard: async (data: {
+    orderId: string;
+    cardNumber: string;
+    cvv: string;
+    expiry: string;
+  }) => {
+    const res = await fetch(`${API_URL}/payments/creditcard`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw errorData;
+    }
+    return res.json();
+  },
+
+  createWithAccountTransfer: async (data: {
     items: { productId: string; quantity: number }[];
     total: number;
     shippingAddress: ShippingAddress;
@@ -297,7 +316,29 @@ export const paymentAPI = {
     accountNumber: string;
     pin: string;
   }) => {
-    const res = await fetch(`${API_URL}/payments/create-with-payment`, {
+    const res = await fetch(`${API_URL}/payments/create-with-account-transfer`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw errorData;
+    }
+    return res.json();
+  },
+
+  createWithCreditCard: async (data: {
+    items: { productId: string; quantity: number }[];
+    total: number;
+    shippingAddress: ShippingAddress;
+    paymentMethod: { type: string };
+    cardNumber: string;
+    cvv: string;
+    expiry: string;
+  }) => {
+    const res = await fetch(`${API_URL}/payments/create-with-credit-card`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(data)

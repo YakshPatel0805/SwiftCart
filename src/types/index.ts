@@ -45,7 +45,7 @@ export interface ShippingAddress {
 }
 
 export type PaymentMethod =
-  | { type: 'credit-card'; cardholderName?: string; cardNumber?: string; expiryDate?: Date; cvv?: string }
+  | { type: 'credit-card'; cardholderName?: string; cardNumber?: string; expiryDate?: string; cvv?: string }
   | { type: 'google-pay' }
   | { type: 'cash-on-delivery' }
   | {

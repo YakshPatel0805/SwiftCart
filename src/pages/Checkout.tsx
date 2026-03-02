@@ -61,10 +61,31 @@ export default function Checkout() {
           pin: paymentMethod.pin
         };
 
-        console.log("Creating order with payment", orderData);
-        await paymentAPI.createWithPayment(orderData);
+        console.log("Creating order with account transfer", orderData);
+        await paymentAPI.createWithAccountTransfer(orderData);
+      } else if (paymentMethod.type === "credit-card") {
+        if (!paymentMethod.cardNumber || !paymentMethod.cvv || !paymentMethod.expiryDate) {
+          alert("Please enter all card details");
+          setIsProcessing(false);
+          return;
+        }
+
+        const orderData = {
+          items: items.map(item => ({
+            productId: item.product.id || (item.product as any)._id,
+            quantity: item.quantity
+          })),
+          total,
+          shippingAddress,
+          paymentMethod: { type: paymentMethod.type },
+          cardNumber: paymentMethod.cardNumber,
+          cvv: paymentMethod.cvv,
+          expiry: paymentMethod.expiryDate
+        };
+
+        console.log("Creating order with credit card", orderData);
+        await paymentAPI.createWithCreditCard(orderData);
       } else {
-        // For other payment methods, create order normally
         const orderData = {
           items: items.map(item => ({
             productId: item.product.id || (item.product as any)._id,
@@ -91,7 +112,6 @@ export default function Checkout() {
   };
 
   const handleOrderComplete = () => {
-    // Clear the cart and redirect to orders
     clearCart();
     navigate('/orders');
   };
@@ -388,6 +408,8 @@ export default function Checkout() {
                           type="text"
                           required
                           placeholder="1234 5678 9012 3456"
+                          value={paymentMethod.cardNumber || ''}
+                          onChange={(e) => setPaymentMethod({ ...paymentMethod, cardNumber: e.target.value })}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
@@ -400,6 +422,8 @@ export default function Checkout() {
                             type="text"
                             required
                             placeholder="MM/YY"
+                            value={paymentMethod.expiryDate || ''}
+                            onChange={(e) => setPaymentMethod({ ...paymentMethod, expiryDate: e.target.value })}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
@@ -411,6 +435,8 @@ export default function Checkout() {
                             type="text"
                             required
                             placeholder="123"
+                            value={paymentMethod.cvv || ''}
+                            onChange={(e) => setPaymentMethod({ ...paymentMethod, cvv: e.target.value })}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
