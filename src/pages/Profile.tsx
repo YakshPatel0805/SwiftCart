@@ -1,9 +1,12 @@
 import { useAuth } from '../context/AuthContext';
-import { User, Shield, Mail, Crown } from 'lucide-react';
-import React from 'react';
+import { User, Shield, Mail, Crown, Edit } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ username: user?.username || '', email: user?.email || '' });
+  const [isSaving, setIsSaving] = useState(false);
 
   if (!user) {
     return (
@@ -16,6 +19,24 @@ export default function Profile() {
       </div>
     );
   }
+
+  const handleSave = async () => {
+    if (!editForm.username || !editForm.email) {
+      alert('Please fill in all fields');
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      await updateProfile(editForm.username, editForm.email);
+      setIsEditing(false);
+      alert('Profile updated successfully');
+    } catch (error: any) {
+      alert(error.message || 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const getRoleBadge = (role?: 'user' | 'admin') => {
     if (role === 'admin') {
@@ -61,8 +82,25 @@ export default function Profile() {
                 <User className="w-5 h-5 text-gray-600 mt-0.5" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-500">Username</p>
-                  <p className="text-base text-gray-900 mt-1">{user.username}</p>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editForm.username}
+                      onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 mt-1"
+                    />
+                  ) : (
+                    <p className="text-base text-gray-900 mt-1">{user.username}</p>
+                  )}
                 </div>
+                {isEditing && (
+                  <button
+                    onClick={() => setEditForm({ username: user.username, email: user.email })}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                )}
               </div>
 
               {/* Email */}
@@ -70,8 +108,25 @@ export default function Profile() {
                 <Mail className="w-5 h-5 text-gray-600 mt-0.5" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-500">Email Address</p>
-                  <p className="text-base text-gray-900 mt-1">{user.email}</p>
+                  {isEditing ? (
+                    <input
+                      type="email"
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 mt-1"
+                    />
+                  ) : (
+                    <p className="text-base text-gray-900 mt-1">{user.email}</p>
+                  )}
                 </div>
+                {isEditing && (
+                  <button
+                    onClick={() => setEditForm({ username: user.username, email: user.email })}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                )}
               </div>
 
               {/* Role */}
@@ -98,6 +153,41 @@ export default function Profile() {
                   <p className="text-base text-gray-900 mt-1 font-mono text-sm">{user.id}</p>
                 </div>
               </div>
+            </div>
+
+            {/* Edit Profile Button */}
+            <div className="mt-6 flex justify-end">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditForm({ username: user.username, email: user.email });
+                    }}
+                    className="mr-3 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSaving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setEditForm({ username: user.username, email: user.email });
+                    setIsEditing(true);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit Profile
+                </button>
+              )}
             </div>
           </div>
         </div>

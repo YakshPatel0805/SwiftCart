@@ -49,6 +49,19 @@ export const authAPI = {
       body: JSON.stringify({ email, oldPassword, newPassword, confirmPassword })
     });
     return response.json();
+  },
+
+  updateProfile: async (username: string, email: string) => {
+    const response = await fetch(`${API_URL}/auth/update-profile`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ username, email })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    }
+    return data;
   }
 };
 

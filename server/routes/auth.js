@@ -111,4 +111,54 @@ router.post('/change-password', authenticateToken, async (req, res) => {
   }
 });
 
+router.patch('/update-profile', authenticateToken, async (req, res) => {
+  try {
+    const { username, email } = req.body;
+
+    if (!username || !email) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if email is already taken by another user
+    const existingUser = await User.findOne({ 
+      email: email.toLowerCase(),
+      _id: { $ne: user._id }
+    });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    // Check if username is already taken by another user
+    const existingUsername = await User.findOne({ 
+      username,
+      _id: { $ne: user._id }
+    });
+    if (existingUsername) {
+      return res.status(400).json({ message: 'Username already in use' });
+    }
+
+    user.username = username;
+    user.email = email.toLowerCase();
+    await user.save();
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 export default router;

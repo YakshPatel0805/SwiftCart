@@ -7,6 +7,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, username: string, password: string, role: string) => Promise<boolean>;
   logout: () => void;
+  updateProfile: (username: string, email: string) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -81,11 +82,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem('token');
   };
 
+  const updateProfile = async (username: string, email: string) => {
+    try {
+      const data = await authAPI.updateProfile(username, email);
+      if (data.user) {
+        const updatedUser: User = {
+          id: data.user.id,
+          email: data.user.email,
+          username: data.user.username,
+          role: data.user.role,
+        };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    } catch (error: any) {
+      console.error('Update profile error:', error);
+      console.error('Error details:', error.message, error);
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user,
     login,
     signup,
     logout,
+    updateProfile,
     isLoading,
   };
 
