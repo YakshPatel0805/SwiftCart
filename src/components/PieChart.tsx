@@ -20,7 +20,14 @@ function generateColor(index: number) {
   return `hsl(${hue}, 70%, 50%)`;
 }
 
-const COLORS = ["#3B82F6",  "#c0e41f", "#22C55E", "#EF4444"]; 
+// const COLORS = ["#3B82F6", "#c0e41f", "#22C55E", "#EF4444"];
+const STATUS_COLORS: Record<string, string> = {
+  pending: "#FACC15",      // yellow
+  processing: "#3B82F6",   // blue
+  shipped: "#8B5CF6",      // purple
+  delivered: "#22C55E",    // green
+  cancelled: "#EF4444",    // red
+};
 
 export default function OrderPieChart({ orders }: OrderPieChartProps) {
   const statusCount: Record<string, number> = orders.reduce(
@@ -52,10 +59,10 @@ export default function OrderPieChart({ orders }: OrderPieChartProps) {
             cy="50%"
             outerRadius={110}
           >
-            {data.map((_, index) => (
+            {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
+                fill={STATUS_COLORS[entry.name] || "#9CA3AF"} // fallback gray
               />
             ))}
           </Pie>

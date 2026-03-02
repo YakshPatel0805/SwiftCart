@@ -51,14 +51,25 @@ export default function Orders() {
       return;
     }
 
+    // Show loading indicator
+    const originalText = document.body.innerHTML;
+    document.body.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;"><div class="bg-white p-6 rounded-lg shadow-lg"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div><p class="text-gray-700">Cancelling order...</p></div></div>';
+
     try {
-      await ordersAPI.cancel(orderId);
+      // Add timeout for cancel request
+      await Promise.race([
+        ordersAPI.cancel(orderId),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Cancel request timed out')), 10000))
+      ]);
       // Reload orders to reflect the change
       await loadOrders();
       setOpenDropdown(null);
       alert('Order cancelled successfully');
     } catch (error: any) {
       alert(error.message || 'Failed to cancel order');
+    } finally {
+      // Restore original content
+      document.body.innerHTML = originalText;
     }
   };
   

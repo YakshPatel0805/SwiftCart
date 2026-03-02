@@ -82,7 +82,7 @@ export default function Header() {
   const handleLogout = () => {
     logout();
     setIsUserMenuOpen(false);
-    navigate('/');
+    navigate('/login');
   };
 
   const handleSearch = (e: React.FormEvent) => {

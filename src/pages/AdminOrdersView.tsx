@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, Clock, User, Mail, MapPin, Calendar, DollarSign } from 'lucide-react';
+import { Package, Truck, XCircle, CheckCircle, Clock, User, Mail, MapPin, Calendar, DollarSign } from 'lucide-react';
 import { ordersAPI } from '../services/api';
 import React from 'react';
 import OrderPieChart from '../components/PieChart';
@@ -33,7 +33,6 @@ export default function AdminOrdersView() {
     try {
       setUpdatingOrderId(orderId);
       await ordersAPI.updateStatus(orderId, newStatus);
-      // Reload orders to get updated data
       await loadOrders();
     } catch (error) {
       console.error('Error updating order status:', error);
@@ -49,8 +48,8 @@ export default function AdminOrdersView() {
         return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'shipped':
         return <Truck className="h-5 w-5 text-blue-600" />;
-      // case 'cancelled':
-      //   return <XCircle className="h-5 w-5 text-red-600" />;
+      case 'cancelled':
+        return <XCircle className="h-5 w-5 text-red-600" />;
       case 'processing':
         return <Clock className="h-5 w-5 text-yellow-600" />;
       default:
@@ -66,8 +65,8 @@ export default function AdminOrdersView() {
         return 'bg-blue-100 text-blue-800';
       case 'processing':
         return 'bg-yellow-100 text-yellow-800';
-      // case 'cancelled':
-      //   return 'bg-red-100 text-red-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -92,7 +91,7 @@ export default function AdminOrdersView() {
       processing: orders.filter(o => o.status === 'processing').length,
       shipped: orders.filter(o => o.status === 'shipped').length,
       delivered: orders.filter(o => o.status === 'delivered').length,
-      // cancelled: orders.filter(o => o.status === 'cancelled').length,
+      cancelled: orders.filter(o => o.status === 'cancelled').length,
       totalRevenue: orders.reduce((sum, o) => sum + (o.total || 0), 0)
     };
   };
@@ -248,7 +247,7 @@ export default function AdminOrdersView() {
                 >
                   Delivered ({stats.delivered})
                 </button>
-                {/* <button
+                <button
                   onClick={() => setSelectedStatus('cancelled')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedStatus === 'cancelled'
@@ -257,7 +256,7 @@ export default function AdminOrdersView() {
                   }`}
                 >
                   Cancelled ({stats.cancelled})
-                </button> */}
+                </button>
               </div>
             </div>
           </div>

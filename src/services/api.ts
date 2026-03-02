@@ -1,3 +1,5 @@
+import { ShippingAddress } from '../types';
+
 const API_URL = 'http://localhost:5000/api';
 
 const getAuthHeaders = () => {
@@ -261,13 +263,37 @@ export const paymentAPI = {
     accountNumber: string;
     pin: string;
   }) => {
-    const res = await fetch(`${API_URL}/payment/accounttransfer`, {
+    const res = await fetch(`${API_URL}/payments/accounttransfer`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
     });
 
-    if (!res.ok) throw await res.json();
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw errorData;
+    }
+    return res.json();
+  },
+
+  createWithPayment: async (data: {
+    items: { productId: string; quantity: number }[];
+    total: number;
+    shippingAddress: ShippingAddress;
+    paymentMethod: { type: string };
+    accountNumber: string;
+    pin: string;
+  }) => {
+    const res = await fetch(`${API_URL}/payments/create-with-payment`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw errorData;
+    }
     return res.json();
   }
 };

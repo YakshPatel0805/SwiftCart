@@ -100,7 +100,8 @@ router.post('/', authenticateToken, async (req, res) => {
       items: orderItems,
       total,
       shippingAddress,
-      paymentMethod: paymentMethod
+      paymentMethod: paymentMethod,
+      status: (paymentMethod.type === 'credit-card' || paymentMethod.type === 'google-pay' || paymentMethod.type === 'Account-Transfer') ? 'processing' : 'pending'
     });
 
     await order.save();

@@ -34,40 +34,59 @@ export default function Checkout() {
     setStep(2);
   };
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsProcessing(true);
 
     try {
-      const orderData = {
-        items: items.map(item => ({
-          productId: item.product.id || (item.product as any)._id,
-          quantity: item.quantity
-        })),
-        total,
-        shippingAddress,
-        paymentMethod: { type: paymentMethod.type }
-      };
-
-      const order = await ordersAPI.create(orderData);
-      console.log("Order created:", order._id);
-
       if (paymentMethod.type === "Account-Transfer") {
         if (!paymentMethod.accNumber || !paymentMethod.pin) {
-          alert("Please enter Account Number OR PIN");
+          alert("Please enter Account Number and PIN");
+          setIsProcessing(false);
           return;
         }
-        const paymentData = {
-          orderId: order._id,
+
+        // Create order with payment validation in one step
+        const orderData = {
+          items: items.map(item => ({
+            productId: item.product.id || (item.product as any)._id,
+            quantity: item.quantity
+          })),
+          total,
+          shippingAddress,
+          paymentMethod: { type: paymentMethod.type },
           accountNumber: paymentMethod.accNumber,
           pin: paymentMethod.pin
         };
-        console.log("Processing Payment", paymentData);
-        await paymentAPI.accountTransfer(paymentData);
+
+        console.log("Creating order with payment", orderData);
+        await paymentAPI.createWithPayment(orderData);
+      } else {
+        // For other payment methods, create order normally
+        const orderData = {
+          items: items.map(item => ({
+            productId: item.product.id || (item.product as any)._id,
+            quantity: item.quantity
+          })),
+          total,
+          shippingAddress,
+          paymentMethod: { type: paymentMethod.type }
+        };
+
+        console.log("Creating order", orderData);
+        await ordersAPI.create(orderData);
       }
+
       setStep(3);
     } catch (error: any) {
       console.error("Checkout error:", error);
-      alert(error.response?.data?.message || "Payment failed");
+      console.error("Error response:", error.message, error);
+      const errorMessage = error.message || error || "Payment failed";
+      alert(errorMessage);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -128,6 +147,19 @@ export default function Checkout() {
           >
             View Orders
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading overlay
+  if (isProcessing) {
+    return (
+      <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg shadow-xl text-center max-w-sm">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Processing Order</h2>
+          <p className="text-gray-600">Please wait while we confirm your payment and place your order...</p>
         </div>
       </div>
     );
@@ -486,9 +518,10 @@ export default function Checkout() {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      disabled={isProcessing}
+                      className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {paymentMethod.type === 'cash-on-delivery' ? 'Confirm Order' : 'Place Order'}
+                      {isProcessing ? 'Processing...' : paymentMethod.type === 'cash-on-delivery' ? 'Confirm Order' : 'Place Order'}
                     </button>
                   </div>
                 </form>
