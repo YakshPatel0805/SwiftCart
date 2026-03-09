@@ -68,25 +68,7 @@ Or with custom credentials:
 npm run create-admin admin@gmail.com admin admin123
 ```
 
-This creates an admin user who can upload products via CSV.
-
-### 3. Test Email Configuration (Optional)
-
-```bash
-cd server
-npm run test-email
-```
-
-This will verify your email configuration is working correctly.
-
-### 4. Seed Database (Optional)
-
-```bash
-cd server
-npm run seed
-```
-
-### 5. Start Backend Server
+### 3. Start Backend Server
 
 ```bash
 cd server
@@ -95,7 +77,7 @@ npm start
 
 Server will run on http://localhost:5000
 
-### 6. Frontend Setup
+### 4. Frontend Setup
 
 ```bash
 npm install

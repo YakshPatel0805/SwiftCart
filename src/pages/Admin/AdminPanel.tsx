@@ -182,13 +182,12 @@ export default function AdminPanel() {
                     </label>
                     <input
                       type="number"
-                      step="0.01"
                       id='productPrice'
                       required
                       value={productForm.price}
                       onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="0.00"
+                      placeholder="100"
                     />
                   </div>
 
