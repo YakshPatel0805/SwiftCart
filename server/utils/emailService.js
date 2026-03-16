@@ -365,7 +365,7 @@ export const sendAdminCancellationNotification = async (order, customerEmail, cu
     
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL,
       subject: `⚠️ Order Cancelled - Order #${order._id}`,
       html: `
         <!DOCTYPE html>
@@ -498,7 +498,7 @@ export const sendContactEmail = async (contactData) => {
     // Send notification email to admin
     const adminMailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL,
       subject: `📧 New Contact Form Submission - ${contactData.subject}`,
       html: `
         <!DOCTYPE html>
