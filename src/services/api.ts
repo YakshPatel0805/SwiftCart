@@ -358,6 +358,23 @@ export const paymentAPI = {
     return res.json();
   },
 
+  googlePay: async (data: {
+    orderId: string;
+    accountId: string;
+  }) => {
+    const res = await fetch(`${API_URL}/payments/googlepay`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw errorData;
+    }
+    return res.json();
+  },
+
   createWithAccountTransfer: async (data: {
     items: { productId: string; quantity: number }[];
     total: number;
@@ -389,6 +406,26 @@ export const paymentAPI = {
     expiry: string;
   }) => {
     const res = await fetch(`${API_URL}/payments/create-with-credit-card`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw errorData;
+    }
+    return res.json();
+  },
+
+  createWithGooglePay: async (data: {
+    items: { productId: string; quantity: number }[];
+    total: number;
+    shippingAddress: ShippingAddress;
+    paymentMethod: { type: string };
+    accountId: string;
+  }) => {
+    const res = await fetch(`${API_URL}/payments/create-with-googlepay`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
@@ -545,6 +582,108 @@ export const usersAPI = {
       return response.json();
     } catch (error) {
       console.error('Users API getById error:', error);
+      throw error;
+    }
+  }
+};
+
+export const bankAPI = {
+  getAll: async () => {
+    try {
+      const response = await fetch(`${API_URL}/bank`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Bank API getAll error:', error);
+      throw error;
+    }
+  },
+
+  getById: async (accountId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/bank/${accountId}`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Bank API getById error:', error);
+      throw error;
+    }
+  },
+
+  add: async (accountData: any) => {
+    try {
+      const response = await fetch(`${API_URL}/bank`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(accountData)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Bank API add error:', error);
+      throw error;
+    }
+  },
+
+  update: async (accountId: string, accountData: any) => {
+    try {
+      const response = await fetch(`${API_URL}/bank/${accountId}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(accountData)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Bank API update error:', error);
+      throw error;
+    }
+  },
+
+  delete: async (accountId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/bank/${accountId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Bank API delete error:', error);
+      throw error;
+    }
+  },
+
+  setDefault: async (accountId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/bank/${accountId}/set-default`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Bank API setDefault error:', error);
       throw error;
     }
   }

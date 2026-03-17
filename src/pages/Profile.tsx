@@ -1,6 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import { User, Shield, Mail, Crown, Edit } from 'lucide-react';
 import { useState } from 'react';
+import AddAccount from '../components/Profile/AddAccount';
 
 export default function Profile() {
   const { user, updateProfile } = useAuth();
@@ -199,6 +200,9 @@ export default function Profile() {
             </div>
           </div>
         </div>
+
+        {/* Payment Methods Section */}
+        <AddAccount />
       </div>
     </div>
   );
