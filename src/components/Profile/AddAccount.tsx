@@ -3,22 +3,24 @@ import { Plus, X, CreditCard, Wallet, Smartphone, Trash2, Star } from 'lucide-re
 import { bankAPI } from '../../services/api';
 
 interface BankAccount {
-  _id: string;
-  accountType: 'bank-account' | 'credit-card' | 'google-pay';
+  _id: string; // Will be 'bank-account', 'credit-card', or 'google-pay'
   bankAccount?: {
     accountHolderName: string;
     accountNumber: string;
     balance: number;
+    isDefault: boolean;
   };
   creditCard?: {
     cardHolderName: string;
     cardNumber: string;
     cardBalance: number;
+    isDefault: boolean;
   };
   googlePay?: {
     mobileNumber: string;
     upiId: string;
     balance: number;
+    isDefault: boolean;
   };
   isDefault: boolean;
   createdAt: string;
@@ -75,9 +77,7 @@ export default function AddAccount() {
     setMessage(null);
 
     try {
-      let accountData: any = {
-        accountType
-      };
+      let accountData: any = {};
 
       if (accountType === 'bank-account') {
         if (!formData.accountHolderName || !formData.accountNumber || !formData.accountPIN) {
@@ -184,28 +184,28 @@ export default function AddAccount() {
   };
 
   const getAccountDisplay = (account: BankAccount) => {
-    switch (account.accountType) {
-      case 'bank-account':
-        return {
-          title: account.bankAccount?.accountHolderName || 'Bank Account',
-          subtitle: `Account: ****${account.bankAccount?.accountNumber?.slice(-4)}`,
-          balance: `₹${account.bankAccount?.balance.toFixed(2)}`
-        };
-      case 'credit-card':
-        return {
-          title: account.creditCard?.cardHolderName || 'Credit Card',
-          subtitle: `Card: ****${account.creditCard?.cardNumber?.slice(-4)}`,
-          balance: `₹${account.creditCard?.cardBalance.toFixed(2)}`
-        };
-      case 'google-pay':
-        return {
-          title: 'Google Pay',
-          subtitle: `UPI: ${account.googlePay?.upiId}`,
-          balance: ''
-        };
-      default:
-        return { title: 'Account', subtitle: '', balance: '' };
+    if (account.bankAccount) {
+      return {
+        title: account.bankAccount.accountHolderName || 'Bank Account',
+        subtitle: `Account: ****${account.bankAccount.accountNumber?.slice(-4)}`,
+        balance: `₹${account.bankAccount.balance.toFixed(2)}`
+      };
     }
+    if (account.creditCard) {
+      return {
+        title: account.creditCard.cardHolderName || 'Credit Card',
+        subtitle: `Card: ****${account.creditCard.cardNumber?.slice(-4)}`,
+        balance: `₹${account.creditCard.cardBalance.toFixed(2)}`
+      };
+    }
+    if (account.googlePay) {
+      return {
+        title: 'Google Pay',
+        subtitle: `UPI: ${account.googlePay.upiId}`,
+        balance: `₹${account.googlePay.balance?.toFixed(2) || '0.00'}`
+      };
+    }
+    return { title: 'Account', subtitle: '', balance: '' };
   };
 
   return (
@@ -445,7 +445,7 @@ export default function AddAccount() {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    {getAccountIcon(account.accountType)}
+                    {getAccountIcon(account)}
                     <div>
                       <h4 className="font-semibold text-gray-900">{display.title}</h4>
                       <p className="text-sm text-gray-600">{display.subtitle}</p>
