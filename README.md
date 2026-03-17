@@ -58,15 +58,10 @@ See `server/EMAIL_COMPLETE_GUIDE.md` for detailed email configuration instructio
 
 ### 2. Create Admin User
 
-```bash
-cd server
-npm run create-admin
-```
-
-Or with custom credentials:
-```bash
-npm run create-admin admin@gmail.com admin admin123
-```
+signup and create admin user with essential credentials.
+ADMIN_EMAIL="admin_email"
+username === 'admin'
+password === 'admin123'
 
 ### 3. Start Backend Server
 
@@ -246,3 +241,11 @@ See `server/EMAIL_COMPLETE_GUIDE.md` for detailed setup instructions.
 - Protected API routes with middleware
 - Admin-only endpoints for product management
 - CORS enabled for frontend communication
+
+
+Valid Credit-Card numbers:  ( In testing choose from here )
+1️⃣ 4539 1488 0343 6467 — Visa
+2️⃣ 4485 2757 4323 8327 — Visa
+3️⃣ 5555 5555 5555 4444 — Mastercard
+4️⃣ 5105 1051 0510 5100 — Mastercard
+5️⃣ 3782 822463 10005 — American Express

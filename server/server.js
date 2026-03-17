@@ -8,6 +8,7 @@ import wishlistRoutes from './routes/wishlist.js';
 import orderRoutes from './routes/orders.js';
 import contactRoutes from './routes/contact.js';
 import paymentRoutes from './routes/payment.js';
+import deliveryRequestRoutes from './routes/deliveryRequests.js';
 
 dotenv.config();
 
@@ -20,6 +21,8 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
+// Register delivery-requests BEFORE orders to avoid route conflicts
+app.use('/api/delivery-requests', deliveryRequestRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/wishlist', wishlistRoutes);
@@ -29,6 +32,27 @@ app.use('/api/payments', paymentRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+// Test endpoint for delivery requests
+app.get('/api/delivery-requests-test', (req, res) => {
+  res.json({ message: 'Delivery requests route is working' });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('🔴 Global error handler:', err);
+  res.status(500).json({ 
+    message: 'Server error', 
+    error: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  console.warn('⚠️ 404 Not Found:', req.method, req.path);
+  res.status(404).json({ message: 'Route not found', path: req.path });
 });
 
 const PORT = process.env.PORT || 5000;

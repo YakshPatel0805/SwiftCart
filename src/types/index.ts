@@ -2,7 +2,7 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  role?: 'user' | 'admin';
+  role?: 'user' | 'admin' | 'deliveryboy';
   wishlist?: Product[];
 }
 

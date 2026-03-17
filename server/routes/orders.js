@@ -1,9 +1,11 @@
 import express from 'express';
 import Order from '../models/Order.js';
+import DeliveryRequest from '../models/DeliveryRequest.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
+import { isDeliveryBoy } from '../middleware/deliveryBoyAuth.js';
 import { 
   sendOrderConfirmationEmail, 
   sendOrderCancellationEmail, 
@@ -245,6 +247,77 @@ router.delete('/clear', authenticateToken, async (req, res) => {
     res.json({ message: 'Orders cleared successfully', deletedCount: result.deletedCount });
   } catch (error) {
     console.error('Error clearing orders:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Delivery Boy routes - Get all orders for delivery
+// Delivery Boy routes - Get all orders for delivery
+router.get('/deliveryboy/all', authenticateToken, isDeliveryBoy, async (req, res) => {
+  try {
+    console.log('📦 Fetching orders for delivery boy:', req.user.userId);
+    
+    // Get only orders assigned to this delivery boy
+    const orders = await Order.find({ assignedDeliveryBoyId: req.user.userId })
+      .populate('items.product')
+      .populate('userId', 'email username')
+      .sort({ createdAt: -1 });
+    
+    console.log('✓ Found orders:', orders.length);
+    res.json(orders);
+  } catch (error) {
+    console.error('❌ Error fetching delivery boy orders:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Delivery Boy route - Update order status (only pending and delivered)
+router.patch('/deliveryboy/:id/status', authenticateToken, isDeliveryBoy, async (req, res) => {
+  try {
+    const { status } = req.body;
+    
+    if (!status) {
+      return res.status(400).json({ message: 'Status is required' });
+    }
+    
+    // Delivery boys can only change to 'shipped' or 'delivered'
+    const allowedStatuses = ['shipped', 'delivered'];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Delivery boys can only update to shipped or delivered status' });
+    }
+    
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Check if this delivery boy is assigned to this order
+    if (order.assignedDeliveryBoyId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'You are not assigned to this order' });
+    }
+    
+    // Can only update orders that are in processing or shipped status
+    if (order.status !== 'processing' && order.status !== 'shipped') {
+      return res.status(400).json({ message: 'Can only update orders in processing or shipped status' });
+    }
+    
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true, runValidators: false }
+    ).populate('items.product').populate('userId', 'email username');
+
+    // If order is delivered, mark delivery request as completed
+    if (status === 'delivered') {
+      await DeliveryRequest.updateOne(
+        { orderId: req.params.id, deliveryBoyId: req.user.userId },
+        { status: 'completed', completedAt: new Date() }
+      );
+    }
+    
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error updating order status:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

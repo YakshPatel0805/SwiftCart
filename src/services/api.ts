@@ -248,6 +248,39 @@ export const ordersAPI = {
       console.error('Orders API clearAll error:', error);
       throw error;
     }
+  },
+
+  getDeliveryBoyOrders: async () => {
+    try {
+      const response = await fetch(`${API_URL}/orders/deliveryboy/all`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Orders API getDeliveryBoyOrders error:', error);
+      throw error;
+    }
+  },
+
+  updateDeliveryBoyOrderStatus: async (id: string, status: 'shipped' | 'delivered') => {
+    try {
+      const response = await fetch(`${API_URL}/orders/deliveryboy/${id}/status`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Orders API updateDeliveryBoyOrderStatus error:', error);
+      throw error;
+    }
   }
 };
 
@@ -366,5 +399,103 @@ export const paymentAPI = {
       throw errorData;
     }
     return res.json();
+  }
+};
+
+export const deliveryRequestAPI = {
+  sendRequests: async (orderId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/delivery-requests/send/${orderId}`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Delivery Request API sendRequests error:', error);
+      throw error;
+    }
+  },
+
+  getPendingRequests: async () => {
+    try {
+      const response = await fetch(`${API_URL}/delivery-requests/pending`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Delivery Request API getPendingRequests error:', error);
+      throw error;
+    }
+  },
+
+  getAllRequests: async () => {
+    try {
+      const response = await fetch(`${API_URL}/delivery-requests`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Delivery Request API getAllRequests error:', error);
+      throw error;
+    }
+  },
+
+  acceptRequest: async (requestId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/delivery-requests/${requestId}/accept`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Delivery Request API acceptRequest error:', error);
+      throw error;
+    }
+  },
+
+  rejectRequest: async (requestId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/delivery-requests/${requestId}/reject`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Delivery Request API rejectRequest error:', error);
+      throw error;
+    }
+  },
+
+  getOrderRequests: async (orderId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/delivery-requests/order/${orderId}`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Delivery Request API getOrderRequests error:', error);
+      throw error;
+    }
   }
 };

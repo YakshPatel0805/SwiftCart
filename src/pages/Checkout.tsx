@@ -63,7 +63,8 @@ export default function Checkout() {
 
         console.log("Creating order with account transfer", orderData);
         await paymentAPI.createWithAccountTransfer(orderData);
-      } else if (paymentMethod.type === "credit-card") {
+      } 
+      else if (paymentMethod.type === "credit-card") {
         if (!paymentMethod.cardNumber || !paymentMethod.cvv || !paymentMethod.expiryDate) {
           alert("Please enter all card details");
           setIsProcessing(false);

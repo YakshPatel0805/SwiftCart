@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/signup', async (req, res) => {
   try {
-    const { email, username, password } = req.body;
+    const { email, username, password, role } = req.body;
 
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
@@ -15,12 +15,13 @@ router.post('/signup', async (req, res) => {
     }
 
     const isAdminSignup = email === process.env.ADMIN_EMAIL && username === 'admin' && password === 'admin123';
+    const isDeliveryBoySignup = email === process.env.DELIVERYBOY_EMAIL && password === 'delivery';
 
     const user = new User({
       email,
       username,
       password,
-      role: isAdminSignup ? 'admin' : 'user'
+      role: isAdminSignup ? 'admin' : isDeliveryBoySignup ? 'deliveryboy' : 'user'
     });
     await user.save();
 

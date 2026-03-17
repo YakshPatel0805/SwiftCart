@@ -38,12 +38,20 @@ export default function Profile() {
     }
   };
 
-  const getRoleBadge = (role?: 'user' | 'admin') => {
+  const getRoleBadge = (role?: 'user' | 'admin' | 'deliveryboy') => {
     if (role === 'admin') {
       return (
         <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
           <Crown className="w-4 h-4" />
           Administrator
+        </span>
+      );
+    }
+    else if (role === 'deliveryboy') {
+      return (
+        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+          <Shield className="w-4 h-4" />
+          DeliveryBoy
         </span>
       );
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Package, Truck, XCircle, CheckCircle, Clock, User, Mail, MapPin, Calendar, DollarSign } from 'lucide-react';
-import { ordersAPI } from '../services/api';
+import { Package, Truck, XCircle, CheckCircle, Clock, User, Mail, MapPin, Calendar, DollarSign, Send } from 'lucide-react';
+import { ordersAPI, deliveryRequestAPI } from '../services/api';
 import OrderPieChart from '../components/PieChart';
 
 export default function AdminOrdersView() {
@@ -9,7 +9,7 @@ export default function AdminOrdersView() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
-  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [sendingDeliveryRequestId, setSendingDeliveryRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -28,16 +28,18 @@ export default function AdminOrdersView() {
     }
   };
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const sendDeliveryRequest = async (orderId: string) => {
     try {
-      setUpdatingOrderId(orderId);
-      await ordersAPI.updateStatus(orderId, newStatus);
+      setSendingDeliveryRequestId(orderId);
+      const result = await deliveryRequestAPI.sendRequests(orderId);
+      alert(`✓ ${result.message}`);
       await loadOrders();
-    } catch (error) {
-      console.error('Error updating order status:', error);
-      alert('Failed to update order status');
+    } catch (error: any) {
+      console.error('Error sending delivery request:', error);
+      const errorMessage = error.message || 'Failed to send delivery requests';
+      alert(`✗ Error: ${errorMessage}\n\nPossible causes:\n- No delivery boys available\n- Order already assigned\n- Server error`);
     } finally {
-      setUpdatingOrderId(null);
+      setSendingDeliveryRequestId(null);
     }
   };
 
@@ -419,37 +421,32 @@ export default function AdminOrdersView() {
                     </div>
 
                     {/* Order Actions */}
-                    <div className="mt-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Update Order Status</h3>
-                      <div className="bg-white rounded-lg p-4">
-                        <div className="flex flex-wrap gap-2">
-                          {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+                    <div className="mt-6 space-y-4">
+                     {/* Send Delivery Request */}
+                      {order.status === 'processing' && !order.assignedDeliveryBoyId && (
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-3">Delivery Management</h3>
+                          <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                            <p className="text-sm text-gray-600 mb-3">Send delivery requests to all available delivery boys</p>
                             <button
-                              key={status}
-                              onClick={() => updateOrderStatus(order._id, status)}
-                              disabled={updatingOrderId === order._id || order.status === status}
-                              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${order.status === status
-                                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                                  : updatingOrderId === order._id
-                                    ? 'bg-gray-200 text-gray-500 cursor-wait'
-                                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                                }`}
+                              onClick={() => sendDeliveryRequest(order._id)}
+                              disabled={sendingDeliveryRequestId === order._id}
+                              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                             >
-                              {updatingOrderId === order._id ? (
-                                <span className="flex items-center">
-                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                  Updating...
-                                </span>
-                              ) : (
-                                `Mark as ${status.charAt(0).toUpperCase() + status.slice(1)}`
-                              )}
+                              <Send className="h-4 w-4" />
+                              {sendingDeliveryRequestId === order._id ? 'Sending...' : 'Send Delivery Requests'}
                             </button>
-                          ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
+                      {order.assignedDeliveryBoyId && (
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-3">Delivery Status</h3>
+                          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <p className="text-sm text-gray-600">✓ Assigned to a delivery boy</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

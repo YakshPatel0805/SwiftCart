@@ -28,7 +28,11 @@ export default function Login() {
 
         if (user?.role === 'admin') {
           navigate('/admin');
-        } else {
+        }
+        else if (user?.role === 'deliveryboy'){
+          navigate('/deliveryboydashboard')
+        }
+        else {
           navigate('/dashboard');
         }
       } else {

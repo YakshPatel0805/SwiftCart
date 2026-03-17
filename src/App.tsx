@@ -6,6 +6,7 @@ import { WishlistProvider } from './context/WishlistContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/Layout/Header';
 import AdminHeader from './components/Layout/AdminHeader';
+import DeliveryBoyHeader from './components/Layout/DeliveryBoyHeader';
 import Footer from './components/Layout/Footer';
 import Home from './pages/Home';
 import Login from './pages/Auth/Login';
@@ -17,6 +18,7 @@ import Contact from './pages/Contact';
 import AdminPanel from './pages/Admin/AdminPanel';
 import AdminProductsView from './pages/AdminProductsView';
 import AdminOrdersView from './pages/AdminOrdersView';
+import DeliveryBoyDashboard from './pages/DeliveryBoyDashboard';
 import Orders from './pages/Orders';
 import CategoryPage from './pages/CategoryPage';
 import SearchResults from './pages/SearchResults';
@@ -43,7 +45,7 @@ function AppLayout() {
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-      {user?.role === 'admin' ? <AdminHeader /> : <Header />}
+      {user?.role === 'admin' ? <AdminHeader /> : user?.role === 'deliveryboy' ? <DeliveryBoyHeader /> : <Header />}
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -61,6 +63,7 @@ function AppLayout() {
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/admin/products" element={<AdminProductsView />} />
           <Route path="/admin/orders" element={<AdminOrdersView />} />
+          <Route path="/deliveryboydashboard" element={<DeliveryBoyDashboard />} />
           
           <Route path="/category/:categoryName" element={<CategoryPage />} />
           <Route path="/search" element={<SearchResults />} />
