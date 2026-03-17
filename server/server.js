@@ -9,6 +9,7 @@ import orderRoutes from './routes/orders.js';
 import contactRoutes from './routes/contact.js';
 import paymentRoutes from './routes/payment.js';
 import deliveryRequestRoutes from './routes/deliveryRequests.js';
+import usersRoutes from './routes/users.js';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ mongoose.connect(process.env.MONGODB_URI)
 // Register delivery-requests BEFORE orders to avoid route conflicts
 app.use('/api/delivery-requests', deliveryRequestRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);

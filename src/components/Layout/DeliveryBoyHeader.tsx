@@ -100,7 +100,7 @@ export default function DeliveryBoyHeader() {
         <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-3">
           <div className="flex flex-col space-y-2">
             <Link
-              to="/deliveryboy"
+              to="/deliveryboydashboard"
               className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
             >
               Dashboard

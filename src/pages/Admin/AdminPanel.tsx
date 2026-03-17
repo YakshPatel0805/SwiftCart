@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, Package, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AssignRole from '../../components/Admin/AssignRole';
 // import { productsAPI } from '../../services/api';
 
 export default function AdminPanel() {
@@ -143,6 +144,9 @@ export default function AdminPanel() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">    
+          {/* Assign Roles Section */}
+          <AssignRole />
+
           {/* Add Single Product Section */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
@@ -393,7 +397,8 @@ export default function AdminPanel() {
                 onClick={() => navigate('/admin/orders')}
                 className="flex items-center justify-center py-3 px-4 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
               >
-                View Orders
+                <Package className="h-5 w-5 mr-2" />
+                View All Orders
               </button>
             </div>
           </div>

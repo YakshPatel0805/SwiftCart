@@ -499,3 +499,53 @@ export const deliveryRequestAPI = {
     }
   }
 };
+
+export const usersAPI = {
+  getAll: async () => {
+    try {
+      const response = await fetch(`${API_URL}/users`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Users API getAll error:', error);
+      throw error;
+    }
+  },
+
+  updateRole: async (userId: string, role: string) => {
+    try {
+      const response = await fetch(`${API_URL}/users/${userId}/role`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ role })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Users API updateRole error:', error);
+      throw error;
+    }
+  },
+
+  getById: async (userId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/users/${userId}`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Users API getById error:', error);
+      throw error;
+    }
+  }
+};

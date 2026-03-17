@@ -15,13 +15,12 @@ router.post('/signup', async (req, res) => {
     }
 
     const isAdminSignup = email === process.env.ADMIN_EMAIL && username === 'admin' && password === 'admin123';
-    const isDeliveryBoySignup = email === process.env.DELIVERYBOY_EMAIL && password === 'delivery';
 
     const user = new User({
       email,
       username,
       password,
-      role: isAdminSignup ? 'admin' : isDeliveryBoySignup ? 'deliveryboy' : 'user'
+      role: isAdminSignup ? 'admin' : 'user'
     });
     await user.save();
 

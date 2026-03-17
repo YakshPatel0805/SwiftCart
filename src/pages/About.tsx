@@ -13,6 +13,15 @@ export default function About() {
               Founded with the mission to make online shopping simple, secure, and enjoyable, we carefully curate 
               our product selection to ensure you get the best value for your money.
             </p>
+            <p>
+              If you want to connect wih us 
+              , feel free to reach out through our contact page.
+              We'd love to hear from you!
+            </p>
+            <p>
+              If you want to join as Delivery Boy. Just E-mail us!
+              We provide you further guidence.
+            </p>
           </div>
         </div>
       </div>
