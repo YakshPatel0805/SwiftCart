@@ -11,11 +11,11 @@ const getAuthHeaders = () => {
 };
 
 export const authAPI = {
-  signup: async (email: string, username: string, password: string, role: string) => {
+  signup: async (email: string, username: string, password: string, role: string, mobile: string) => {
     const response = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, username, password, role })
+      body: JSON.stringify({ email, username, password, role, mobile })
     });
     const data = await response.json();
     if (!response.ok) {
@@ -51,11 +51,11 @@ export const authAPI = {
     return response.json();
   },
 
-  updateProfile: async (username: string, email: string) => {
+  updateProfile: async (username: string, email: string, mobile?: string) => {
     const response = await fetch(`${API_URL}/auth/update-profile`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ username, email })
+      body: JSON.stringify({ username, email, mobile })
     });
     const data = await response.json();
     if (!response.ok) {
@@ -279,6 +279,22 @@ export const ordersAPI = {
       return data;
     } catch (error) {
       console.error('Orders API updateDeliveryBoyOrderStatus error:', error);
+      throw error;
+    }
+  },
+
+  track: async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/orders/${id}/track`, {
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Orders API track error:', error);
       throw error;
     }
   }

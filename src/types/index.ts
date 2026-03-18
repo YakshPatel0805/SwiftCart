@@ -2,6 +2,7 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  mobile?: string;
   role?: 'user' | 'admin' | 'deliveryboy';
   wishlist?: Product[];
 }

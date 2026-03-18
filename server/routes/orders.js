@@ -34,6 +34,7 @@ router.get('/', authenticateToken, async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user.userId })
       .populate('items.product')
+      .populate('assignedDeliveryBoyId', 'username email mobile')
       .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
@@ -236,6 +237,88 @@ router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Track order - Get order with delivery boy details
+router.get('/:id/track', authenticateToken, async (req, res) => {
+  try {
+    const order = await Order.findOne({ 
+      _id: req.params.id, 
+      userId: req.user.userId 
+    })
+    .populate('items.product')
+    .populate('assignedDeliveryBoyId', 'username email mobile');
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    
+    // Get delivery boy contact info if assigned
+    let deliveryBoyInfo = null;
+    if (order.assignedDeliveryBoyId) {
+      deliveryBoyInfo = {
+        name: order.assignedDeliveryBoyId.username,
+        email: order.assignedDeliveryBoyId.email,
+        mobile: order.assignedDeliveryBoyId.mobile
+      };
+    }
+    
+    const getStatusHistory = (order) => {
+      const history = [
+        { status: 'pending', date: order.createdAt, description: 'Order placed successfully' }
+      ];
+      
+      if (order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered') {
+        history.push({ 
+          status: 'processing', 
+          date: new Date(new Date(order.createdAt).getTime() + 30 * 60000), // 30 minutes later
+          description: 'Order confirmed and being prepared' 
+        });
+      }
+      
+      if (order.status === 'shipped' || order.status === 'delivered') {
+        history.push({ 
+          status: 'shipped', 
+          date: new Date(new Date(order.createdAt).getTime() + 24 * 60 * 60000), // 1 day later
+          description: 'Order shipped and on the way' 
+        });
+      }
+      
+      if (order.status === 'delivered') {
+        history.push({ 
+          status: 'delivered', 
+          date: new Date(new Date(order.createdAt).getTime() + 72 * 60 * 60000), // 3 days later
+          description: 'Order delivered successfully' 
+        });
+      }
+      
+      if (order.status === 'cancelled') {
+        history.push({ 
+          status: 'cancelled', 
+          date: new Date(), 
+          description: 'Order cancelled' 
+        });
+      }
+      
+      return history;
+    };
+    
+    const trackingInfo = {
+      orderId: order._id,
+      status: order.status,
+      createdAt: order.createdAt,
+      items: order.items,
+      total: order.total,
+      shippingAddress: order.shippingAddress,
+      deliveryBoy: deliveryBoyInfo,
+      statusHistory: getStatusHistory(order)
+    };
+    
+    res.json(trackingInfo);
+  } catch (error) {
+    console.error('Error tracking order:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

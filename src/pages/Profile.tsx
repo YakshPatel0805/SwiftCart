@@ -1,12 +1,16 @@
 import { useAuth } from '../context/AuthContext';
-import { User, Shield, Mail, Crown, Edit } from 'lucide-react';
+import { User, Shield, Mail, Crown, Edit, Phone } from 'lucide-react';
 import { useState } from 'react';
 import AddAccount from '../components/Profile/AddAccount';
 
 export default function Profile() {
   const { user, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ username: user?.username || '', email: user?.email || '' });
+  const [editForm, setEditForm] = useState({ 
+    username: user?.username || '', 
+    email: user?.email || '',
+    mobile: user?.mobile || ''
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   if (!user) {
@@ -23,13 +27,22 @@ export default function Profile() {
 
   const handleSave = async () => {
     if (!editForm.username || !editForm.email) {
-      alert('Please fill in all fields');
+      alert('Please fill in username and email');
       return;
+    }
+
+    // Validate mobile number if provided
+    if (editForm.mobile) {
+      const mobileRegex = /^[\+]?[1-9][\d]{0,10}$/;
+      if (!mobileRegex.test(editForm.mobile)) {
+        alert('Please enter a valid mobile number');
+        return;
+      }
     }
     
     setIsSaving(true);
     try {
-      await updateProfile(editForm.username, editForm.email);
+      await updateProfile(editForm.username, editForm.email, editForm.mobile);
       setIsEditing(false);
       alert('Profile updated successfully');
     } catch (error: any) {
@@ -104,7 +117,7 @@ export default function Profile() {
                 </div>
                 {isEditing && (
                   <button
-                    onClick={() => setEditForm({ username: user.username, email: user.email })}
+                    onClick={() => setEditForm({ username: user.username, email: user.email, mobile: user.mobile || '' })}
                     className="text-gray-500 hover:text-gray-700"
                   >
                     <Edit className="w-5 h-5" />
@@ -130,7 +143,34 @@ export default function Profile() {
                 </div>
                 {isEditing && (
                   <button
-                    onClick={() => setEditForm({ username: user.username, email: user.email })}
+                    onClick={() => setEditForm({ username: user.username, email: user.email, mobile: user.mobile || '' })}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Mobile Number */}
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                <Phone className="w-5 h-5 text-gray-600 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-500">Mobile Number</p>
+                  {isEditing ? (
+                    <input
+                      type="tel"
+                      value={editForm.mobile}
+                      onChange={(e) => setEditForm({ ...editForm, mobile: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 mt-1"
+                      placeholder="Enter mobile number"
+                    />
+                  ) : (
+                    <p className="text-base text-gray-900 mt-1">{user.mobile || 'Not provided'}</p>
+                  )}
+                </div>
+                {isEditing && (
+                  <button
+                    onClick={() => setEditForm({ username: user.username, email: user.email, mobile: user.mobile || '' })}
                     className="text-gray-500 hover:text-gray-700"
                   >
                     <Edit className="w-5 h-5" />
@@ -171,7 +211,7 @@ export default function Profile() {
                   <button
                     onClick={() => {
                       setIsEditing(false);
-                      setEditForm({ username: user.username, email: user.email });
+                      setEditForm({ username: user.username, email: user.email, mobile: user.mobile || '' });
                     }}
                     className="mr-3 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
                   >
@@ -188,7 +228,7 @@ export default function Profile() {
               ) : (
                 <button
                   onClick={() => {
-                    setEditForm({ username: user.username, email: user.email });
+                    setEditForm({ username: user.username, email: user.email, mobile: user.mobile || '' });
                     setIsEditing(true);
                   }}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"

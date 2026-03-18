@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -10,6 +10,7 @@ export default function Signup() {
     username: '',
     password: '',
     confirmPassword: '',
+    mobile: '',
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +37,13 @@ export default function Signup() {
       return;
     }
 
+    // Validate mobile number
+    const mobileRegex = /^[\+]?[1-9][\d]{0,10}$/;
+    if (!mobileRegex.test(formData.mobile)) {
+      setError('Please enter a valid mobile number');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const role = isAdminUser(formData.email, formData.username) ? 'admin' : 'user';
@@ -43,7 +51,8 @@ export default function Signup() {
         formData.email,
         formData.username,
         formData.password,
-        role
+        role,
+        formData.mobile
       );
 
       if (success) {
@@ -128,6 +137,26 @@ export default function Signup() {
                   placeholder="Choose a username"
                 />
                 <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
+                Mobile Number
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  id="mobile"
+                  name="mobile"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  value={formData.mobile}
+                  onChange={handleInputChange}
+                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter your mobile number"
+                />
+                <Phone className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
               </div>
             </div>
 

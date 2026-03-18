@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Package, CheckCircle, MoreVertical, XCircle, Trash2 } from 'lucide-react';
+import { Package, CheckCircle, MoreVertical, XCircle, Trash2, Truck, User, Phone, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
 
@@ -219,10 +219,10 @@ export default function Orders() {
                             )}
                             <button
                               onClick={() => {
-                                alert('Order tracking feature removed');
+                                navigate(`/orders/${order._id}/track`);
                                 setOpenDropdown(null);
                               }}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50"
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             >
                               Track Your Order
                             </button>
@@ -267,6 +267,40 @@ export default function Orders() {
                         <p className="text-sm text-gray-600">Total</p>
                         <p className="text-xl font-bold text-gray-900">${order.total.toFixed(2)}</p>
                       </div>
+                    </div>
+                    
+                    {/* Delivery Boy Info Banner */}
+                    {order.assignedDeliveryBoyId && (
+                      <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Truck className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-semibold text-blue-800">Your Delivery Person</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                            <span className="text-gray-800 font-medium">{order.assignedDeliveryBoyId.username}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                            <span className="text-gray-700">{order.assignedDeliveryBoyId.mobile || 'N/A'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                            <span className="text-gray-600 truncate">{order.assignedDeliveryBoyId.email}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick Track Button */}
+                    <div className="mt-4 pt-4 border-t">
+                      <button
+                        onClick={() => navigate(`/orders/${order._id}/track`)}
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                      >
+                        Track This Order
+                      </button>
                     </div>
                   </div>
 

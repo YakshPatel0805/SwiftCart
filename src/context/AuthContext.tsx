@@ -5,9 +5,9 @@ import { authAPI } from '../services/api';
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, username: string, password: string, role: string) => Promise<boolean>;
+  signup: (email: string, username: string, password: string, role: string, mobile: string) => Promise<boolean>;
   logout: () => void;
-  updateProfile: (username: string, email: string) => Promise<void>;
+  updateProfile: (username: string, email: string, mobile?: string) => Promise<void>;
   recentlyViewed: string[];
   addToRecentlyViewed: (productId: string) => void;
   clearRecentlyViewed: () => void;
@@ -50,6 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           id: data.user.id,
           email: data.user.email,
           username: data.user.username,
+          mobile: data.user.mobile,
           role: data.user.role,
         };
         setUser(userProfile);
@@ -68,10 +69,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     email: string,
     username: string,
     password: string,
-    role: string
+    role: string,
+    mobile: string
   ): Promise<boolean> => {
     try {
-      const data = await authAPI.signup(email, username, password, role);
+      const data = await authAPI.signup(email, username, password, role, mobile);
       return data.success === true;
     } catch (error) {
       console.error('Signup error:', error);
@@ -85,14 +87,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem('token');
   };
 
-  const updateProfile = async (username: string, email: string) => {
+  const updateProfile = async (username: string, email: string, mobile?: string) => {
     try {
-      const data = await authAPI.updateProfile(username, email);
+      const data = await authAPI.updateProfile(username, email, mobile);
       if (data.user) {
         const updatedUser: User = {
           id: data.user.id,
           email: data.user.email,
           username: data.user.username,
+          mobile: data.user.mobile,
           role: data.user.role,
         };
         setUser(updatedUser);

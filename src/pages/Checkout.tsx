@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreditCard, Truck, Lock, Smartphone, Wallet, HandCoins } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { ordersAPI, paymentAPI } from '../services/api';
+import { ordersAPI, paymentAPI, bankAPI } from '../services/api';
 import { ShippingAddress, PaymentMethod } from '../types';
 
 export default function Checkout() {
@@ -35,6 +35,17 @@ export default function Checkout() {
   };
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [googlePayAccountId, setGooglePayAccountId] = useState<string | null>(null);
+
+  // Fetch Google Pay account ID when that method is selected
+  useEffect(() => {
+    if (paymentMethod.type === 'google-pay' && !googlePayAccountId) {
+      bankAPI.getAll().then((accounts: any[]) => {
+        const gpAccount = accounts.find((a: any) => a.googlePay?.upiId);
+        if (gpAccount) setGooglePayAccountId(gpAccount._id);
+      }).catch(() => {});
+    }
+  }, [paymentMethod.type]);
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,8 +108,18 @@ export default function Checkout() {
           paymentMethod: { type: paymentMethod.type }
         };
 
-        console.log("Creating order", orderData);
-        await ordersAPI.create(orderData);
+        if (paymentMethod.type === 'google-pay') {
+          if (!googlePayAccountId) {
+            alert('No Google Pay account found. Please add one in your profile.');
+            setIsProcessing(false);
+            return;
+          }
+          console.log("Creating order with Google Pay", { ...orderData, accountId: googlePayAccountId });
+          await paymentAPI.createWithGooglePay({ ...orderData, accountId: googlePayAccountId });
+        } else {
+          console.log("Creating order", orderData);
+          await ordersAPI.create(orderData);
+        }
       }
 
       setStep(3);
@@ -500,9 +521,15 @@ export default function Checkout() {
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
                       <Smartphone className="h-12 w-12 text-blue-600 mx-auto mb-3" />
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">Pay with Google Pay</h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        You'll be redirected to complete your payment securely with Google Pay
-                      </p>
+                      {googlePayAccountId ? (
+                        <p className="text-sm text-green-700 font-medium mb-2">
+                          Google Pay account linked and ready
+                        </p>
+                      ) : (
+                        <p className="text-sm text-red-600 mb-2">
+                          No Google Pay account found. Please add one in your profile first.
+                        </p>
+                      )}
                       <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                         <Lock className="h-4 w-4" />
                         <span>Secured by Google</span>

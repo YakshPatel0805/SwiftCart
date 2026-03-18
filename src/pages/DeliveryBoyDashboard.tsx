@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, Clock, AlertCircle, Check, X, RefreshCw } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, AlertCircle, Check, X, RefreshCw, User, Phone, MapPin, Mail } from 'lucide-react';
 import { ordersAPI, deliveryRequestAPI } from '../services/api';
 
 interface DeliveryRequest {
@@ -25,38 +25,31 @@ interface DeliveryRequest {
 }
 
 interface OrderItem {
-  product: {
-    _id: string;
-    name: string;
-    image: string;
-  };
-  productSnapshot: {
-    name: string;
-    price: number;
-    image: string;
-  };
+  product: { _id: string; name: string; image: string; };
+  productSnapshot: { name: string; price: number; image: string; };
   quantity: number;
 }
 
 interface Order {
   _id: string;
-  userId: {
-    email: string;
-    username: string;
-  };
+  userId: { email: string; username: string; };
   items: OrderItem[];
   total: number;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   shippingAddress: {
-    name: string;
-    email: string;
-    address: string;
-    city: string;
-    state: string;
-    zipcode: string;
-    country: string;
+    name: string; email: string; address: string;
+    city: string; state: string; zipcode: string; country: string;
   };
   createdAt: string;
+}
+
+interface CustomerInfoModal {
+  customerName: string;
+  customerMobile: string;
+  customerEmail: string;
+  deliveryAddress: {
+    address: string; city: string; state: string; zipcode: string; country: string;
+  };
 }
 
 export default function DeliveryBoyDashboard() {
@@ -68,6 +61,7 @@ export default function DeliveryBoyDashboard() {
   const [respondingRequestId, setRespondingRequestId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'requests' | 'orders'>('requests');
+  const [customerModal, setCustomerModal] = useState<CustomerInfoModal | null>(null);
 
   useEffect(() => {
     loadData();
@@ -110,9 +104,13 @@ export default function DeliveryBoyDashboard() {
   const handleAcceptRequest = async (requestId: string) => {
     try {
       setRespondingRequestId(requestId);
-      await deliveryRequestAPI.acceptRequest(requestId);
-      alert('Delivery request accepted! You can now update the order status.');
+      const result = await deliveryRequestAPI.acceptRequest(requestId);
+      // Show customer & delivery details modal
+      if (result.userAndDeliveryDetails) {
+        setCustomerModal(result.userAndDeliveryDetails);
+      }
       await loadData();
+      setActiveTab('orders');
     } catch (error) {
       console.error('Error accepting request:', error);
       alert('Failed to accept request');
@@ -369,9 +367,71 @@ export default function DeliveryBoyDashboard() {
           </div>
         )}
 
+        {/* Customer Info Modal - shown after accepting a request */}
+        {customerModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-xl font-bold text-gray-900">Delivery Assignment</h2>
+                <button
+                  onClick={() => setCustomerModal(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-5 flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                <p className="text-green-800 text-sm font-medium">Request accepted! Here are your delivery details.</p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Customer Details</p>
+                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <User className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      <span className="text-gray-900 font-medium">{customerModal.customerName}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      <span className="text-gray-900">{customerModal.customerMobile || 'Not provided'}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      <span className="text-gray-600 text-sm">{customerModal.customerEmail}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Delivery Address</p>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                      <div className="text-gray-900 text-sm leading-relaxed">
+                        <p>{customerModal.deliveryAddress.address}</p>
+                        <p>{customerModal.deliveryAddress.city}, {customerModal.deliveryAddress.state} {customerModal.deliveryAddress.zipcode}</p>
+                        <p>{customerModal.deliveryAddress.country}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setCustomerModal(null)}
+                className="w-full mt-6 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 font-medium"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Orders Tab */}
-        {activeTab === 'orders' && (
-          <>
+        {activeTab === 'orders' && (          <>
             {/* Filter */}
             <div className="bg-white rounded-lg shadow mb-6 p-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -442,8 +502,7 @@ export default function DeliveryBoyDashboard() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">{order.shippingAddress.name}</div>
                             <div className="text-sm text-gray-500">{order.shippingAddress.email}</div>
-                          </td>
-                          <td className="px-6 py-4">
+                          </td>                          <td className="px-6 py-4">
                             <div className="text-sm text-gray-900">
                               {order.shippingAddress.address}
                             </div>

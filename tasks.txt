@@ -1,4 +1,2 @@
--> order is placed but payment fail shows in account transfer.
--> credit-card functionality update.
--> google-pay functionality update.
--> 
+-> add delivery boy personal details -> based on role form should appear for deliveryboy.
+// -> if order request accept by delivery boy, his details should be send to user and dilivery address and user details(name, mobile number) send to deliveryboy.

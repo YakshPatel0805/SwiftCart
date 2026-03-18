@@ -7,11 +7,28 @@ const router = express.Router();
 
 router.post('/signup', async (req, res) => {
   try {
-    const { email, username, password, role } = req.body;
+    const { email, username, password, mobile } = req.body;
+
+    // Validate required fields
+    if (!email || !username || !password || !mobile) {
+      return res.status(400).json({ success: false, message: 'All fields including mobile number are required' });
+    }
+
+    // Validate mobile number format (basic validation)
+    const mobileRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    if (!mobileRegex.test(mobile)) {
+      return res.status(400).json({ success: false, message: 'Please enter a valid mobile number' });
+    }
 
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Username or email already exists' });
+    }
+
+    // Check if mobile number already exists
+    const existingMobile = await User.findOne({ mobile });
+    if (existingMobile) {
+      return res.status(400).json({ success: false, message: 'Mobile number already registered' });
     }
 
     const isAdminSignup = email === process.env.ADMIN_EMAIL && username === 'admin' && password === 'admin123';
@@ -20,6 +37,7 @@ router.post('/signup', async (req, res) => {
       email,
       username,
       password,
+      mobile,
       role: isAdminSignup ? 'admin' : 'user'
     });
     await user.save();
@@ -33,6 +51,7 @@ router.post('/signup', async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
+        mobile: user.mobile,
         role: user.role
       }
     });
@@ -63,6 +82,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
+        mobile: user.mobile,
         role: user.role
       }
     });
@@ -113,10 +133,18 @@ router.post('/change-password', authenticateToken, async (req, res) => {
 
 router.patch('/update-profile', authenticateToken, async (req, res) => {
   try {
-    const { username, email } = req.body;
+    const { username, email, mobile } = req.body;
 
     if (!username || !email) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({ message: 'Username and email are required' });
+    }
+
+    // Validate mobile number if provided
+    if (mobile) {
+      const mobileRegex = /^[\+]?[1-9][\d]{0,15}$/;
+      if (!mobileRegex.test(mobile)) {
+        return res.status(400).json({ message: 'Please enter a valid mobile number' });
+      }
     }
 
     const user = await User.findById(req.user.userId);
@@ -142,8 +170,22 @@ router.patch('/update-profile', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: 'Username already in use' });
     }
 
+    // Check if mobile is already taken by another user (if provided)
+    if (mobile) {
+      const existingMobile = await User.findOne({ 
+        mobile,
+        _id: { $ne: user._id }
+      });
+      if (existingMobile) {
+        return res.status(400).json({ message: 'Mobile number already in use' });
+      }
+    }
+
     user.username = username;
     user.email = email.toLowerCase();
+    if (mobile) {
+      user.mobile = mobile;
+    }
     await user.save();
 
     res.json({
@@ -152,6 +194,7 @@ router.patch('/update-profile', authenticateToken, async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
+        mobile: user.mobile,
         role: user.role
       }
     });

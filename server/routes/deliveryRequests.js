@@ -143,7 +143,7 @@ router.patch('/:requestId/accept', authenticateToken, isDeliveryBoy, async (req,
     }
 
     // Check if order is already assigned
-    const order = await Order.findById(request.orderId);
+    const order = await Order.findById(request.orderId).populate('userId', 'username email mobile');
     if (order.assignedDeliveryBoyId) {
       // Another delivery boy already accepted
       request.status = 'rejected';
@@ -151,6 +151,9 @@ router.patch('/:requestId/accept', authenticateToken, isDeliveryBoy, async (req,
       await request.save();
       return res.status(400).json({ message: 'Order already assigned to another delivery boy' });
     }
+
+    // Get delivery boy details
+    const deliveryBoy = await User.findById(req.user.userId);
 
     // Accept the request
     request.status = 'accepted';
@@ -174,9 +177,29 @@ router.patch('/:requestId/accept', authenticateToken, isDeliveryBoy, async (req,
       }
     );
 
+    // Return comprehensive data for frontend
     res.json({
       message: 'Delivery request accepted',
-      request: await request.populate('orderId')
+      request: await request.populate('orderId'),
+      // Delivery boy details to send to user
+      deliveryBoyDetails: {
+        name: deliveryBoy.username,
+        email: deliveryBoy.email,
+        mobile: deliveryBoy.mobile
+      },
+      // User and delivery details to send to delivery boy
+      userAndDeliveryDetails: {
+        customerName: order.shippingAddress.name,
+        customerMobile: order.userId.mobile,
+        customerEmail: order.userId.email,
+        deliveryAddress: {
+          address: order.shippingAddress.address,
+          city: order.shippingAddress.city,
+          state: order.shippingAddress.state,
+          zipcode: order.shippingAddress.zipcode,
+          country: order.shippingAddress.country
+        }
+      }
     });
   } catch (error) {
     console.error('Error accepting delivery request:', error);
