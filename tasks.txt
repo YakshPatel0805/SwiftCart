@@ -1,2 +1,0 @@
--> add delivery boy personal details -> based on role form should appear for deliveryboy.
-// -> if order request accept by delivery boy, his details should be send to user and dilivery address and user details(name, mobile number) send to deliveryboy.
