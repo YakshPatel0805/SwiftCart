@@ -38,11 +38,6 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Test endpoint for delivery requests
-app.get('/api/delivery-requests-test', (req, res) => {
-  res.json({ message: 'Delivery requests route is working' });
-});
-
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('🔴 Global error handler:', err);

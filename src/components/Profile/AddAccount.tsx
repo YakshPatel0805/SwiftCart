@@ -445,7 +445,7 @@ export default function AddAccount() {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    {getAccountIcon(account)}
+                    {getAccountIcon(account.bankAccount ? 'bank-account' : account.creditCard ? 'credit-card' : 'google-pay')}
                     <div>
                       <h4 className="font-semibold text-gray-900">{display.title}</h4>
                       <p className="text-sm text-gray-600">{display.subtitle}</p>

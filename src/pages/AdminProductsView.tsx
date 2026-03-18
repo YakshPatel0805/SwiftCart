@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-import React from 'react';
 import { productsAPI } from '../services/api';
 import { Product } from '../types';
 import { Package, Filter, Search, Edit, Trash2 } from 'lucide-react';
@@ -12,7 +10,6 @@ interface Category {
 }
 
 export default function AdminProductsView() {
-  // const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Users, Shield, Truck, User as UserIcon, ChevronDown, Loader } from 'lucide-react';
+import { useState } from 'react';
+import { Users, Shield, Truck, User as ChevronDown, Loader, Crown } from 'lucide-react';
 import { usersAPI } from '../../services/api';
 
 interface User {
@@ -65,11 +65,11 @@ export default function AssignRole() {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'admin':
-        return <Shield className="h-4 w-4 text-red-600" />;
+        return <Crown className="h-4 w-4 text-red-600" />;
       case 'deliveryboy':
         return <Truck className="h-4 w-4 text-blue-600" />;
       default:
-        return <UserIcon className="h-4 w-4 text-gray-600" />;
+        return <Shield className="h-4 w-4 text-gray-600" />;
     }
   };
 

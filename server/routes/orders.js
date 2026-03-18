@@ -112,14 +112,15 @@ router.post('/', authenticateToken, async (req, res) => {
     // Auto-update stock for each product
     for (const item of orderItems) {
       const product = await Product.findById(item.product);
-      if (product && product.stockQuantity !== undefined) {
-        product.stockQuantity -= item.quantity;
-        if (product.stockQuantity < 0) {
-          product.stockQuantity = 0;
-        }
-        product.inStock = product.stockQuantity > 0;
-        await product.save();
-        console.log(`Updated stock for product ${product.name}: ${product.stockQuantity} remaining`);
+      if (product) {
+        const newQty = Math.max(0, (product.stockQuantity || 0) - item.quantity);
+        await Product.findByIdAndUpdate(item.product, {
+          stockQuantity: newQty,
+          inStock: newQty > 0
+        });
+        console.log(`Updated stock for product ${product.name}: ${newQty} remaining`);
+      } else {
+        console.warn(`Product not found for stock update: ${item.product}`);
       }
     }
     
@@ -182,6 +183,19 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
       { status: 'cancelled' },
       { new: true, runValidators: false }
     ).populate('items.product');
+
+    // Restore stock for each cancelled item
+    for (const item of order.items) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        const restoredQty = (product.stockQuantity || 0) + item.quantity;
+        await Product.findByIdAndUpdate(item.product, {
+          stockQuantity: restoredQty,
+          inStock: restoredQty > 0
+        });
+        console.log(`Restored stock for ${product.name}: ${restoredQty}`);
+      }
+    }
     
     // Send order cancellation email
     if (user) {
@@ -323,18 +337,6 @@ router.get('/:id/track', authenticateToken, async (req, res) => {
   }
 });
 
-// Clear all orders for user
-router.delete('/clear', authenticateToken, async (req, res) => {
-  try {
-    const result = await Order.deleteMany({ userId: req.user.userId });
-    res.json({ message: 'Orders cleared successfully', deletedCount: result.deletedCount });
-  } catch (error) {
-    console.error('Error clearing orders:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-// Delivery Boy routes - Get all orders for delivery
 // Delivery Boy routes - Get all orders for delivery
 router.get('/deliveryboy/all', authenticateToken, isDeliveryBoy, async (req, res) => {
   try {

@@ -571,88 +571,8 @@ export const sendContactEmail = async (contactData) => {
   }
 };
 
-// Send password reset email
-export const sendPasswordResetEmail = async (userEmail, resetToken, userName) => {
-  try {
-    const transporter = createTransporter();
-    
-    // Create reset link (adjust domain based on your deployment)
-    const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
-    
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: userEmail,
-      subject: 'Password Reset Request - SwiftCart',
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; }
-            .content { padding: 20px; background-color: #f9fafb; }
-            .reset-box { background-color: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #2563eb; }
-            .reset-btn { display: inline-block; background-color: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 4px; margin: 20px 0; }
-            .warning { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }
-            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-            .code { background-color: #f3f4f6; padding: 10px; border-radius: 4px; font-family: monospace; word-break: break-all; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Password Reset Request</h1>
-            </div>
-            <div class="content">
-              <p>Hi ${userName},</p>
-              
-              <p>We received a request to reset your password. If you didn't make this request, you can ignore this email.</p>
-              
-              <div class="reset-box">
-                <h3>Reset Your Password</h3>
-                <p>Click the button below to reset your password. This link will expire in 1 hour.</p>
-                
-                <center>
-                  <a href="${resetLink}" class="reset-btn">Reset Password</a>
-                </center>
-                
-                <p style="text-align: center; color: #666; font-size: 12px;">Or copy this link:</p>
-                <div class="code">${resetLink}</div>
-              </div>
-              
-              <div class="warning">
-                <strong>⚠️ Security Notice:</strong> If you didn't request a password reset, please ignore this email. Your account is secure. If you believe someone is trying to access your account, please contact our support team immediately.
-              </div>
-              
-              <p><strong>Why did you receive this email?</strong></p>
-              <p>This email was sent because a password reset was requested for the account associated with this email address. If this wasn't you, please disregard this message.</p>
-              
-              <p><strong>Need Help?</strong></p>
-              <p>If you have any questions or need assistance, please contact our support team at support@swiftcart.com</p>
-            </div>
-            <div class="footer">
-              <p>© 2024 SwiftCart. All rights reserved.</p>
-              <p>This is an automated email. Please do not reply to this message.</p>
-              <p>This password reset link will expire in 1 hour for security reasons.</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log('Password reset email sent to:', userEmail);
-    return true;
-  } catch (error) {
-    console.error('Error sending password reset email:', error);
-    return false;
-  }
-};
-
 // Send delivery request email to delivery boy
-export const sendDeliveryRequestEmail = async (order, deliveryBoyEmail, deliveryBoyName) => {
+export const sendDeliveryRequestEmail = async (order, deliveryBoyEmail) => {
   try {
     const transporter = createTransporter();
     
