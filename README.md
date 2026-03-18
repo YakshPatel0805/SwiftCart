@@ -52,7 +52,7 @@ A full-stack e-commerce platform built with React, Node.js, Express, and MongoDB
 
 ```bash
 git clone <repository-url>
-cd ecommerce-app
+cd SwiftCart
 npm install
 cd server && npm install && cd ..
 ```
@@ -65,8 +65,6 @@ Create `server/.env`:
 MONGODB_URI=mongodb://localhost:27017/ecommerce
 JWT_SECRET=your_secure_jwt_secret_key_here
 PORT=5000
-
-# Email Configuration
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-gmail-app-password
 ADMIN_EMAIL=admin@yourcompany.com
