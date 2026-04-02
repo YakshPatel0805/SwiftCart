@@ -1,13 +1,14 @@
 import { useAuth } from '../context/AuthContext';
 import { User, Shield, Mail, Crown, Edit, Phone } from 'lucide-react';
 import { useState } from 'react';
-import AddAccount from '../components/Profile/AddAccount';
+// import AddAccount from '../components/Profile/AddAccount';
+import AddAccount from '../pages/AddAccount';
 
 export default function Profile() {
   const { user, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ 
-    username: user?.username || '', 
+  const [editForm, setEditForm] = useState({
+    username: user?.username || '',
     email: user?.email || '',
     mobile: user?.mobile || ''
   });
@@ -39,7 +40,7 @@ export default function Profile() {
         return;
       }
     }
-    
+
     setIsSaving(true);
     try {
       await updateProfile(editForm.username, editForm.email, editForm.mobile);
@@ -97,7 +98,7 @@ export default function Profile() {
           {/* Profile Information */}
           <div className="p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Profile Information</h2>
-            
+
             <div className="space-y-4">
               {/* Username */}
               <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
@@ -193,15 +194,6 @@ export default function Profile() {
                   )}
                 </div>
               </div>
-
-              {/* User ID */}
-              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                <Shield className="w-5 h-5 text-gray-600 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-500">User ID</p>
-                  <p className="text-base text-gray-900 mt-1 font-mono text-sm">{user.id}</p>
-                </div>
-              </div>
             </div>
 
             {/* Edit Profile Button */}
@@ -242,7 +234,7 @@ export default function Profile() {
         </div>
 
         {/* Payment Methods Section */}
-        <AddAccount />
+        {user?.role === 'user' && <AddAccount />}
       </div>
     </div>
   );

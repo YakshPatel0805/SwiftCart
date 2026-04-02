@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, X, CreditCard, Wallet, Smartphone, Trash2, Star } from 'lucide-react';
-import { bankAPI } from '../../services/api';
+import { bankAPI } from '../services/api';
 
 interface BankAccount {
   _id: string; // Will be 'bank-account', 'credit-card', or 'google-pay'
