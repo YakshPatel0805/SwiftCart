@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, X, CreditCard, Wallet, Smartphone, Trash2, Star } from 'lucide-react';
+import { Plus, CreditCard, Wallet, Smartphone, Trash2, Star } from 'lucide-react';
 import { bankAPI } from '../services/api';
 
 interface BankAccount {
@@ -223,11 +223,10 @@ export default function AddAccount() {
 
       {message && (
         <div
-          className={`mb-4 p-4 rounded-md ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
+          className={`mb-4 p-4 rounded-md ${message.type === 'success'
+            ? 'bg-green-50 text-green-800 border border-green-200'
+            : 'bg-red-50 text-red-800 border border-red-200'
+            }`}
         >
           {message.text}
         </div>
@@ -246,11 +245,10 @@ export default function AddAccount() {
                 <button
                   key={type}
                   onClick={() => setAccountType(type)}
-                  className={`p-3 rounded-lg border-2 transition-colors flex items-center justify-center gap-2 ${
-                    accountType === type
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  }`}
+                  className={`p-3 rounded-lg border-2 transition-colors flex items-center justify-center gap-2 ${accountType === type
+                    ? 'border-blue-600 bg-blue-50'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
                 >
                   {getAccountIcon(type)}
                   <span className="text-sm font-medium capitalize">
@@ -439,9 +437,8 @@ export default function AddAccount() {
             return (
               <div
                 key={account._id}
-                className={`p-4 rounded-lg border-2 transition-colors ${
-                  account.isDefault ? 'border-blue-600 bg-blue-50' : 'border-gray-200 bg-gray-50'
-                }`}
+                className={`p-4 rounded-lg border-2 transition-colors ${account.isDefault ? 'border-blue-600 bg-blue-50' : 'border-gray-200 bg-gray-50'
+                  }`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">

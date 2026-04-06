@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 const createTransporter = () => {
   // For development, you can use Gmail or any SMTP service
   // For production, use services like SendGrid, AWS SES, etc.
-  
+
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -18,7 +18,7 @@ const createTransporter = () => {
 export const sendOrderConfirmationEmail = async (order, userEmail) => {
   try {
     const transporter = createTransporter();
-    
+
     const itemsList = order.items.map(item => {
       const product = item.productSnapshot || item.product;
       return `
@@ -121,7 +121,7 @@ export const sendOrderConfirmationEmail = async (order, userEmail) => {
 export const sendOrderCancellationEmail = async (order, userEmail) => {
   try {
     const transporter = createTransporter();
-    
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: userEmail,
@@ -181,7 +181,7 @@ export const sendOrderCancellationEmail = async (order, userEmail) => {
 export const sendPaymentConfirmationEmail = async (order, userEmail) => {
   try {
     const transporter = createTransporter();
-    
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: userEmail,
@@ -247,7 +247,7 @@ export const sendPaymentConfirmationEmail = async (order, userEmail) => {
 export const sendAdminOrderNotification = async (order, customerEmail, customerName) => {
   try {
     const transporter = createTransporter();
-    
+
     const itemsList = order.items.map(item => {
       const product = item.productSnapshot || item.product;
       return `
@@ -362,7 +362,7 @@ export const sendAdminOrderNotification = async (order, customerEmail, customerN
 export const sendAdminCancellationNotification = async (order, customerEmail, customerName) => {
   try {
     const transporter = createTransporter();
-    
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.ADMIN_EMAIL,
@@ -439,7 +439,7 @@ export const sendAdminCancellationNotification = async (order, customerEmail, cu
 export const sendContactEmail = async (contactData) => {
   try {
     const transporter = createTransporter();
-    
+
     // Send confirmation email to customer
     const customerMailOptions = {
       from: process.env.EMAIL_USER,
@@ -560,10 +560,10 @@ export const sendContactEmail = async (contactData) => {
     // Send both emails
     await transporter.sendMail(customerMailOptions);
     console.log('Contact confirmation email sent to:', contactData.email);
-    
+
     await transporter.sendMail(adminMailOptions);
     console.log('Contact notification email sent to admin');
-    
+
     return true;
   } catch (error) {
     console.error('Error sending contact email:', error);
@@ -575,7 +575,7 @@ export const sendContactEmail = async (contactData) => {
 export const sendDeliveryRequestEmail = async (order, deliveryBoyEmail) => {
   try {
     const transporter = createTransporter();
-    
+
     const itemsList = order.items.map(item => {
       const product = item.productSnapshot || item.product;
       return `
@@ -591,7 +591,7 @@ export const sendDeliveryRequestEmail = async (order, deliveryBoyEmail) => {
     }).join('');
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.EMAIL_USER, // ADMIN_EMAIL
       to: deliveryBoyEmail,
       subject: `🚚 New Delivery Request - Order #${order._id}`,
       html: `

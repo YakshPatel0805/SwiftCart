@@ -62,12 +62,13 @@ cd server && npm install && cd ..
 Create `server/.env`:
 
 ```env
-MONGODB_URI=mongodb://localhost:27017/ecommerce
+MONGODB_URI=mongodb://localhost:27017/SwiftCart
 JWT_SECRET=your_secure_jwt_secret_key_here
 PORT=5000
 EMAIL_USER=your-email@gmail.com
-EMAIL_PASSWORD=your-gmail-app-password
+EMAIL_PASSWORD=your-gmail-app-password-for-user
 ADMIN_EMAIL=admin@yourcompany.com
+ADMIN_EMAIL_PASSWORD=your-gmail-app-password-for-admin
 ```
 
 ### 3. Start Development Servers
