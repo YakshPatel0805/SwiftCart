@@ -48,8 +48,8 @@ export default function TrackOrder() {
   };
 
   const getStatusIcon = (status: string, isActive: boolean) => {
-    const iconClass = `h-6 w-6 ${isActive ? 'text-blue-600' : 'text-gray-400'}`;
-    
+    const iconClass = `h-6 w-6 transition-colors duration-500`;
+
     switch (status) {
       case 'pending':
         return <Clock className={iconClass} />;
@@ -82,7 +82,7 @@ export default function TrackOrder() {
   const getStatusSteps = () => {
     const steps = ['pending', 'processing', 'shipped', 'delivered'];
     const currentIndex = steps.indexOf(trackingInfo?.status || 'pending');
-    
+
     return steps.map((step, index) => ({
       status: step,
       label: step.charAt(0).toUpperCase() + step.slice(1),
@@ -94,7 +94,7 @@ export default function TrackOrder() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading tracking information...</p>
@@ -107,7 +107,7 @@ export default function TrackOrder() {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="text-center">
               <Package className="h-16 w-16 text-red-400 mx-auto mb-4" />
@@ -134,7 +134,7 @@ export default function TrackOrder() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6">
           <button
@@ -155,30 +155,50 @@ export default function TrackOrder() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Order Status</h2>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(trackingInfo.status)}`}>
+                <span className={`px-3 py-2 rounded-full text-sm font-medium ${getStatusColor(trackingInfo.status)}`}>
                   {trackingInfo.status.charAt(0).toUpperCase() + trackingInfo.status.slice(1)}
                 </span>
               </div>
 
               {/* Status Progress */}
-              <div className="relative">
-                <div className="flex items-center justify-between">
+              <div className="py-8 px-4">
+                <div className="flex items-center w-full">
                   {statusSteps.map((step, index) => (
-                    <div key={step.status} className="flex flex-col items-center relative">
-                      <div className={`rounded-full p-3 ${step.isActive ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                        {getStatusIcon(step.status, step.isActive)}
+                    <div key={step.status} className={`flex items-center ${index < statusSteps.length - 1 ? 'flex-1' : ''}`}>
+                      {/* Icon and Label Container */}
+                      <div className="flex flex-col items-center relative group">
+                        <div className={`
+                          relative z-10 flex items-center justify-center w-14 h-14 rounded-full border-4 transition-all duration-500 shadow-sm
+                          ${step.isActive ? 'bg-blue-600 border-blue-100 text-white shadow-blue-200' : 'bg-white border-gray-50 text-gray-300'}
+                          ${step.isCompleted ? 'bg-green-600 border-green-50' : ''}
+                        `}>
+                          {getStatusIcon(step.status, step.isActive)}
+                        </div>
+                        
+                        <div className="absolute -bottom-10 w-32 text-center">
+                          <p className={`text-xs font-bold uppercase tracking-widest transition-colors duration-500 ${step.isActive ? 'text-blue-600' : 'text-gray-400'}`}>
+                            {step.label}
+                          </p>
+                          {step.isCompleted && (
+                            <p className="text-[10px] text-green-600 font-semibold mt-0.5">Completed</p>
+                          )}
+                        </div>
                       </div>
-                      <span className={`text-sm mt-2 ${step.isActive ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
-                        {step.label}
-                      </span>
+
+                      {/* Connection Line */}
                       {index < statusSteps.length - 1 && (
-                        <div className={`absolute top-6 left-full w-full h-0.5 ${step.isCompleted ? 'bg-blue-600' : 'bg-gray-300'}`} 
-                             style={{ width: 'calc(100% - 24px)', marginLeft: '12px' }} />
+                        <div className="flex-1 h-1.5 mx-2 bg-gray-100 rounded-full overflow-hidden relative">
+                          <div 
+                            className={`absolute top-0 left-0 h-full transition-all duration-1000 ease-in-out ${step.isCompleted ? 'bg-green-500' : 'bg-blue-600'}`}
+                            style={{ width: step.isCompleted ? '100%' : (step.isActive ? '50%' : '0%') }}
+                          />
+                        </div>
                       )}
                     </div>
                   ))}
                 </div>
               </div>
+              <div className="h-10" /> {/* Spacer for the absolute positioned labels */}
             </div>
 
             {/* Order Items */}
@@ -224,9 +244,8 @@ export default function TrackOrder() {
                 {trackingInfo.statusHistory.map((event, index) => (
                   <div key={index} className="flex items-start space-x-4">
                     <div className="flex-shrink-0">
-                      <div className={`rounded-full p-2 ${
-                        event.status === trackingInfo.status ? 'bg-blue-100' : 'bg-gray-100'
-                      }`}>
+                      <div className={`rounded-full p-2 ${event.status === trackingInfo.status ? 'bg-blue-100' : 'bg-gray-100'
+                        }`}>
                         {getStatusIcon(event.status, event.status === trackingInfo.status)}
                       </div>
                     </div>
@@ -277,11 +296,42 @@ export default function TrackOrder() {
                 Shipping Address
               </h3>
               <div className="text-gray-600 space-y-1">
-                <p className="font-medium text-gray-900">{trackingInfo.shippingAddress.name}</p>
-                <p>{trackingInfo.shippingAddress.address}</p>
-                <p>{trackingInfo.shippingAddress.city}, {trackingInfo.shippingAddress.state}</p>
-                <p>{trackingInfo.shippingAddress.zipcode}</p>
-                <p>{trackingInfo.shippingAddress.country}</p>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Ordered by:</span>
+                  <span className="text-gray-900 font-mono text-sm">
+                    {trackingInfo.shippingAddress.name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Address:</span>
+                  <span className="text-gray-900 font-mono text-sm">
+                    {trackingInfo.shippingAddress.address}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">City:</span>
+                  <span className="text-gray-900 font-mono text-sm">
+                    {trackingInfo.shippingAddress.city}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">State:</span>
+                  <span className="text-gray-900 font-mono text-sm">
+                    {trackingInfo.shippingAddress.state}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Zipcode:</span>
+                  <span className="text-gray-900 font-mono text-sm">
+                    {trackingInfo.shippingAddress.zipcode}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Country:</span>
+                  <span className="text-gray-900 font-mono text-sm">
+                    {trackingInfo.shippingAddress.country}
+                  </span>
+                </div>
               </div>
             </div>
 

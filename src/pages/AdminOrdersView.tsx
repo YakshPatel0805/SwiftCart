@@ -10,6 +10,7 @@ export default function AdminOrdersView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [sendingDeliveryRequestId, setSendingDeliveryRequestId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -40,6 +41,20 @@ export default function AdminOrdersView() {
       alert(`✗ Error: ${errorMessage}\n\nPossible causes:\n- No delivery boys available\n- Order already assigned\n- Server error`);
     } finally {
       setSendingDeliveryRequestId(null);
+    }
+  };
+  
+  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+    try {
+      setUpdatingStatusId(orderId);
+      await ordersAPI.updateStatus(orderId, newStatus);
+      alert(`✓ Order status updated to ${newStatus}`);
+      await loadOrders();
+    } catch (error: any) {
+      console.error('Error updating order status:', error);
+      alert(`✗ Error: ${error.message || 'Failed to update order status'}`);
+    } finally {
+      setUpdatingStatusId(null);
     }
   };
 
@@ -421,29 +436,66 @@ export default function AdminOrdersView() {
                     </div>
 
                     {/* Order Actions */}
-                    <div className="mt-6 space-y-4">
-                     {/* Send Delivery Request */}
+                    <div className="mt-6 space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Order Management</h3>
+                        <div className="flex flex-wrap gap-3">
+                          {/* Mark as Processing button for Pending orders */}
+                          {order.status === 'pending' && (
+                            <button
+                              onClick={() => handleUpdateStatus(order._id, 'processing')}
+                              disabled={updatingStatusId === order._id}
+                              className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:bg-gray-400"
+                            >
+                              <Clock className="h-4 w-4" />
+                              {updatingStatusId === order._id ? 'Updating...' : 'Mark as Processing'}
+                            </button>
+                          )}
+
+                          {/* Cancel Order button for non-finalized orders */}
+                          {order.status !== 'delivered' && order.status !== 'cancelled' && (
+                            <button
+                              onClick={() => {
+                                if (window.confirm('Are you sure you want to cancel this order?')) {
+                                  handleUpdateStatus(order._id, 'cancelled');
+                                }
+                              }}
+                              disabled={updatingStatusId === order._id}
+                              className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:border-gray-300 disabled:text-gray-300"
+                            >
+                              <XCircle className="h-4 w-4" />
+                              Cancel Order
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Send Delivery Request */}
                       {order.status === 'processing' && !order.assignedDeliveryBoyId && (
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-3">Delivery Management</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-3">Delivery Logistics</h3>
                           <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                            <p className="text-sm text-gray-600 mb-3">Send delivery requests to all available delivery boys</p>
+                            <p className="text-sm text-gray-600 mb-3">Order is ready for dispatch. Send requests to delivery boys.</p>
                             <button
                               onClick={() => sendDeliveryRequest(order._id)}
                               disabled={sendingDeliveryRequestId === order._id}
                               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                             >
                               <Send className="h-4 w-4" />
-                              {sendingDeliveryRequestId === order._id ? 'Sending...' : 'Send Delivery Requests'}
+                              {sendingDeliveryRequestId === order._id ? 'Sending...' : 'Dispatch Order (Send Requests)'}
                             </button>
                           </div>
                         </div>
                       )}
+
                       {order.assignedDeliveryBoyId && (
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900 mb-3">Delivery Status</h3>
                           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                            <p className="text-sm text-gray-600">✓ Assigned to a delivery boy</p>
+                            <p className="text-sm text-gray-600 flex items-center gap-2">
+                              <CheckCircle className="h-4 w-4 text-blue-600" />
+                              Successfully assigned to a delivery boy. Execution in progress.
+                            </p>
                           </div>
                         </div>
                       )}

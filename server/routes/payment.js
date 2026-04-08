@@ -3,7 +3,9 @@ import Order from "../models/Order.js";
 import Payment from "../models/Payment.js";
 import Bank from "../models/Bank.js";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 import { authenticateToken } from "../middleware/auth.js";
+import { sendPaymentConfirmationEmail, sendOrderConfirmationEmail } from "../utils/mail.js";
 
 const router = express.Router();
 
@@ -32,8 +34,13 @@ const finalizePayment = async (order, method) => {
     status: "success",
     transactionId: "TXN" + Date.now()
   });
-  order.status = "processing";
-  await order.save();
+  // Send payment confirmation emails
+  const user = await User.findById(order.userId);
+  if (user) {
+    sendPaymentConfirmationEmail(user, payment, order); // To User
+    sendPaymentConfirmationEmail(user, payment, order, true); // To Admin
+  }
+
   return payment;
 };
 
@@ -135,7 +142,7 @@ router.post("/create-with-account-transfer", authenticateToken, async (req, res)
     bankAccount.bankAccount.balance -= total;
     await bankAccount.save();
 
-    const order = await Order.create({ userId: req.user.userId, items: orderItems, total, shippingAddress, paymentMethod, status: "processing" });
+    const order = await Order.create({ userId: req.user.userId, items: orderItems, total, shippingAddress, paymentMethod, status: "pending" });
     const payment = await finalizePayment(order, "Account-Transfer");
 
     res.status(201).json({ message: "Order placed successfully", order, payment, remainingBalance: bankAccount.bankAccount.balance });
@@ -163,7 +170,7 @@ router.post("/create-with-credit-card", authenticateToken, async (req, res) => {
     bankAccount.creditCard.cardBalance -= total;
     await bankAccount.save();
 
-    const order = await Order.create({ userId: req.user.userId, items: orderItems, total, shippingAddress, paymentMethod, status: "processing" });
+    const order = await Order.create({ userId: req.user.userId, items: orderItems, total, shippingAddress, paymentMethod, status: "pending" });
     const payment = await finalizePayment(order, "credit-card");
 
     res.status(201).json({ message: "Order placed successfully", order, payment, remainingBalance: bankAccount.creditCard.cardBalance });
@@ -186,7 +193,7 @@ router.post("/create-with-googlepay", authenticateToken, async (req, res) => {
     bankAccount.googlePay.balance -= total;
     await bankAccount.save();
 
-    const order = await Order.create({ userId: req.user.userId, items: orderItems, total, shippingAddress, paymentMethod, status: "processing" });
+    const order = await Order.create({ userId: req.user.userId, items: orderItems, total, shippingAddress, paymentMethod, status: "pending" });
     const payment = await finalizePayment(order, "google-pay");
 
     res.status(201).json({ message: "Order placed successfully", order, payment, remainingBalance: bankAccount.googlePay.balance });

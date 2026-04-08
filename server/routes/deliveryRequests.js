@@ -5,7 +5,8 @@ import User from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
 import { isDeliveryBoy } from '../middleware/deliveryBoyAuth.js';
-import { sendDeliveryRequestEmail } from '../utils/emailService.js';
+import { sendOrderConfirmationEmail } from '../utils/mail.js';
+
 
 const router = express.Router();
 
@@ -49,19 +50,7 @@ router.post('/send/:orderId', authenticateToken, isAdmin, async (req, res) => {
         })
       )
     );
-    console.log('✓ Created delivery requests:', requests.length);
-
-    // Send email notifications to all delivery boys
-    for (const deliveryBoy of deliveryBoys) {
-      try {
-        await sendDeliveryRequestEmail(order, deliveryBoy.email, deliveryBoy.username);
-        console.log('✓ Email sent to:', deliveryBoy.email);
-      } catch (emailError) {
-        console.error('⚠️ Email error for', deliveryBoy.email, ':', emailError.message);
-      }
-    }
-
-    console.log('✓ Delivery requests sent successfully');
+    
     res.json({
       message: `Delivery requests sent to ${deliveryBoys.length} delivery boys`,
       requestCount: requests.length
@@ -160,9 +149,13 @@ router.patch('/:requestId/accept', authenticateToken, isDeliveryBoy, async (req,
     request.respondedAt = new Date();
     await request.save();
 
-    // Assign delivery boy to order
+    // Assign delivery boy to order and update status to processing
     order.assignedDeliveryBoyId = req.user.userId;
+    order.status = 'processing';
     await order.save();
+
+    // Send confirmation email to user as the order is now being processed
+    sendOrderConfirmationEmail(order.userId, order);
 
     // Reject all other pending requests for this order
     await DeliveryRequest.updateMany(

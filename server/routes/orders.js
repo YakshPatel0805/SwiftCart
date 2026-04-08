@@ -6,13 +6,12 @@ import User from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
 import { isDeliveryBoy } from '../middleware/deliveryBoyAuth.js';
-import { 
-  sendOrderConfirmationEmail, 
-  sendOrderCancellationEmail, 
-  sendPaymentConfirmationEmail,
-  sendAdminOrderNotification,
-  sendAdminCancellationNotification
-} from '../utils/emailService.js';
+import {
+  sendOrderConfirmationEmail,
+  sendNewOrderAdminEmail,
+  sendOrderCancellationEmail,
+  sendOrderDeliveredEmail
+} from '../utils/mail.js';
 
 const router = express.Router();
 
@@ -44,15 +43,15 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
-    const order = await Order.findOne({ 
-      _id: req.params.id, 
-      userId: req.user.userId 
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
     }).populate('items.product');
-    
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-    
+
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -62,7 +61,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
   try {
     console.log('Creating order for user:', req.user.userId);
-    
+
     const { items, total, shippingAddress, paymentMethod } = req.body;
 
     if (!items || items.length === 0) {
@@ -79,12 +78,12 @@ router.post('/', authenticateToken, async (req, res) => {
       items.map(async (item) => {
         console.log('Processing item:', item);
         const product = await Product.findById(item.productId);
-        
+
         if (!product) {
           console.error('Product not found:', item.productId);
           throw new Error(`Product not found: ${item.productId}`);
         }
-        
+
         return {
           product: item.productId,
           productSnapshot: {
@@ -103,12 +102,12 @@ router.post('/', authenticateToken, async (req, res) => {
       total,
       shippingAddress,
       paymentMethod: paymentMethod,
-      status: (paymentMethod.type === 'credit-card' || paymentMethod.type === 'google-pay' || paymentMethod.type === 'Account-Transfer') ? 'processing' : 'pending'
+      status: 'pending'
     });
 
     await order.save();
     console.log('Order saved successfully:', order._id);
-    
+
     // Auto-update stock for each product
     for (const item of orderItems) {
       const product = await Product.findById(item.product);
@@ -123,33 +122,12 @@ router.post('/', authenticateToken, async (req, res) => {
         console.warn(`Product not found for stock update: ${item.product}`);
       }
     }
-    
+
     await order.populate('items.product');
-    
-    // Send order confirmation email
-    const emailSent = await sendOrderConfirmationEmail(order, shippingAddress.email || user.email);
-    if (emailSent) {
-      console.log('Order confirmation email sent successfully');
-    }
-    
-    // Send payment confirmation email (for immediate payment methods)
-    if (paymentMethod.type === 'credit-card' || paymentMethod.type === 'google-pay' || paymentMethod.type === 'Account-Transfer') {
-      const paymentEmailSent = await sendPaymentConfirmationEmail(order, shippingAddress.email || user.email);
-      if (paymentEmailSent) {
-        console.log('Payment confirmation email sent successfully');
-      }
-    }
-    
-    // Send admin notification about new order
-    const adminNotificationSent = await sendAdminOrderNotification(
-      order, 
-      shippingAddress.email || user.email,
-      shippingAddress.name || user.username
-    );
-    if (adminNotificationSent) {
-      console.log('Admin order notification sent successfully');
-    }
-    
+
+
+    sendNewOrderAdminEmail(order);
+
     res.status(201).json(order);
   } catch (error) {
     console.error('Error creating order:', error);
@@ -160,23 +138,20 @@ router.post('/', authenticateToken, async (req, res) => {
 // Cancel order endpoint
 router.patch('/:id/cancel', authenticateToken, async (req, res) => {
   try {
-    const order = await Order.findOne({ 
-      _id: req.params.id, 
-      userId: req.user.userId 
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
     });
-    
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-    
+
     // Only allow cancellation if order is not shipped or delivered
     if (order.status === 'delivered') {
       return res.status(400).json({ message: 'Cannot cancel order that is already shipped or delivered' });
     }
-    
-    // Get user details for email
-    const user = await User.findById(req.user.userId);
-    
+
     // Use findByIdAndUpdate to avoid validation issues with old payment methods
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
@@ -196,25 +171,13 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
         console.log(`Restored stock for ${product.name}: ${restoredQty}`);
       }
     }
-    
-    // Send order cancellation email
+    // Send cancellation emails
+    const user = await User.findById(req.user.userId);
     if (user) {
-      const emailSent = await sendOrderCancellationEmail(updatedOrder, order.shippingAddress.email || user.email);
-      if (emailSent) {
-        console.log('Order cancellation email sent successfully');
-      }
-      
-      // Send admin notification about order cancellation
-      const adminNotificationSent = await sendAdminCancellationNotification(
-        updatedOrder,
-        order.shippingAddress.email || user.email,
-        order.shippingAddress.name || user.username
-      );
-      if (adminNotificationSent) {
-        console.log('Admin cancellation notification sent successfully');
-      }
+      sendOrderCancellationEmail(user, updatedOrder); // To User
+      sendOrderCancellationEmail(user, updatedOrder, true); // To Admin
     }
-    
+
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error cancelling order:', error);
@@ -226,28 +189,34 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
 router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { status } = req.body;
-    
+
     if (!status) {
       return res.status(400).json({ message: 'Status is required' });
     }
-    
+
     const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
     }
-    
+
     const update = { status };
-    
+
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       update,
       { new: true, runValidators: false }
     ).populate('items.product').populate('userId', 'email username');
-    
+
     if (!updatedOrder) {
       return res.status(404).json({ message: 'Order not found' });
     }
-    
+
+    // Send order confirmation if status changed to processing
+    if (status === 'processing' && updatedOrder.userId) {
+      sendOrderConfirmationEmail(updatedOrder.userId, updatedOrder);
+      sendNewOrderAdminEmail(updatedOrder);
+    }
+
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error updating order status:', error);
@@ -258,17 +227,17 @@ router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
 // Track order - Get order with delivery boy details
 router.get('/:id/track', authenticateToken, async (req, res) => {
   try {
-    const order = await Order.findOne({ 
-      _id: req.params.id, 
-      userId: req.user.userId 
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
     })
-    .populate('items.product')
-    .populate('assignedDeliveryBoyId', 'username email mobile');
-    
+      .populate('items.product')
+      .populate('assignedDeliveryBoyId', 'username email mobile');
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-    
+
     // Get delivery boy contact info if assigned
     let deliveryBoyInfo = null;
     if (order.assignedDeliveryBoyId) {
@@ -278,47 +247,47 @@ router.get('/:id/track', authenticateToken, async (req, res) => {
         mobile: order.assignedDeliveryBoyId.mobile
       };
     }
-    
+
     const getStatusHistory = (order) => {
       const history = [
         { status: 'pending', date: order.createdAt, description: 'Order placed successfully' }
       ];
-      
+
       if (order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered') {
-        history.push({ 
-          status: 'processing', 
+        history.push({
+          status: 'processing',
           date: new Date(new Date(order.createdAt).getTime() + 30 * 60000), // 30 minutes later
-          description: 'Order confirmed and being prepared' 
+          description: 'Order confirmed and being prepared'
         });
       }
-      
+
       if (order.status === 'shipped' || order.status === 'delivered') {
-        history.push({ 
-          status: 'shipped', 
+        history.push({
+          status: 'shipped',
           date: new Date(new Date(order.createdAt).getTime() + 24 * 60 * 60000), // 1 day later
-          description: 'Order shipped and on the way' 
+          description: 'Order shipped and on the way'
         });
       }
-      
+
       if (order.status === 'delivered') {
-        history.push({ 
-          status: 'delivered', 
+        history.push({
+          status: 'delivered',
           date: new Date(new Date(order.createdAt).getTime() + 72 * 60 * 60000), // 3 days later
-          description: 'Order delivered successfully' 
+          description: 'Order delivered successfully'
         });
       }
-      
+
       if (order.status === 'cancelled') {
-        history.push({ 
-          status: 'cancelled', 
-          date: new Date(), 
-          description: 'Order cancelled' 
+        history.push({
+          status: 'cancelled',
+          date: new Date(),
+          description: 'Order cancelled'
         });
       }
-      
+
       return history;
     };
-    
+
     const trackingInfo = {
       orderId: order._id,
       status: order.status,
@@ -329,7 +298,7 @@ router.get('/:id/track', authenticateToken, async (req, res) => {
       deliveryBoy: deliveryBoyInfo,
       statusHistory: getStatusHistory(order)
     };
-    
+
     res.json(trackingInfo);
   } catch (error) {
     console.error('Error tracking order:', error);
@@ -341,13 +310,13 @@ router.get('/:id/track', authenticateToken, async (req, res) => {
 router.get('/deliveryboy/all', authenticateToken, isDeliveryBoy, async (req, res) => {
   try {
     console.log('📦 Fetching orders for delivery boy:', req.user.userId);
-    
+
     // Get only orders assigned to this delivery boy
     const orders = await Order.find({ assignedDeliveryBoyId: req.user.userId })
       .populate('items.product')
       .populate('userId', 'email username')
       .sort({ createdAt: -1 });
-    
+
     console.log('✓ Found orders:', orders.length);
     res.json(orders);
   } catch (error) {
@@ -360,17 +329,17 @@ router.get('/deliveryboy/all', authenticateToken, isDeliveryBoy, async (req, res
 router.patch('/deliveryboy/:id/status', authenticateToken, isDeliveryBoy, async (req, res) => {
   try {
     const { status } = req.body;
-    
+
     if (!status) {
       return res.status(400).json({ message: 'Status is required' });
     }
-    
+
     // Delivery boys can only change to 'shipped' or 'delivered'
     const allowedStatuses = ['shipped', 'delivered'];
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({ message: 'Delivery boys can only update to shipped or delivered status' });
     }
-    
+
     const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -380,26 +349,33 @@ router.patch('/deliveryboy/:id/status', authenticateToken, isDeliveryBoy, async 
     if (order.assignedDeliveryBoyId.toString() !== req.user.userId) {
       return res.status(403).json({ message: 'You are not assigned to this order' });
     }
-    
+
     // Can only update orders that are in processing or shipped status
     if (order.status !== 'processing' && order.status !== 'shipped') {
       return res.status(400).json({ message: 'Can only update orders in processing or shipped status' });
     }
-    
+
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true, runValidators: false }
     ).populate('items.product').populate('userId', 'email username');
 
-    // If order is delivered, mark delivery request as completed
+    // If order is delivered, mark delivery request as completed and send emails
     if (status === 'delivered') {
       await DeliveryRequest.updateOne(
         { orderId: req.params.id, deliveryBoyId: req.user.userId },
         { status: 'completed', completedAt: new Date() }
       );
+
+      // Send delivery confirmation emails
+      const user = await User.findById(updatedOrder.userId);
+      if (user) {
+        sendOrderDeliveredEmail(user, updatedOrder); // To User
+        sendOrderDeliveredEmail(user, updatedOrder, true); // To Admin
+      }
     }
-    
+
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error updating order status:', error);

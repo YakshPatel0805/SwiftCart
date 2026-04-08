@@ -128,7 +128,7 @@ export default function Orders() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">Loading orders...</div>
         </div>
       </div>
@@ -200,15 +200,6 @@ export default function Orders() {
                         
                         {openDropdown === order._id && (
                           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                            <button
-                              onClick={() => {
-                                alert('View details functionality coming soon!');
-                                setOpenDropdown(null);
-                              }}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              View Details
-                            </button>
                             {canCancelOrder(order.status) && (
                               <button
                                 onClick={() => handleCancelOrder(order._id)}
