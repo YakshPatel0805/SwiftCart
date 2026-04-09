@@ -84,7 +84,7 @@ export default function Home() {
             Discover amazing products across clothing, electronics, and many more...
           </p>
           <button
-            onClick={() => navigate('/category/furniture')}
+            onClick={() => navigate('/category/all')}
             className="bg-white text-blue-600 dark:bg-gray-800 dark:text-blue-400 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             Shop Now
@@ -114,20 +114,20 @@ export default function Home() {
             Shop by Category
           </h2>
 
-          <div className="flex gap-8 animate-scroll hover:[animation-play-state:paused]">
-            {[ ...categoryProducts].map((product, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categoryProducts.slice(0, 6).map((product, index) => (
               <div
                 key={index}
                 onClick={() => navigate(`/category/${product.category}`)}
-                className="relative overflow-hidden rounded-lg cursor-pointer group flex-shrink-0 w-80"
+                className="relative overflow-hidden rounded-xl cursor-pointer group h-64 shadow-md hover:shadow-xl transition-all duration-300"
               >
                 <img
                   src={product.image}
                   alt={product.category}
-                  className="w-full h-64 object-cover transition-transform group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-black dark:bg-opacity-60 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold capitalize">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end justify-center pb-8 transition-opacity group-hover:from-black/80">
+                  <h3 className="text-white text-2xl font-bold capitalize tracking-wide transform transition-transform duration-300 group-hover:scale-105">
                     {product.category}
                   </h3>
                 </div>

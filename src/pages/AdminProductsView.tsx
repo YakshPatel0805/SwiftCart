@@ -272,7 +272,10 @@ export default function AdminProductsView() {
                       Rewiew
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Quantity
+                      Stock
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Sold
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -320,7 +323,10 @@ export default function AdminProductsView() {
                         {product.reviews}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {product.stockQuantity}
+                        {product.stockQuantity || 0}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {product.soldCount || 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
@@ -448,7 +454,7 @@ export default function AdminProductsView() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Quantity
+                        Stock Quantity
                       </label>
                       <input
                         type="string"

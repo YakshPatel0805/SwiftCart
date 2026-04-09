@@ -5,7 +5,7 @@ import User from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
 import { isDeliveryBoy } from '../middleware/deliveryBoyAuth.js';
-import { sendOrderConfirmationEmail } from '../utils/mail.js';
+import { sendOrderConfirmationEmail } from '../utils/emailServices.js';
 
 
 const router = express.Router();
@@ -14,7 +14,7 @@ const router = express.Router();
 router.post('/send/:orderId', authenticateToken, isAdmin, async (req, res) => {
   try {
     console.log('📨 Delivery Request: Received send request for order:', req.params.orderId);
-    
+
     const { orderId } = req.params;
 
     // Check if order exists
@@ -34,7 +34,7 @@ router.post('/send/:orderId', authenticateToken, isAdmin, async (req, res) => {
     // Get all delivery boys
     const deliveryBoys = await User.find({ role: 'deliveryboy' });
     console.log('✓ Found delivery boys:', deliveryBoys.length);
-    
+
     if (deliveryBoys.length === 0) {
       console.log('❌ No delivery boys available');
       return res.status(400).json({ message: 'No delivery boys available' });
@@ -50,7 +50,7 @@ router.post('/send/:orderId', authenticateToken, isAdmin, async (req, res) => {
         })
       )
     );
-    
+
     res.json({
       message: `Delivery requests sent to ${deliveryBoys.length} delivery boys`,
       requestCount: requests.length
@@ -80,8 +80,7 @@ router.get('/order/:orderId', authenticateToken, isAdmin, async (req, res) => {
 // Delivery boy route - Get pending delivery requests
 router.get('/pending', authenticateToken, isDeliveryBoy, async (req, res) => {
   try {
-    console.log('📋 Fetching pending requests for delivery boy:', req.user.userId);
-    
+
     const requests = await DeliveryRequest.find({
       deliveryBoyId: req.user.userId,
       status: 'pending'
@@ -89,7 +88,6 @@ router.get('/pending', authenticateToken, isDeliveryBoy, async (req, res) => {
       .populate('orderId')
       .sort({ requestedAt: -1 });
 
-    console.log('✓ Found pending requests:', requests.length);
     res.json(requests);
   } catch (error) {
     console.error('❌ Error fetching delivery requests:', error);

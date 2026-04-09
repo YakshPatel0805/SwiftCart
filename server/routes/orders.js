@@ -11,7 +11,7 @@ import {
   sendNewOrderAdminEmail,
   sendOrderCancellationEmail,
   sendOrderDeliveredEmail
-} from '../utils/mail.js';
+} from '../utils/emailServices.js';
 
 const router = express.Router();
 
@@ -125,7 +125,6 @@ router.post('/', authenticateToken, async (req, res) => {
 
     await order.populate('items.product');
 
-
     sendNewOrderAdminEmail(order);
 
     res.status(201).json(order);
@@ -201,14 +200,42 @@ router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
 
     const update = { status };
 
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const previousStatus = order.status;
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       update,
       { new: true, runValidators: false }
     ).populate('items.product').populate('userId', 'email username');
 
-    if (!updatedOrder) {
-      return res.status(404).json({ message: 'Order not found' });
+    // Handle stock restoration if cancelled by admin
+    if (status === 'cancelled' && previousStatus !== 'cancelled') {
+      for (const item of updatedOrder.items) {
+        // Use item.product._id because it's populated
+        const productId = item.product._id || item.product;
+        const product = await Product.findById(productId);
+        if (product) {
+          const restoredQty = (product.stockQuantity || 0) + item.quantity;
+          await Product.findByIdAndUpdate(productId, {
+            stockQuantity: restoredQty,
+            inStock: restoredQty > 0
+          });
+        }
+      }
+    }
+
+    // Handle soldCount increment if delivered
+    if (status === 'delivered' && previousStatus !== 'delivered') {
+      for (const item of updatedOrder.items) {
+        const productId = item.product._id || item.product;
+        await Product.findByIdAndUpdate(productId, {
+          $inc: { soldCount: item.quantity }
+        });
+      }
     }
 
     // Send order confirmation if status changed to processing
@@ -309,7 +336,6 @@ router.get('/:id/track', authenticateToken, async (req, res) => {
 // Delivery Boy routes - Get all orders for delivery
 router.get('/deliveryboy/all', authenticateToken, isDeliveryBoy, async (req, res) => {
   try {
-    console.log('📦 Fetching orders for delivery boy:', req.user.userId);
 
     // Get only orders assigned to this delivery boy
     const orders = await Order.find({ assignedDeliveryBoyId: req.user.userId })
@@ -317,7 +343,6 @@ router.get('/deliveryboy/all', authenticateToken, isDeliveryBoy, async (req, res
       .populate('userId', 'email username')
       .sort({ createdAt: -1 });
 
-    console.log('✓ Found orders:', orders.length);
     res.json(orders);
   } catch (error) {
     console.error('❌ Error fetching delivery boy orders:', error);
@@ -361,12 +386,20 @@ router.patch('/deliveryboy/:id/status', authenticateToken, isDeliveryBoy, async 
       { new: true, runValidators: false }
     ).populate('items.product').populate('userId', 'email username');
 
-    // If order is delivered, mark delivery request as completed and send emails
+    // If order is delivered, mark delivery request as completed, increment soldCount and send emails
     if (status === 'delivered') {
       await DeliveryRequest.updateOne(
         { orderId: req.params.id, deliveryBoyId: req.user.userId },
         { status: 'completed', completedAt: new Date() }
       );
+
+      // Increment soldCount for each product in the order
+      for (const item of updatedOrder.items) {
+        const productId = item.product._id || item.product;
+        await Product.findByIdAndUpdate(productId, {
+          $inc: { soldCount: item.quantity }
+        });
+      }
 
       // Send delivery confirmation emails
       const user = await User.findById(updatedOrder.userId);

@@ -5,7 +5,7 @@ import Bank from "../models/Bank.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
 import { authenticateToken } from "../middleware/auth.js";
-import { sendPaymentConfirmationEmail, sendOrderConfirmationEmail } from "../utils/mail.js";
+import { sendPaymentConfirmationEmail, sendOrderConfirmationEmail } from "../utils/emailServices.js";
 
 const router = express.Router();
 
