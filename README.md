@@ -69,7 +69,10 @@ USER_EMAIL=your-email@gmail.com
 USER_EMAIL_PASSWORD=your-gmail-app-password-for-user
 ADMIN_EMAIL=admin@yourcompany.com
 ADMIN_EMAIL_PASSWORD=your-gmail-app-password-for-admin
+REDIS_URI=redis_connection_string
 ```
+for redis implementation create account & databse on redis cloud.  
+copy connection string and paste it in REDIS_URI.
 
 ### 3. Start Development Servers
 
