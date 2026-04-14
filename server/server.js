@@ -11,6 +11,7 @@ import paymentRoutes from './routes/payment.js';
 import deliveryRequestRoutes from './routes/deliveryRequests.js';
 import usersRoutes from './routes/users.js';
 import bankRoutes from './routes/bank.js';
+import { connectRedis } from './utils/redis.js';
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ app.use(express.json());
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
+
+connectRedis();
 
 // Register delivery-requests BEFORE orders to avoid route conflicts
 app.use('/api/delivery-requests', deliveryRequestRoutes);

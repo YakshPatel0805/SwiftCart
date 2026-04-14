@@ -21,6 +21,7 @@ router.get('/admin/all', authenticateToken, isAdmin, async (req, res) => {
     const orders = await Order.find()
       .populate('items.product')
       .populate('userId', 'email username')
+      .populate('assignedDeliveryBoyId', 'username email mobile')
       .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {

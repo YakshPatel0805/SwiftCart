@@ -5,17 +5,30 @@ import { Readable } from 'stream';
 import Product from '../models/Product.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
+import redisClient from '../utils/redis.js';
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
 router.get('/categories', async (req, res) => {
   try {
+    if (redisClient.isOpen) {
+      const cachedCategories = await redisClient.get('categories');
+      if (cachedCategories) {
+        return res.json(JSON.parse(cachedCategories));
+      }
+    }
+
     const categories = await Product.aggregate([
       { $group: { _id: '$category', count: { $sum: 1 } } },
       { $sort: { _id: 1 } },
       { $project: { category: '$_id', count: 1, _id: 0 } }
     ]);
+
+    if (redisClient.isOpen) {
+      await redisClient.setEx('categories', 3600, JSON.stringify(categories));
+    }
+
     res.json(categories);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -24,7 +37,19 @@ router.get('/categories', async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
+    if (redisClient.isOpen) {
+      const cachedProducts = await redisClient.get('products:all');
+      if (cachedProducts) {
+        return res.json(JSON.parse(cachedProducts));
+      }
+    }
+
     const products = await Product.find();
+
+    if (redisClient.isOpen) {
+      await redisClient.setEx('products:all', 3600, JSON.stringify(products));
+    }
+
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -33,10 +58,22 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
+    if (redisClient.isOpen) {
+      const cachedProduct = await redisClient.get(`product:${req.params.id}`);
+      if (cachedProduct) {
+        return res.json(JSON.parse(cachedProduct));
+      }
+    }
+
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
+    if (redisClient.isOpen) {
+      await redisClient.setEx(`product:${req.params.id}`, 3600, JSON.stringify(product));
+    }
+
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -47,6 +84,11 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
   try {
     const product = new Product(req.body);
     await product.save();
+
+    if (redisClient.isOpen) {
+      await redisClient.del(['products:all', 'categories']);
+    }
+
     res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -114,6 +156,10 @@ router.post(
 
             const savedProducts = await Product.insertMany(products);
 
+            if (redisClient.isOpen) {
+              await redisClient.del(['products:all', 'categories']);
+            }
+
             res.json({
               message: `Successfully uploaded ${savedProducts.length} products`,
               count: savedProducts.length,
@@ -151,6 +197,10 @@ router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    if (redisClient.isOpen) {
+      await redisClient.del(['products:all', 'categories', `product:${req.params.id}`]);
+    }
+
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -163,6 +213,10 @@ router.delete('/:id', authenticateToken, isAdmin, async (req, res) => {
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
+    }
+
+    if (redisClient.isOpen) {
+      await redisClient.del(['products:all', 'categories', `product:${req.params.id}`]);
     }
 
     res.json({ message: 'Product deleted successfully' });

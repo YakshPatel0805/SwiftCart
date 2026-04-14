@@ -43,7 +43,7 @@ export default function AdminOrdersView() {
       setSendingDeliveryRequestId(null);
     }
   };
-  
+
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
       setUpdatingStatusId(orderId);
@@ -133,7 +133,7 @@ export default function AdminOrdersView() {
           <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
           <p className="mt-2 text-gray-600">View and manage all customer orders</p>
         </div>
-        
+
         {/* Status Cards and Graphical Visualization */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="grid grid-cols-2 gap-4">
@@ -222,8 +222,8 @@ export default function AdminOrdersView() {
                 <button
                   onClick={() => setSelectedStatus('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'all'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   All ({stats.total})
@@ -231,8 +231,8 @@ export default function AdminOrdersView() {
                 <button
                   onClick={() => setSelectedStatus('pending')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'pending'
-                      ? 'bg-gray-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gray-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   Pending ({stats.pending})
@@ -240,8 +240,8 @@ export default function AdminOrdersView() {
                 <button
                   onClick={() => setSelectedStatus('processing')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'processing'
-                      ? 'bg-yellow-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   Processing ({stats.processing})
@@ -249,8 +249,8 @@ export default function AdminOrdersView() {
                 <button
                   onClick={() => setSelectedStatus('shipped')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'shipped'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   Shipped ({stats.shipped})
@@ -258,19 +258,18 @@ export default function AdminOrdersView() {
                 <button
                   onClick={() => setSelectedStatus('delivered')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'delivered'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   Delivered ({stats.delivered})
                 </button>
                 <button
                   onClick={() => setSelectedStatus('cancelled')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedStatus === 'cancelled'
-                      ? 'bg-red-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'cancelled'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
                 >
                   Cancelled ({stats.cancelled})
                 </button>
@@ -348,16 +347,13 @@ export default function AdminOrdersView() {
                         </h3>
                         <div className="bg-white rounded-lg p-4 space-y-2">
                           <div>
-                            <p className="text-sm text-gray-600">Name</p>
-                            <p className="font-medium">{order.shippingAddress.name}</p>
+                            <p className="text-sm text-gray-600"> <span className="font-medium">Name:</span> {order.shippingAddress.name}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-600">Email</p>
-                            <p className="font-medium">{order.userId?.email || order.shippingAddress?.email || 'N/A'}</p>
+                            <p className="text-sm text-gray-600"> <span className="font-medium">Email:</span> {order.userId?.email || order.shippingAddress?.email || 'N/A'}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-600">User ID</p>
-                            <p className="font-mono text-sm">{order.userId?._id || order.userId || 'N/A'}</p>
+                            <p className="text-sm text-gray-600"> <span className="font-medium">User ID:</span> {order.userId?._id || order.userId || 'N/A'}</p>
                           </div>
                         </div>
                       </div>
@@ -369,12 +365,12 @@ export default function AdminOrdersView() {
                           Shipping Address
                         </h3>
                         <div className="bg-white rounded-lg p-4">
-                          <p className="font-medium">{order.shippingAddress.name}</p>
-                          <p className="text-gray-600">{order.shippingAddress.address}</p>
+                          <p className="font-medium"> <span className="font-medium">Name:</span> {order.shippingAddress.name}</p>
+                          <p className="text-gray-600"> <span className="font-medium">Address:</span> {order.shippingAddress.address}</p>
                           <p className="text-gray-600">
-                            {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipcode}
+                            <span className="font-medium">City:</span> {order.shippingAddress.city}, <span className="font-medium">State:</span> {order.shippingAddress.state}, <span className="font-medium">Zipcode:</span> {order.shippingAddress.zipcode}
                           </p>
-                          <p className="text-gray-600">{order.shippingAddress.country}</p>
+                          <p className="text-gray-600"> <span className="font-medium">Country:</span> {order.shippingAddress.country}</p>
                         </div>
                       </div>
                     </div>
@@ -492,10 +488,27 @@ export default function AdminOrdersView() {
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900 mb-3">Delivery Status</h3>
                           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                            <p className="text-sm text-gray-600 flex items-center gap-2">
-                              <CheckCircle className="h-4 w-4 text-blue-600" />
-                              Successfully assigned to a delivery boy. Execution in progress.
+                            <p className="text-sm font-medium text-gray-900 flex items-center gap-2 mb-3">
+                              <CheckCircle className="h-5 w-5 text-blue-600" />
+                              Assigned to Delivery Partner
                             </p>
+                            <div className="bg-white rounded-md p-3 border border-blue-100 shadow-sm space-y-2 text-sm">
+                              <div className="flex items-center text-gray-700">
+                                <User className="h-4 w-4 text-gray-400 mr-2" />
+                                <span className="font-medium w-16">Name:</span>
+                                <span>{order.assignedDeliveryBoyId.username || 'Loading...'}</span>
+                              </div>
+                              <div className="flex items-center text-gray-700">
+                                <Mail className="h-4 w-4 text-gray-400 mr-2" />
+                                <span className="font-medium w-16">Email:</span>
+                                <span>{order.assignedDeliveryBoyId.email || 'Loading...'}</span>
+                              </div>
+                              <div className="flex items-center text-gray-700">
+                                <Truck className="h-4 w-4 text-gray-400 mr-2" />
+                                <span className="font-medium w-16">Mobile:</span>
+                                <span>{order.assignedDeliveryBoyId.mobile || 'Loading...'}</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )}
