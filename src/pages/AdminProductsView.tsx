@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { productsAPI } from '../services/api';
 import { Product } from '../types';
-import { Package, Filter, Search, Edit, Trash2 } from 'lucide-react';
+import { Package, Filter, Search, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCategoryChart } from '../components/PieChart';
 
 interface Category {
@@ -18,10 +18,38 @@ export default function AdminProductsView() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
+
+  const getPaginationRange = () => {
+    const delta = 1;
+    const pages = [];
+
+    const left = Math.max(2, currentPage - delta);
+    const right = Math.min(totalPages - 1, currentPage + delta);
+
+    pages.push(1);
+
+    if (left > 2) pages.push('...');
+
+    for (let i = left; i <= right; i++) {
+      pages.push(i);
+    }
+
+    if (right < totalPages - 1) pages.push('...');
+
+    if (totalPages > 1) pages.push(totalPages);
+
+    return pages;
+  };
 
   const loadData = async () => {
     try {
@@ -89,6 +117,14 @@ export default function AdminProductsView() {
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const getCategoryStats = () => {
     if (selectedCategory === 'all') {
@@ -283,7 +319,7 @@ export default function AdminProductsView() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredProducts.map((product) => (
+                  {currentItems.map((product) => (
                     <tr key={product.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -356,6 +392,86 @@ export default function AdminProductsView() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Pagination UI */}
+          {filteredProducts.length > 0 && (
+            <div className="px-6 py-4 bg-white border-t border-gray-200 flex items-center justify-between">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => paginate(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Showing <span className="font-medium">{indexOfFirstItem + 1}</span> to{' '}
+                    <span className="font-medium">
+                      {Math.min(indexOfLastItem, filteredProducts.length)}
+                    </span> of{' '}
+                    <span className="font-medium">{filteredProducts.length}</span> results
+                  </p>
+                </div>
+                <div>
+                  <nav className="relative z-0 inline-flex items-center gap-1" aria-label="Pagination">
+                    {/* Previous */}
+                    <button
+                      onClick={() => paginate(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <span className="sr-only">Previous</span>
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+
+                    {/* Page Numbers (Amazon Style) */}
+                    {getPaginationRange().map((page, index) => {
+                      if (page === '...') {
+                        return (
+                          <span key={index} className="px-3 py-1 text-gray-500">
+                            ...
+                          </span>
+                        );
+                      }
+
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => typeof page === 'number' && paginate(page)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page
+                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                            }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    })}
+
+                    {/* Next */}
+                    <button
+                      onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <span className="sr-only">Next</span>
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                  </nav>
+                </div>
+              </div>
             </div>
           )}
         </div>
