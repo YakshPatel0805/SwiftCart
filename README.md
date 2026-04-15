@@ -23,6 +23,7 @@ A full-stack e-commerce platform built with React, Node.js, Express, and MongoDB
 - **Real-time Order Tracking**: Live status updates from processing to delivery
 - **Admin Dashboard**: Comprehensive management interface
 - **CSV Product Import**: Bulk product uploads with validation
+- **Payment Details Display**: View payment information (amount, method, status, transaction ID) across all order views
 
 ## 🛠️ Tech Stack
 
@@ -176,6 +177,36 @@ POST /api/payments/create-with-*   - Create order with payment
 3782 822463 10005   — American Express
 ```
 
+## 💰 Payment Details Display
+
+### Overview
+Payment information is displayed across all order views for customers, admins, and delivery personnel. Payment details include:
+- **Amount**: Formatted with currency symbol
+- **Method**: Human-readable payment method label
+- **Status**: Visual indicator (Pending, Success, or Failed)
+- **Transaction ID**: Unique identifier for successful payments
+
+### Payment Status
+- **Pending**: Order placed, payment awaiting completion
+- **Success**: Payment completed successfully
+- **Failed**: Payment processing failed
+
+### Where Payment Details Appear
+1. **Admin Order View**: Expanded order details section
+2. **Customer Order Tracking**: Sidebar payment information card
+3. **Delivery Boy Dashboard**: Expandable order details
+
+### Payment Method Labels
+- `credit-card` → Credit Card
+- `google-pay` → Google Pay
+- `cash-on-delivery` → Cash on Delivery
+- `Account-Transfer` → Account Transfer
+
+### Components
+- **PaymentDetails Component** (`src/components/Payment/PaymentDetails.tsx`): Reusable component for displaying payment information
+- **OrderItems Component** (`src/components/Order/OrderItems.tsx`): Displays product details for all order items
+- **Payment Utilities** (`src/utils/paymentUtils.ts`): Helper functions for payment formatting and display
+
 ## 📧 Email Notifications
 
 ### Customer Emails
@@ -254,6 +285,19 @@ POST /api/payments/create-with-*   - Create order with payment
     balance: Number,
     isDefault: Boolean
   }
+}
+```
+
+### Payment Collection
+```javascript
+{
+  orderId: ObjectId,
+  userId: ObjectId,
+  amount: Number,
+  method: String (credit-card|google-pay|cash-on-delivery|Account-Transfer),
+  status: String (pending|success|failed),
+  transactionId: String,
+  createdAt: Date
 }
 ```
 

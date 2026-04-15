@@ -26,14 +26,27 @@ const buildOrderItems = async (items) => {
 
 // Shared helper: create payment record and mark order processing
 const finalizePayment = async (order, method) => {
-  const payment = await Payment.create({
-    orderId: order._id,
-    userId: order.userId,
-    amount: order.total,
-    method,
-    status: "success",
-    transactionId: "TXN" + Date.now()
-  });
+  // Update existing pending payment or create new one
+  let payment = await Payment.findOne({ orderId: order._id });
+  
+  if (payment) {
+    // Update existing pending payment
+    payment.method = method;
+    payment.status = 'success';
+    payment.transactionId = 'TXN' + Date.now();
+    await payment.save();
+  } else {
+    // Create new payment (fallback for orders created without pending payment)
+    payment = await Payment.create({
+      orderId: order._id,
+      userId: order.userId,
+      amount: order.total,
+      method,
+      status: 'success',
+      transactionId: 'TXN' + Date.now()
+    });
+  }
+  
   // Send payment confirmation emails
   const user = await User.findById(order.userId);
   if (user) {
@@ -43,6 +56,55 @@ const finalizePayment = async (order, method) => {
 
   return payment;
 };
+
+// Get payment by order ID
+router.get('/order/:orderId', authenticateToken, async (req, res) => {
+  try {
+    const payment = await Payment.findOne({ orderId: req.params.orderId });
+    if (!payment) {
+      return res.status(404).json({ message: 'Payment not found' });
+    }
+    res.json(payment);
+  } catch (error) {
+    console.error('Error fetching payment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Handle cash on delivery payment (mark as success when delivered)
+router.post("/cashondelivery", authenticateToken, async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    if (order.userId.toString() !== req.user.userId) return res.status(403).json({ message: "Not authorized for this order" });
+
+    // Update or create payment record for cash on delivery
+    let payment = await Payment.findOne({ orderId });
+    
+    if (payment) {
+      payment.method = "cash-on-delivery";
+      payment.status = "success";
+      payment.transactionId = "COD" + Date.now();
+      await payment.save();
+    } else {
+      payment = await Payment.create({
+        orderId: order._id,
+        userId: order.userId,
+        amount: order.total,
+        method: "cash-on-delivery",
+        status: "success",
+        transactionId: "COD" + Date.now()
+      });
+    }
+
+    res.json({ message: "Cash on delivery payment recorded", payment });
+  } catch (error) {
+    console.error("Cash on delivery error:", error);
+    res.status(error.status || 500).json({ message: error.message || "Server error" });
+  }
+});
 
 // Pay for an existing order via bank account transfer
 router.post("/accounttransfer", authenticateToken, async (req, res) => {

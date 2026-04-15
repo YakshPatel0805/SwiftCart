@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// const adminEmail = process.env.ADMIN_EMAIL;
+const adminEmail = process.env.ADMIN_EMAIL;
 
 const commonStyle = `
   font-family: Arial, sans-serif;

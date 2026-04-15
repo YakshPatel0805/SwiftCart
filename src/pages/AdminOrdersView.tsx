@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Package, Truck, XCircle, CheckCircle, Clock, User, Mail, MapPin, Calendar, DollarSign, Send } from 'lucide-react';
 import { ordersAPI, deliveryRequestAPI } from '../services/api';
 import OrderPieChart from '../components/PieChart';
+import PaymentDetails from '../components/Payment/PaymentDetails';
+import OrderItems from '../components/Order/OrderItems';
 
 export default function AdminOrdersView() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -378,57 +380,15 @@ export default function AdminOrdersView() {
                     {/* Order Items */}
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-3">Order Items</h3>
-                      <div className="bg-white rounded-lg overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-200">
-                            {order.items && order.items.length > 0 ? (
-                              order.items.map((item: any, index: number) => {
-                                const productData = item.productSnapshot || item.product || {};
-                                const productName = productData.name || 'Product Unavailable';
-                                const productImage = productData.image || 'https://via.placeholder.com/150';
-                                const productPrice = productData.price || 0;
+                      <OrderItems items={order.items} showImages={true} />
+                    </div>
 
-                                return (
-                                  <tr key={index}>
-                                    <td className="px-4 py-3">
-                                      <div className="flex items-center">
-                                        <img
-                                          src={productImage}
-                                          alt={productName}
-                                          className="h-12 w-12 rounded-md object-cover"
-                                          onError={(e) => {
-                                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150';
-                                          }}
-                                        />
-                                        <span className="ml-3 font-medium">{productName}</span>
-                                      </div>
-                                    </td>
-                                    <td className="px-4 py-3">${productPrice.toFixed(2)}</td>
-                                    <td className="px-4 py-3">{item.quantity}</td>
-                                    <td className="px-4 py-3 font-medium">
-                                      ${(productPrice * item.quantity).toFixed(2)}
-                                    </td>
-                                  </tr>
-                                );
-                              })
-                            ) : (
-                              <tr>
-                                <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                                  No items found in this order
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
+                    {/* Payment Details */}
+                    <div className="mt-6">
+                      <PaymentDetails 
+                        orderId={order._id}
+                        paymentData={order.payment}
+                      />
                     </div>
 
                     {/* Order Actions */}

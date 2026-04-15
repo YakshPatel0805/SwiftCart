@@ -57,3 +57,38 @@ export type PaymentMethod =
       accNumber?: string;
       pin?: string;
     };
+
+export interface Payment {
+  _id: string;
+  orderId: string;
+  userId: string;
+  amount: number;
+  method: 'Account-Transfer' | 'cash-on-delivery' | 'google-pay' | 'credit-card';
+  status: 'success' | 'failed' | 'pending';
+  transactionId?: string;
+  createdAt: Date;
+}
+
+export interface PaymentDetailsProps {
+  orderId: string;
+  paymentData?: Payment;
+  loading?: boolean;
+  error?: string;
+}
+
+export interface OrderItemsProps {
+  items: Array<{
+    productSnapshot?: {
+      name: string;
+      price: number;
+      image: string;
+    };
+    product?: {
+      name: string;
+      price: number;
+      image: string;
+    };
+    quantity: number;
+  }>;
+  showImages?: boolean;
+}

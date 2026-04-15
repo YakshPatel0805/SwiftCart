@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, Truck, CheckCircle, Clock, AlertCircle, Check, X, RefreshCw, User, Phone, MapPin, Mail } from 'lucide-react';
 import { ordersAPI, deliveryRequestAPI } from '../services/api';
+import PaymentDetails from '../components/Payment/PaymentDetails';
+import OrderItems from '../components/Order/OrderItems';
 
 interface DeliveryRequest {
   _id: string;
@@ -41,6 +43,7 @@ interface Order {
     city: string; state: string; zipcode: string; country: string;
   };
   createdAt: string;
+  payment?: any;
 }
 
 interface CustomerInfoModal {
@@ -62,6 +65,7 @@ export default function DeliveryBoyDashboard() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'requests' | 'orders'>('requests');
   const [customerModal, setCustomerModal] = useState<CustomerInfoModal | null>(null);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -495,60 +499,76 @@ export default function DeliveryBoyDashboard() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredOrders.map((order) => (
-                        <tr key={order._id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {order._id.slice(-8).toUpperCase()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{order.shippingAddress.name}</div>
-                            <div className="text-sm text-gray-500">{order.shippingAddress.email}</div>
-                          </td>                          <td className="px-6 py-4">
-                            <div className="text-sm text-gray-900">
-                              {order.shippingAddress.address}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {order.shippingAddress.city}, {order.shippingAddress.state}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            ${order.total.toFixed(2)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-3 py-1 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                              {getStatusIcon(order.status)}
-                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            {(order.status === 'processing' || order.status === 'shipped') && (
-                              <div className="flex gap-2">
-                                {order.status === 'processing' && (
-                                  <button
-                                    onClick={() => handleStatusUpdate(order._id, 'shipped')}
-                                    disabled={updatingOrderId === order._id}
-                                    className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
-                                    title="Mark as shipped"
-                                  >
-                                    {updatingOrderId === order._id ? 'Updating...' : 'Ship'}
-                                  </button>
-                                )}
-                                {order.status === 'shipped' && (
-                                  <button
-                                    onClick={() => handleStatusUpdate(order._id, 'delivered')}
-                                    disabled={updatingOrderId === order._id}
-                                    className="text-green-600 hover:text-green-900 disabled:opacity-50"
-                                    title="Mark as delivered"
-                                  >
-                                    {updatingOrderId === order._id ? 'Updating...' : 'Deliver'}
-                                  </button>
-                                )}
+                        <React.Fragment key={order._id}>
+                          <tr className="hover:bg-gray-50 cursor-pointer" onClick={() => setExpandedOrderId(expandedOrderId === order._id ? null : order._id)}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              {order._id.slice(-8).toUpperCase()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{order.shippingAddress.name}</div>
+                              <div className="text-sm text-gray-500">{order.shippingAddress.email}</div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="text-sm text-gray-900">
+                                {order.shippingAddress.address}
                               </div>
-                            )}
-                            {order.status === 'delivered' && (
-                              <span className="text-green-600 font-semibold">✓ Delivered</span>
-                            )}
-                          </td>
-                        </tr>
+                              <div className="text-sm text-gray-500">
+                                {order.shippingAddress.city}, {order.shippingAddress.state}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              ${order.total.toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`px-3 py-1 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                                {getStatusIcon(order.status)}
+                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" onClick={(e) => e.stopPropagation()}>
+                              {(order.status === 'processing' || order.status === 'shipped') && (
+                                <div className="flex gap-2">
+                                  {order.status === 'processing' && (
+                                    <button
+                                      onClick={() => handleStatusUpdate(order._id, 'shipped')}
+                                      disabled={updatingOrderId === order._id}
+                                      className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
+                                      title="Mark as shipped"
+                                    >
+                                      {updatingOrderId === order._id ? 'Updating...' : 'Ship'}
+                                    </button>
+                                  )}
+                                  {order.status === 'shipped' && (
+                                    <button
+                                      onClick={() => handleStatusUpdate(order._id, 'delivered')}
+                                      disabled={updatingOrderId === order._id}
+                                      className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                                      title="Mark as delivered"
+                                    >
+                                      {updatingOrderId === order._id ? 'Updating...' : 'Deliver'}
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                              {order.status === 'delivered' && (
+                                <span className="text-green-600 font-semibold">✓ Delivered</span>
+                              )}
+                            </td>
+                          </tr>
+                          {expandedOrderId === order._id && (
+                            <tr className="bg-gray-50">
+                              <td colSpan={6} className="px-6 py-4">
+                                <div className="space-y-4">
+                                  <PaymentDetails 
+                                    orderId={order._id}
+                                    paymentData={(order as any).payment}
+                                  />
+                                  <OrderItems items={order.items as any} showImages={false} />
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Package, Truck, CheckCircle, Clock, User, Phone, Mail, MapPin, ArrowLeft } from 'lucide-react';
 import { ordersAPI } from '../services/api';
+import PaymentDetails from '../components/Payment/PaymentDetails';
+import OrderItems from '../components/Order/OrderItems';
 
 interface TrackingInfo {
   orderId: string;
@@ -10,6 +12,7 @@ interface TrackingInfo {
   items: any[];
   total: number;
   shippingAddress: any;
+  payment?: any;
   deliveryBoy: {
     name: string;
     email: string;
@@ -204,37 +207,7 @@ export default function TrackOrder() {
             {/* Order Items */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Items</h2>
-              <div className="space-y-4">
-                {trackingInfo.items.map((item: any, index: number) => (
-                  <div key={index} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
-                    <img
-                      src={item.productSnapshot?.image || item.product?.image}
-                      alt={item.productSnapshot?.name || item.product?.name}
-                      className="w-16 h-16 object-cover rounded-md"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">
-                        {item.productSnapshot?.name || item.product?.name}
-                      </h3>
-                      <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
-                      <p className="text-sm text-gray-500">
-                        Price: ${(item.productSnapshot?.price || item.product?.price).toFixed(2)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-gray-900">
-                        ${((item.productSnapshot?.price || item.product?.price) * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="border-t pt-4 mt-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-900">Total</span>
-                  <span className="text-xl font-bold text-gray-900">${trackingInfo.total.toFixed(2)}</span>
-                </div>
-              </div>
+              <OrderItems items={trackingInfo.items} showImages={true} />
             </div>
 
             {/* Status History */}
@@ -265,6 +238,14 @@ export default function TrackOrder() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Payment Details */}
+            <div>
+              <PaymentDetails 
+                orderId={trackingInfo.orderId}
+                paymentData={trackingInfo.payment}
+              />
+            </div>
+
             {/* Delivery Information */}
             {trackingInfo.deliveryBoy && (
               <div className="bg-white rounded-lg shadow-md p-6">

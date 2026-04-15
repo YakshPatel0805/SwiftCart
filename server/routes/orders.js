@@ -3,6 +3,7 @@ import Order from '../models/Order.js';
 import DeliveryRequest from '../models/DeliveryRequest.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
+import Payment from '../models/Payment.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
 import { isDeliveryBoy } from '../middleware/deliveryBoyAuth.js';
@@ -23,7 +24,19 @@ router.get('/admin/all', authenticateToken, isAdmin, async (req, res) => {
       .populate('userId', 'email username')
       .populate('assignedDeliveryBoyId', 'username email mobile')
       .sort({ createdAt: -1 });
-    res.json(orders);
+    
+    // Fetch payment data for each order
+    const ordersWithPayment = await Promise.all(
+      orders.map(async (order) => {
+        const payment = await Payment.findOne({ orderId: order._id });
+        return {
+          ...order.toObject(),
+          payment
+        };
+      })
+    );
+    
+    res.json(ordersWithPayment);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -36,7 +49,19 @@ router.get('/', authenticateToken, async (req, res) => {
       .populate('items.product')
       .populate('assignedDeliveryBoyId', 'username email mobile')
       .sort({ createdAt: -1 });
-    res.json(orders);
+    
+    // Fetch payment data for each order
+    const ordersWithPayment = await Promise.all(
+      orders.map(async (order) => {
+        const payment = await Payment.findOne({ orderId: order._id });
+        return {
+          ...order.toObject(),
+          payment
+        };
+      })
+    );
+    
+    res.json(ordersWithPayment);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -108,6 +133,32 @@ router.post('/', authenticateToken, async (req, res) => {
 
     await order.save();
     console.log('Order saved successfully:', order._id);
+
+    // Create a pending payment record for this order
+    try {
+      const paymentMethodData = req.body.paymentMethod;
+      let methodType = 'unknown';
+      
+      // Handle both object and string formats
+      if (typeof paymentMethodData === 'object' && paymentMethodData?.type) {
+        methodType = paymentMethodData.type;
+      } else if (typeof paymentMethodData === 'string') {
+        methodType = paymentMethodData;
+      }
+      
+      const payment = await Payment.create({
+        orderId: order._id,
+        userId: req.user.userId,
+        amount: order.total,
+        method: methodType,
+        status: 'pending',
+        transactionId: null
+      });
+      console.log('Pending payment record created:', payment._id);
+    } catch (paymentError) {
+      console.error('Error creating pending payment:', paymentError);
+      // Don't fail the order creation if payment record fails
+    }
 
     // Auto-update stock for each product
     for (const item of orderItems) {
@@ -266,6 +317,9 @@ router.get('/:id/track', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
+    // Fetch payment data
+    const payment = await Payment.findOne({ orderId: order._id });
+
     // Get delivery boy contact info if assigned
     let deliveryBoyInfo = null;
     if (order.assignedDeliveryBoyId) {
@@ -323,6 +377,7 @@ router.get('/:id/track', authenticateToken, async (req, res) => {
       items: order.items,
       total: order.total,
       shippingAddress: order.shippingAddress,
+      payment,
       deliveryBoy: deliveryBoyInfo,
       statusHistory: getStatusHistory(order)
     };
@@ -337,14 +392,24 @@ router.get('/:id/track', authenticateToken, async (req, res) => {
 // Delivery Boy routes - Get all orders for delivery
 router.get('/deliveryboy/all', authenticateToken, isDeliveryBoy, async (req, res) => {
   try {
-
     // Get only orders assigned to this delivery boy
     const orders = await Order.find({ assignedDeliveryBoyId: req.user.userId })
       .populate('items.product')
       .populate('userId', 'email username')
       .sort({ createdAt: -1 });
 
-    res.json(orders);
+    // Fetch payment data for each order
+    const ordersWithPayment = await Promise.all(
+      orders.map(async (order) => {
+        const payment = await Payment.findOne({ orderId: order._id });
+        return {
+          ...order.toObject(),
+          payment
+        };
+      })
+    );
+
+    res.json(ordersWithPayment);
   } catch (error) {
     console.error('❌ Error fetching delivery boy orders:', error);
     res.status(500).json({ message: 'Server error', error: error.message });

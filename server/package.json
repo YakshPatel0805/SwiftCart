@@ -6,9 +6,7 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "seed": "node scripts/seedProducts.js",
-    "create-admin": "node scripts/createAdmin.js",
-    "test-email": "node testEmail.js",
-    "test": "jest"
+    "create-admin": "node scripts/createAdmin.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -25,8 +23,6 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
-    "jest": "^30.2.0",
-    "nodemon": "^3.0.1",
-    "supertest": "^7.2.2"
+    "nodemon": "^3.0.1"
   }
 }
