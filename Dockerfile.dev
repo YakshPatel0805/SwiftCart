@@ -1,0 +1,19 @@
+# Frontend Development Dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
+
+# Copy source code
+COPY . .
+
+# Expose ports (3000 for serve, 5173 for Vite dev server)
+EXPOSE 3000 5173
+
+# Start Vite dev server
+CMD ["npm", "run", "dev"]

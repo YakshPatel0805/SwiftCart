@@ -31,6 +31,9 @@ import Wishlist from './pages/Wishlist';
 import TrackOrder from './pages/TrackOrder';
 import ChangePassword from './pages/Auth/ChangePassword.tsx';
 
+import { NotificationProvider } from './context/NotificationContext';
+import Notification from './components/Notification';
+
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -45,7 +48,8 @@ function AppLayout() {
   const { user } = useAuth();
   
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 relative">
+      <Notification />
       {user?.role === 'admin' ? <AdminHeader /> : user?.role === 'deliveryboy' ? <DeliveryBoyHeader /> : <Header />}
       <main>
         <Routes>
@@ -84,14 +88,16 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <WishlistProvider>
-          <CartProvider>
-            <Router>
-              <ScrollToTop />
-              <AppLayout />
-            </Router>
-          </CartProvider>
-        </WishlistProvider>
+        <NotificationProvider>
+          <WishlistProvider>
+            <CartProvider>
+              <Router>
+                <ScrollToTop />
+                <AppLayout />
+              </Router>
+            </CartProvider>
+          </WishlistProvider>
+        </NotificationProvider>
       </AuthProvider>
     </ThemeProvider>
   );

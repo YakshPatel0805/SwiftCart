@@ -1,6 +1,6 @@
 import { ShippingAddress } from '../types';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
@@ -169,6 +169,36 @@ export const ordersAPI = {
       return response.json();
     } catch (error) {
       console.error('Orders API getAllAdmin error:', error);
+      throw error;
+    }
+  },
+
+  getRecentNotifications: async () => {
+    try {
+      const response = await fetch(`${API_URL}/orders/admin/notifications/recent`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Orders API getRecentNotifications error:', error);
+      throw error;
+    }
+  },
+
+  getStatsCount: async () => {
+    try {
+      const response = await fetch(`${API_URL}/orders/admin/stats/count`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Orders API getStatsCount error:', error);
       throw error;
     }
   },

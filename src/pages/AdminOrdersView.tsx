@@ -4,8 +4,10 @@ import { ordersAPI, deliveryRequestAPI } from '../services/api';
 import OrderPieChart from '../components/PieChart';
 import PaymentDetails from '../components/Payment/PaymentDetails';
 import OrderItems from '../components/Order/OrderItems';
+import { useNotification } from '../context/NotificationContext';
 
 export default function AdminOrdersView() {
+  const { showNotification } = useNotification();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -35,12 +37,12 @@ export default function AdminOrdersView() {
     try {
       setSendingDeliveryRequestId(orderId);
       const result = await deliveryRequestAPI.sendRequests(orderId);
-      alert(`✓ ${result.message}`);
+      showNotification(`✓ ${result.message}`);
       await loadOrders();
     } catch (error: any) {
       console.error('Error sending delivery request:', error);
       const errorMessage = error.message || 'Failed to send delivery requests';
-      alert(`✗ Error: ${errorMessage}\n\nPossible causes:\n- No delivery boys available\n- Order already assigned\n- Server error`);
+      showNotification(`✗ Error: ${errorMessage}`, 'error');
     } finally {
       setSendingDeliveryRequestId(null);
     }
@@ -50,11 +52,11 @@ export default function AdminOrdersView() {
     try {
       setUpdatingStatusId(orderId);
       await ordersAPI.updateStatus(orderId, newStatus);
-      alert(`✓ Order status updated to ${newStatus}`);
+      showNotification(`✓ Order status updated to ${newStatus}`);
       await loadOrders();
     } catch (error: any) {
       console.error('Error updating order status:', error);
-      alert(`✗ Error: ${error.message || 'Failed to update order status'}`);
+      showNotification(`✗ Error: ${error.message || 'Failed to update order status'}`, 'error');
     } finally {
       setUpdatingStatusId(null);
     }

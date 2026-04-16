@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Truck, CheckCircle, Clock, AlertCircle, Check, X, RefreshCw, User, Phone, MapPin, Mail } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, AlertCircle, Check, X, RefreshCw, User, Phone, MapPin, Mail, XCircle } from 'lucide-react';
 import { ordersAPI, deliveryRequestAPI } from '../services/api';
 import PaymentDetails from '../components/Payment/PaymentDetails';
 import OrderItems from '../components/Order/OrderItems';
+import { useNotification } from '../context/NotificationContext';
 
 interface DeliveryRequest {
   _id: string;
@@ -56,6 +57,7 @@ interface CustomerInfoModal {
 }
 
 export default function DeliveryBoyDashboard() {
+  const { showNotification } = useNotification();
   const [orders, setOrders] = useState<Order[]>([]);
   const [requests, setRequests] = useState<DeliveryRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,9 +93,7 @@ export default function DeliveryBoyDashboard() {
       console.log('✓ Dashboard data loaded:', { orders: ordersData.length, requests: requestsData.length });
     } catch (error: any) {
       console.error('❌ Error loading data:', error);
-      console.error('Error message:', error.message);
-      console.error('Error details:', error);
-      alert(`Failed to load data: ${error.message}`);
+      showNotification(`Failed to load data: ${error.message}`, 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -117,7 +117,7 @@ export default function DeliveryBoyDashboard() {
       setActiveTab('orders');
     } catch (error) {
       console.error('Error accepting request:', error);
-      alert('Failed to accept request');
+      showNotification('Failed to accept request', 'error');
     } finally {
       setRespondingRequestId(null);
     }
@@ -127,11 +127,11 @@ export default function DeliveryBoyDashboard() {
     try {
       setRespondingRequestId(requestId);
       await deliveryRequestAPI.rejectRequest(requestId);
-      alert('Delivery request rejected');
+      showNotification('Delivery request rejected');
       await loadData();
     } catch (error) {
       console.error('Error rejecting request:', error);
-      alert('Failed to reject request');
+      showNotification('Failed to reject request', 'error');
     } finally {
       setRespondingRequestId(null);
     }
@@ -142,10 +142,10 @@ export default function DeliveryBoyDashboard() {
       setUpdatingOrderId(orderId);
       await ordersAPI.updateDeliveryBoyOrderStatus(orderId, newStatus);
       await loadData();
-      alert(`Order status updated to ${newStatus}`);
+      showNotification(`Order status updated to ${newStatus}`);
     } catch (error) {
       console.error('Error updating order status:', error);
-      alert('Failed to update order status');
+      showNotification('Failed to update order status', 'error');
     } finally {
       setUpdatingOrderId(null);
     }
@@ -344,24 +344,31 @@ export default function DeliveryBoyDashboard() {
                           {request.orderId.shippingAddress.city}, {request.orderId.shippingAddress.state} {request.orderId.shippingAddress.zipcode}<br />
                           {request.orderId.shippingAddress.country}
                         </p>
-                        <div className="mt-4 flex gap-3">
-                          <button
-                            onClick={() => handleAcceptRequest(request._id)}
-                            disabled={respondingRequestId === request._id}
-                            className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
-                          >
-                            <Check className="h-4 w-4" />
-                            {respondingRequestId === request._id ? 'Accepting...' : 'Accept'}
-                          </button>
-                          <button
-                            onClick={() => handleRejectRequest(request._id)}
-                            disabled={respondingRequestId === request._id}
-                            className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
-                          >
-                            <X className="h-4 w-4" />
-                            {respondingRequestId === request._id ? 'Rejecting...' : 'Reject'}
-                          </button>
-                        </div>
+                        {request.orderId.status === 'cancelled' ? (
+                          <div className="w-full bg-red-50 border border-red-200 text-red-700 py-3 mt-4 rounded-lg text-center font-bold flex items-center justify-center gap-2">
+                             <XCircle className="h-5 w-5" />
+                             ORDER CANCELLED BY USER
+                          </div>
+                        ) : (
+                          <div className="mt-4 flex gap-3">
+                            <button
+                              onClick={() => handleAcceptRequest(request._id)}
+                              disabled={respondingRequestId === request._id}
+                              className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
+                            >
+                              <Check className="h-4 w-4" />
+                              {respondingRequestId === request._id ? 'Accepting...' : 'Accept'}
+                            </button>
+                            <button
+                              onClick={() => handleRejectRequest(request._id)}
+                              disabled={respondingRequestId === request._id}
+                              className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
+                            >
+                              <X className="h-4 w-4" />
+                              {respondingRequestId === request._id ? 'Rejecting...' : 'Reject'}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -442,7 +449,7 @@ export default function DeliveryBoyDashboard() {
                 Filter by Status
               </label>
               <div className="flex flex-wrap gap-2">
-                {['all', 'processing', 'shipped', 'delivered'].map(status => (
+                {['all', 'processing', 'shipped', 'delivered', 'cancelled'].map(status => (
                   <button
                     key={status}
                     onClick={() => setFilterStatus(status)}

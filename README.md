@@ -24,6 +24,8 @@ A full-stack e-commerce platform built with React, Node.js, Express, and MongoDB
 - **Admin Dashboard**: Comprehensive management interface
 - **CSV Product Import**: Bulk product uploads with validation
 - **Payment Details Display**: View payment information (amount, method, status, transaction ID) across all order views
+- **Persistent Notification System**: Real-time Admin alerts for new orders, cancellations, and deliveries with history tracking
+- **Selective Notification Filtering**: Intelligent filtering to keep history focused on high-priority order events
 
 ## 🛠️ Tech Stack
 
@@ -48,6 +50,27 @@ A full-stack e-commerce platform built with React, Node.js, Express, and MongoDB
 - npm or yarn package manager
 
 ## ⚡ Quick Start
+
+### Option 1: Using Docker (Recommended)
+
+```bash
+git clone <repository-url>
+cd SwiftCart
+
+# Copy environment template
+cp .env.docker .env
+
+# Start all services with Docker
+docker-compose up --build
+
+# Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:5000
+```
+
+For detailed Docker setup, see [DOCKER_SETUP.md](./DOCKER_SETUP.md).
+
+### Option 2: Local Development
 
 ### 1. Clone and Install
 
@@ -74,6 +97,10 @@ REDIS_URI=redis_connection_string
 ```
 for redis implementation create account & databse on redis cloud.  
 copy connection string and paste it in REDIS_URI.
+
+** This happens when your database is running on local and Docker is also running on your machine. **
+If database is not apear in MongoDB verify the port number in docker-compose.yml file.
+you should see like - "27018:27017", in which port number is 27018. In your connection string.
 
 ### 3. Start Development Servers
 
@@ -118,6 +145,13 @@ Premium T-Shirt,29.99,https://example.com/img.jpg,clothing,Comfortable cotton sh
 - Assign delivery personnel roles
 - View all user accounts
 - Manage user permissions
+
+### Real-time Notifications (Bell Menu)
+- **Order Received Alerts**: Instant notification when a new order is placed.
+- **Cancellation Alerts**: Notified when a user or admin cancels an order.
+- **Delivery Alerts**: Real-time updates when a delivery boy marks an order as delivered.
+- **History Persistence**: Notifications are saved in the browser and persist across page refreshes.
+- **Smart Filtering**: General system feedback (like "Product Updated") appears as transient toasts only, keeping the notification history clean and focused on order events.
 
 ## 🔐 API Documentation
 
@@ -251,10 +285,11 @@ Payment information is displayed across all order views for customers, admins, a
   userId: ObjectId,
   items: [{productId, quantity, price}],
   total: Number,
-  status: String,
+  status: String (pending|processing|shipped|delivered|cancelled),
   shippingAddress: Object,
   paymentMethod: String,
-  createdAt: Date
+  createdAt: Date,
+  updatedAt: Date
 }
 ```
 

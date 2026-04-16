@@ -3,6 +3,7 @@ import { productsAPI } from '../services/api';
 import { Product } from '../types';
 import { Package, Filter, Search, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCategoryChart } from '../components/PieChart';
+import { useNotification } from '../context/NotificationContext';
 
 interface Category {
   category: string;
@@ -10,6 +11,7 @@ interface Category {
 }
 
 export default function AdminProductsView() {
+  const { showNotification } = useNotification();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -86,10 +88,10 @@ export default function AdminProductsView() {
       await productsAPI.update(editingProduct.id, editingProduct);
       await loadData();
       setEditingProduct(null);
-      alert('Product updated successfully!');
+      showNotification('Product updated successfully!');
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('Failed to update product');
+      showNotification('Failed to update product', 'error');
     } finally {
       setActionLoading(false);
     }
@@ -102,10 +104,10 @@ export default function AdminProductsView() {
       setDeletingProductId(productId);
       await productsAPI.delete(productId);
       await loadData();
-      alert('Product deleted successfully!');
+      showNotification('Product deleted successfully!');
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert('Failed to delete product');
+      showNotification('Failed to delete product', 'error');
     } finally {
       setDeletingProductId(null);
     }

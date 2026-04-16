@@ -2,12 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { Package, CheckCircle, MoreVertical, XCircle, Trash2, Truck, User, Phone, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
+import { useNotification } from '../context/NotificationContext';
 
 export default function Orders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const { showNotification } = useNotification();
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
@@ -50,25 +53,16 @@ export default function Orders() {
       return;
     }
 
-    // Show loading indicator
-    const originalText = document.body.innerHTML;
-    document.body.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;"><div class="bg-white p-6 rounded-lg shadow-lg"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div><p class="text-gray-700">Cancelling order...</p></div></div>';
-
+    setIsCancelling(true);
     try {
-      // Add timeout for cancel request
-      await Promise.race([
-        ordersAPI.cancel(orderId),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Cancel request timed out')), 10000))
-      ]);
-      // Reload orders to reflect the change
+      await ordersAPI.cancel(orderId);
       await loadOrders();
       setOpenDropdown(null);
-      alert('Order cancelled successfully');
+      showNotification('Order cancelled successfully');
     } catch (error: any) {
-      alert(error.message || 'Failed to cancel order');
+      showNotification(error.message || 'Failed to cancel order', 'error');
     } finally {
-      // Restore original content
-      document.body.innerHTML = originalText;
+      setIsCancelling(false);
     }
   };
   
@@ -82,9 +76,9 @@ export default function Orders() {
     try {
       await ordersAPI.clearAll();
       await loadOrders();
-      alert('All orders cleared successfully');
+      showNotification('All orders cleared successfully');
     } catch (error: any) {
-      alert(error.message || 'Failed to clear orders');
+      showNotification(error.message || 'Failed to clear orders', 'error');
     }
   };
 
@@ -136,7 +130,15 @@ export default function Orders() {
   }
 
   return (
-    <div className="bg-gray-50 py-12">
+    <div className="bg-gray-50 py-12 relative">
+      {isCancelling && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-700">Cancelling order...</p>
+          </div>
+        </div>
+      )}
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">My Orders</h1>

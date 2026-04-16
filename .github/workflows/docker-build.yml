@@ -1,0 +1,100 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Build backend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: false
+          tags: swiftcart-backend:latest
+      
+      - name: Build frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: swiftcart-frontend:latest
+      
+      - name: Test Docker Compose
+        run: |
+          docker-compose config
+          docker-compose build
+      
+      - name: Start services
+        run: |
+          docker-compose up -d
+          sleep 10
+      
+      - name: Check service health
+        run: |
+          docker-compose ps
+          docker-compose exec -T backend wget -q -O- http://localhost:5000/api/health || true
+      
+      - name: View logs
+        if: failure()
+        run: docker-compose logs
+      
+      - name: Stop services
+        if: always()
+        run: docker-compose down
+
+  # Optional: Push to Docker Hub
+  push:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Build and push backend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/swiftcart-backend:latest
+            ${{ secrets.DOCKER_USERNAME }}/swiftcart-backend:${{ github.sha }}
+      
+      - name: Build and push frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/swiftcart-frontend:latest
+            ${{ secrets.DOCKER_USERNAME }}/swiftcart-frontend:${{ github.sha }}

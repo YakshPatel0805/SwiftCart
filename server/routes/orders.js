@@ -288,13 +288,19 @@ router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
           $inc: { soldCount: item.quantity }
         });
       }
+
+      // If order is delivered and payment method is Cash on Delivery, update payment status to success
+      if (updatedOrder.paymentMethod && updatedOrder.paymentMethod.type === 'cash-on-delivery') {
+        await Payment.findOneAndUpdate(
+          { orderId: req.params.id },
+          { 
+            status: 'success',
+            transactionId: 'COD' + Date.now()
+          }
+        );
+      }
     }
 
-    // Send order confirmation if status changed to processing
-    if (status === 'processing' && updatedOrder.userId) {
-      sendOrderConfirmationEmail(updatedOrder.userId, updatedOrder);
-      sendNewOrderAdminEmail(updatedOrder);
-    }
 
     res.json(updatedOrder);
   } catch (error) {
@@ -467,17 +473,50 @@ router.patch('/deliveryboy/:id/status', authenticateToken, isDeliveryBoy, async 
         });
       }
 
-      // Send delivery confirmation emails
-      const user = await User.findById(updatedOrder.userId);
-      if (user) {
-        sendOrderDeliveredEmail(user, updatedOrder); // To User
-        sendOrderDeliveredEmail(user, updatedOrder, true); // To Admin
+
+      // If order is delivered and payment method is Cash on Delivery, update payment status to success
+      if (updatedOrder.paymentMethod && updatedOrder.paymentMethod.type === 'cash-on-delivery') {
+        await Payment.findOneAndUpdate(
+          { orderId: req.params.id },
+          { 
+            status: 'success',
+            transactionId: 'COD' + Date.now()
+          }
+        );
       }
     }
 
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+// Admin route - Get recent important updates (pending, cancelled, delivered) for notifications
+router.get('/admin/notifications/recent', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    console.log('--- NOTIFICATION POLL START ---');
+    const recentUpdates = await Order.find({
+      status: { $in: ['pending', 'cancelled', 'delivered'] }
+    })
+      .populate('userId', 'username email')
+      .sort({ updatedAt: -1 })
+      .limit(10);
+    
+    console.log(`--- NOTIFICATION POLL END: Found ${recentUpdates.length} orders ---`);
+    res.json(recentUpdates);
+  } catch (error) {
+    console.error('--- NOTIFICATION POLL ERROR ---', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Admin route - Get total order count (for dashboards)
+router.get('/admin/stats/count', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const count = await Order.countDocuments();
+    res.json({ count });
+  } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
