@@ -495,7 +495,6 @@ router.patch('/deliveryboy/:id/status', authenticateToken, isDeliveryBoy, async 
 // Admin route - Get recent important updates (pending, cancelled, delivered) for notifications
 router.get('/admin/notifications/recent', authenticateToken, isAdmin, async (req, res) => {
   try {
-    console.log('--- NOTIFICATION POLL START ---');
     const recentUpdates = await Order.find({
       status: { $in: ['pending', 'cancelled', 'delivered'] }
     })
@@ -503,10 +502,8 @@ router.get('/admin/notifications/recent', authenticateToken, isAdmin, async (req
       .sort({ updatedAt: -1 })
       .limit(10);
     
-    console.log(`--- NOTIFICATION POLL END: Found ${recentUpdates.length} orders ---`);
     res.json(recentUpdates);
   } catch (error) {
-    console.error('--- NOTIFICATION POLL ERROR ---', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

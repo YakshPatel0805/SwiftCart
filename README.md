@@ -60,6 +60,9 @@ cd SwiftCart
 # Copy environment template
 cp .env.docker .env
 
+# Before running docker-compose up --build
+# start docker application in your desktop.
+
 # Start all services with Docker
 docker-compose up --build
 
@@ -79,6 +82,12 @@ git clone <repository-url>
 cd SwiftCart
 npm install
 cd server && npm install && cd ..
+```
+** or **
+```bash
+cd SwiftCart
+npm install --legacy-peer-deps
+cd server && npm install --legacy-peer-deps && cd ..
 ```
 
 ### 2. Environment Configuration

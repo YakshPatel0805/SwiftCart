@@ -1,4 +1,4 @@
-import { User, LogOut, Moon, Sun, Bell, Trash2, Check, Clock } from 'lucide-react';
+import { User, LogOut, Moon, Sun, Bell, Trash2, Clock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';

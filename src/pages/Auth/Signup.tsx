@@ -58,7 +58,7 @@ export default function Signup() {
       if (success) {
         navigate('/login');
       } else {
-        setError('Username or email already exists');
+        setError('Username or email or mobile number already exists');
       }
     } catch (err) {
       setError('An error occurred during signup');

@@ -20,9 +20,7 @@ services:
 
   # Database Initialization Service
   db-init:
-    build:
-      context: ./server
-      dockerfile: Dockerfile.dev
+    image: node:18-alpine
     container_name: swiftcart-db-init-dev
     environment:
       MONGODB_URI: mongodb://mongodb:27017/SwiftCart
@@ -31,7 +29,10 @@ services:
         condition: service_healthy
     networks:
       - swiftcart-network-dev
-    command: sh -c "sleep 5 && node src/scripts/initMongoAuth.js"
+    volumes:
+      - ./server:/app
+    working_dir: /app
+    command: sh -c "sleep 5 && node scripts/initMongoAuth.js"
     restart: "no"
 
   # Backend Service (Development)
