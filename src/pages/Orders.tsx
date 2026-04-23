@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Package, CheckCircle, MoreVertical, XCircle, Trash2, Truck, User, Phone, Mail } from 'lucide-react';
+import { Package, CheckCircle, XCircle, Trash2, Truck, User, Phone, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
 import { useNotification } from '../context/NotificationContext';
@@ -65,8 +65,6 @@ export default function Orders() {
       setIsCancelling(false);
     }
   };
-  
-
 
   const handleClearOrders = async () => {
     if (!confirm('Are you sure you want to clear all your orders? This action cannot be undone.')) {
@@ -80,10 +78,6 @@ export default function Orders() {
     } catch (error: any) {
       showNotification(error.message || 'Failed to clear orders', 'error');
     }
-  };
-
-  const toggleDropdown = (orderId: string) => {
-    setOpenDropdown(openDropdown === orderId ? null : orderId);
   };
 
   const getStatusIcon = (status: string) => {
@@ -142,7 +136,7 @@ export default function Orders() {
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">My Orders</h1>
-          
+
           {orders.length > 0 && (
             <div className="mb-4">
               <button
@@ -154,7 +148,7 @@ export default function Orders() {
               </button>
             </div>
           )}
-          
+
           {orders.length === 0 ? (
             <div className="text-center py-8">
               <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -184,44 +178,6 @@ export default function Orders() {
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </span>
-                      
-                      {/* Dropdown Menu */}
-                      <div 
-                        className="relative dropdown-container"
-                        ref={(el) => (dropdownRefs.current[order._id] = el)}
-                      >
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleDropdown(order._id);
-                          }}
-                          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                        >
-                          <MoreVertical className="h-5 w-5 text-gray-600" />
-                        </button>
-                        
-                        {openDropdown === order._id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                            {canCancelOrder(order.status) && (
-                              <button
-                                onClick={() => handleCancelOrder(order._id)}
-                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                              >
-                                Cancel Order
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                navigate(`/orders/${order._id}/track`);
-                                setOpenDropdown(null);
-                              }}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              Track Your Order
-                            </button>
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
 
@@ -261,7 +217,7 @@ export default function Orders() {
                         <p className="text-xl font-bold text-gray-900">${order.total.toFixed(2)}</p>
                       </div>
                     </div>
-                    
+
                     {/* Delivery Boy Info Banner */}
                     {order.assignedDeliveryBoyId && (
                       <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -287,10 +243,18 @@ export default function Orders() {
                     )}
 
                     {/* Quick Track Button */}
-                    <div className="mt-4 pt-4 border-t">
+                    <div className="mt-4 pt-4 border-t flex">
+                      {canCancelOrder(order.status) && (
+                        <button
+                          onClick={() => handleCancelOrder(order._id)}
+                        className="w-full bg-red-600 mr-5 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                        >
+                          Cancel Order
+                        </button>
+                      )}
                       <button
                         onClick={() => navigate(`/orders/${order._id}/track`)}
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        className="w-full bg-blue-600 ml-5 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                       >
                         Track This Order
                       </button>
