@@ -269,3 +269,35 @@ export const sendOrderDeliveredEmail = async (user, order, isAdminAlert = false)
     console.error('Error sending delivery confirmation email:', error);
   }
 };
+
+// 5. Refund Confirmation (User)
+export const sendRefundConfirmationEmail = async (user, payment, order) => {
+  const mailOptions = {
+    from: process.env.ADMIN_EMAIL,
+    to: user.email,
+    subject: `Refund Processed - ${order._id}`,
+    html: `
+      <div style="${commonStyle}">
+        <div style="${headerStyle}; background-color: #6366f1;">
+          <h1>SwiftCart</h1>
+          <p>Refund Confirmation</p>
+        </div>
+        <h2>Your refund has been processed!</h2>
+        <p>We've processed a refund of <strong>${formatCurrency(payment.amount)}</strong> for order <strong>${order._id}</strong>.</p>
+        <p>The amount has been credited back to your original payment method: <strong>${payment.method}</strong>.</p>
+        <p><strong>Transaction ID:</strong> ${payment.transactionId}</p>
+        
+        <div style="${footerStyle}">
+          <p>&copy; 2026 SwiftCart Inc. All rights reserved.</p>
+        </div>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Refund confirmation email sent to ${user.email}`);
+  } catch (error) {
+    console.error('Error sending refund confirmation email:', error);
+  }
+};

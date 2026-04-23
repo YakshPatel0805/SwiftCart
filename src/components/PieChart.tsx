@@ -27,6 +27,8 @@ const STATUS_COLORS: Record<string, string> = {
   shipped: "#8B5CF6",      // purple
   delivered: "#22C55E",    // green
   cancelled: "#EF4444",    // red
+  "return-requested": "#FB923C", // light orange
+  refunded: "#A855F7",     // purple
 };
 
 export default function OrderPieChart({ orders }: OrderPieChartProps) {

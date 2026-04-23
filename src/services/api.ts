@@ -327,6 +327,22 @@ export const ordersAPI = {
       console.error('Orders API track error:', error);
       throw error;
     }
+  },
+  requestReturn: async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/orders/${id}/request-return`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Orders API requestReturn error:', error);
+      throw error;
+    }
   }
 };
 
@@ -482,6 +498,22 @@ export const paymentAPI = {
       throw errorData;
     }
     return res.json();
+  },
+  refund: async (orderId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/payments/refund/${orderId}`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error('Payment API refund error:', error);
+      throw error;
+    }
   }
 };
 

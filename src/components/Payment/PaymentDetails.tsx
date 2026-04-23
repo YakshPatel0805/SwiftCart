@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle, AlertCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Clock, DollarSign } from 'lucide-react';
 import { PaymentDetailsProps } from '../../types';
 import {
   getPaymentMethodLabel,
@@ -58,6 +58,10 @@ export default function PaymentDetails({
         return <XCircle className="h-5 w-5" />;
       case 'pending':
         return <Clock className="h-5 w-5" />;
+      case 'refunded':
+        return <DollarSign className="h-5 w-5" />;
+      case 'cancelled':
+        return <XCircle className="h-5 w-5" />;
       default:
         return <AlertCircle className="h-5 w-5" />;
     }

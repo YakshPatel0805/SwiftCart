@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Package, CheckCircle, XCircle, Trash2, Truck, User, Phone, Mail } from 'lucide-react';
+import { Package, CheckCircle, XCircle, Trash2, Truck, User, Phone, Mail, Clock, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
 import { useNotification } from '../context/NotificationContext';
@@ -80,6 +80,20 @@ export default function Orders() {
     }
   };
 
+  const handleRequestReturn = async (orderId: string) => {
+    if (!confirm('Are you sure you want to request a return for this order?')) {
+      return;
+    }
+
+    try {
+      await ordersAPI.requestReturn(orderId);
+      await loadOrders();
+      showNotification('Return request submitted successfully');
+    } catch (error: any) {
+      showNotification(error.message || 'Failed to request return', 'error');
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'delivered':
@@ -88,6 +102,10 @@ export default function Orders() {
         return <Package className="h-5 w-5 text-blue-600" />;
       case 'cancelled':
         return <XCircle className="h-5 w-5 text-red-600" />;
+      case 'return-requested':
+        return <Clock className="h-5 w-5 text-yellow-600" />;
+      case 'refunded':
+        return <DollarSign className="h-5 w-5 text-purple-600" />;
       default:
         return <Package className="h-5 w-5 text-gray-600" />;
     }
@@ -103,13 +121,29 @@ export default function Orders() {
         return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'return-requested':
+        return 'bg-orange-100 text-orange-800';
+      case 'refunded':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
   const canCancelOrder = (status: string) => {
-    return status !== 'delivered' && status !== 'cancelled';
+    return status === 'pending' || status === 'processing';
+  };
+
+  const canRequestReturn = (order: any) => {
+    if (order.status !== 'delivered') return false;
+    
+    // Within 7 days
+    const deliveryDate = new Date(order.updatedAt);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - deliveryDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays <= 7;
   };
 
 
@@ -242,19 +276,27 @@ export default function Orders() {
                       </div>
                     )}
 
-                    {/* Quick Track Button */}
-                    <div className="mt-4 pt-4 border-t flex">
+                    {/* Action Buttons */}
+                    <div className="mt-4 pt-4 border-t flex flex-wrap gap-4">
                       {canCancelOrder(order.status) && (
                         <button
                           onClick={() => handleCancelOrder(order._id)}
-                        className="w-full bg-red-600 mr-5 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                        className="flex-1 min-w-[150px] bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
                         >
                           Cancel Order
                         </button>
                       )}
+                      {canRequestReturn(order) && (
+                        <button
+                          onClick={() => handleRequestReturn(order._id)}
+                          className="flex-1 min-w-[150px] bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
+                        >
+                          Request Return
+                        </button>
+                      )}
                       <button
                         onClick={() => navigate(`/orders/${order._id}/track`)}
-                        className="w-full bg-blue-600 ml-5 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        className="flex-1 min-w-[150px] bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                       >
                         Track This Order
                       </button>

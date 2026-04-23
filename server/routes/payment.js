@@ -5,7 +5,8 @@ import Bank from "../models/Bank.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
 import { authenticateToken } from "../middleware/auth.js";
-import { sendPaymentConfirmationEmail, sendOrderConfirmationEmail } from "../utils/emailServices.js";
+import { isAdmin } from "../middleware/adminAuth.js";
+import { sendPaymentConfirmationEmail, sendOrderConfirmationEmail, sendRefundConfirmationEmail } from "../utils/emailServices.js";
 
 const router = express.Router();
 
@@ -262,6 +263,72 @@ router.post("/create-with-googlepay", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Create with Google Pay error:", error);
     res.status(error.status || 500).json({ message: error.message || "Server error" });
+  }
+});
+
+// Admin endpoint to process refunds
+router.post("/refund/:orderId", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    const payment = await Payment.findOne({ orderId, status: "success" });
+    if (!payment) return res.status(400).json({ message: "No successful payment found for this order" });
+
+    const bankAccount = await Bank.findOne({ userId: order.userId });
+    if (!bankAccount) return res.status(404).json({ message: "User's bank account not found" });
+
+    // Refund based on payment method
+    let balanceUpdated = false;
+    if (payment.method === "Account-Transfer") {
+      bankAccount.bankAccount.balance += payment.amount;
+      balanceUpdated = true;
+    } else if (payment.method === "credit-card") {
+      bankAccount.creditCard.cardBalance += payment.amount;
+      balanceUpdated = true;
+    } else if (payment.method === "google-pay") {
+      bankAccount.googlePay.balance += payment.amount;
+      balanceUpdated = true;
+    } else if (payment.method === "cash-on-delivery") {
+      return res.status(400).json({ message: "Cash on delivery orders cannot be refunded via bank transfer" });
+    }
+
+    if (balanceUpdated) {
+      await bankAccount.save();
+    }
+
+    // Update payment status
+    payment.status = "refunded";
+    await payment.save();
+
+    // Update order status
+    order.status = "refunded";
+    await order.save();
+
+    // Restore stock
+    for (const item of order.items) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        const restoredQty = (product.stockQuantity || 0) + item.quantity;
+        await Product.findByIdAndUpdate(item.product, {
+          stockQuantity: restoredQty,
+          inStock: restoredQty > 0
+        });
+      }
+    }
+
+    // Send email to user
+    const user = await User.findById(order.userId);
+    if (user) {
+      sendRefundConfirmationEmail(user, payment, order);
+    }
+
+    res.json({ message: "Refund processed successfully", payment, order });
+  } catch (error) {
+    console.error("Refund error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 

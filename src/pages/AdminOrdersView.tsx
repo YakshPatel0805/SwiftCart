@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Package, Truck, XCircle, CheckCircle, Clock, User, Mail, MapPin, Calendar, DollarSign, Send } from 'lucide-react';
-import { ordersAPI, deliveryRequestAPI } from '../services/api';
+import { ordersAPI, deliveryRequestAPI, paymentAPI } from '../services/api';
 import OrderPieChart from '../components/PieChart';
 import PaymentDetails from '../components/Payment/PaymentDetails';
 import OrderItems from '../components/Order/OrderItems';
@@ -15,6 +15,7 @@ export default function AdminOrdersView() {
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [sendingDeliveryRequestId, setSendingDeliveryRequestId] = useState<string | null>(null);
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+  const [processingRefundId, setProcessingRefundId] = useState<string | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -62,6 +63,24 @@ export default function AdminOrdersView() {
     }
   };
 
+  const handleRefund = async (orderId: string) => {
+    if (!confirm('Are you sure you want to process a refund for this order?')) {
+      return;
+    }
+
+    try {
+      setProcessingRefundId(orderId);
+      await paymentAPI.refund(orderId);
+      showNotification('✓ Refund processed successfully');
+      await loadOrders();
+    } catch (error: any) {
+      console.error('Error processing refund:', error);
+      showNotification(`✗ Error: ${error.message || 'Failed to process refund'}`, 'error');
+    } finally {
+      setProcessingRefundId(null);
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'delivered':
@@ -72,6 +91,10 @@ export default function AdminOrdersView() {
         return <XCircle className="h-5 w-5 text-red-600" />;
       case 'processing':
         return <Clock className="h-5 w-5 text-yellow-600" />;
+      case 'return-requested':
+        return <Clock className="h-5 w-5 text-orange-600" />;
+      case 'refunded':
+        return <DollarSign className="h-5 w-5 text-purple-600" />;
       default:
         return <Package className="h-5 w-5 text-gray-600" />;
     }
@@ -87,6 +110,10 @@ export default function AdminOrdersView() {
         return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'return-requested':
+        return 'bg-orange-100 text-orange-800';
+      case 'refunded':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -113,6 +140,8 @@ export default function AdminOrdersView() {
       shipped: orders.filter(o => o.status === 'shipped').length,
       delivered: orders.filter(o => o.status === 'delivered').length,
       cancelled: orders.filter(o => o.status === 'cancelled').length,
+      returnRequested: orders.filter(o => o.status === 'return-requested').length,
+      refunded: orders.filter(o => o.status === 'refunded').length,
       totalRevenue: deliveredOrders.reduce((sum, o) => sum + (o.total || 0), 0)
     };
   };
@@ -277,6 +306,24 @@ export default function AdminOrdersView() {
                 >
                   Cancelled ({stats.cancelled})
                 </button>
+                <button
+                  onClick={() => setSelectedStatus('return-requested')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'return-requested'
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                >
+                  Returns ({stats.returnRequested})
+                </button>
+                <button
+                  onClick={() => setSelectedStatus('refunded')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedStatus === 'refunded'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                >
+                  Refunded ({stats.refunded})
+                </button>
               </div>
             </div>
           </div>
@@ -411,7 +458,7 @@ export default function AdminOrdersView() {
                           )}
 
                           {/* Cancel Order button for non-finalized orders */}
-                          {order.status !== 'delivered' && order.status !== 'cancelled' && (
+                          {order.status !== 'delivered' && order.status !== 'cancelled' && order.status !== 'refunded' && order.status !== 'return-requested' && (
                             <button
                               onClick={() => {
                                 if (window.confirm('Are you sure you want to cancel this order?')) {
@@ -423,6 +470,18 @@ export default function AdminOrdersView() {
                             >
                               <XCircle className="h-4 w-4" />
                               Cancel Order
+                            </button>
+                          )}
+
+                          {/* Refund Buttons */}
+                          {(order.status === 'return-requested' || (order.status === 'cancelled' && order.payment?.status === 'success')) && (
+                            <button
+                              onClick={() => handleRefund(order._id)}
+                              disabled={processingRefundId === order._id}
+                              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400"
+                            >
+                              <DollarSign className="h-4 w-4" />
+                              {processingRefundId === order._id ? 'Processing Refund...' : (order.status === 'return-requested' ? 'Approve Return & Refund' : 'Process Refund')}
                             </button>
                           )}
                         </div>

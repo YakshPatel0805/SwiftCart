@@ -210,6 +210,12 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
       { new: true, runValidators: false }
     ).populate('items.product');
 
+    // Update payment status to cancelled if it was pending
+    await Payment.findOneAndUpdate(
+      { orderId: req.params.id, status: 'pending' },
+      { status: 'cancelled' }
+    );
+
     // Restore stock for each cancelled item
     for (const item of order.items) {
       const product = await Product.findById(item.product);
@@ -232,6 +238,45 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
     res.json(updatedOrder);
   } catch (error) {
     console.error('Error cancelling order:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Request return endpoint
+router.patch('/:id/request-return', authenticateToken, async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    if (order.status !== 'delivered') {
+      return res.status(400).json({ message: 'Only delivered orders can be returned' });
+    }
+
+    // Check if order was delivered within last 7 days
+    const deliveryDate = new Date(order.updatedAt);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - deliveryDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays > 7) {
+      return res.status(400).json({ message: 'Return window (7 days) has expired' });
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: 'return-requested' },
+      { new: true }
+    ).populate('items.product');
+
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error requesting return:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -278,6 +323,12 @@ router.patch('/:id/status', authenticateToken, isAdmin, async (req, res) => {
           });
         }
       }
+
+      // Update payment status to cancelled if it was pending
+      await Payment.findOneAndUpdate(
+        { orderId: req.params.id, status: 'pending' },
+        { status: 'cancelled' }
+      );
     }
 
     // Handle soldCount increment if delivered

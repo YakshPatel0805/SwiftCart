@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Package, Truck, CheckCircle, Clock, User, Phone, Mail, MapPin, ArrowLeft } from 'lucide-react';
+import { Package, Truck, CheckCircle, Clock, MapPin, Calendar, DollarSign, ArrowLeft, Phone, User, Mail } from 'lucide-react';
 import { ordersAPI } from '../services/api';
 import PaymentDetails from '../components/Payment/PaymentDetails';
 import OrderItems from '../components/Order/OrderItems';
@@ -135,6 +135,50 @@ export default function TrackOrder() {
 
   const statusSteps = getStatusSteps();
 
+  const handleRequestReturn = async (orderId: string) => {
+    if (!confirm('Are you sure you want to request a return for this order?')) {
+      return;
+    }
+
+    try {
+      await ordersAPI.requestReturn(orderId);
+      loadTrackingInfo();
+    } catch (error: any) {
+      console.error('Error requesting return:', error);
+    }
+  };
+
+  const canRequestReturn = (order: TrackingInfo) => {
+    if (order.status !== 'delivered') return false;
+
+    // Within 7 days
+    const deliveryDate = new Date(order.createdAt); // Should ideally be delivery date, but using createdAt/updatedAt as proxy
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - deliveryDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays <= 7;
+  };
+
+  const getStatusColorTrack = (status: string) => {
+    switch (status) {
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      case 'shipped':
+        return 'bg-blue-100 text-blue-800';
+      case 'processing':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'return-requested':
+        return 'bg-orange-100 text-orange-800';
+      case 'refunded':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -158,7 +202,7 @@ export default function TrackOrder() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Order Status</h2>
-                <span className={`px-3 py-2 rounded-full text-sm font-medium ${getStatusColor(trackingInfo.status)}`}>
+                <span className={`px-3 py-2 rounded-full text-sm font-medium ${getStatusColorTrack(trackingInfo.status)}`}>
                   {trackingInfo.status.charAt(0).toUpperCase() + trackingInfo.status.slice(1)}
                 </span>
               </div>
@@ -334,6 +378,21 @@ export default function TrackOrder() {
                 </div>
               </div>
             </div>
+
+            {/* Refund Action */}
+            {canRequestReturn(trackingInfo) && (
+              <div className="bg-orange-50 rounded-lg shadow-md p-6 border border-orange-200 mt-6">
+                <h3 className="text-lg font-semibold text-orange-900 mb-2">Need to return this?</h3>
+                <p className="text-sm text-orange-700 mb-4">You can request a return within 7 days of delivery.</p>
+                <button
+                  onClick={() => handleRequestReturn(trackingInfo.orderId)}
+                  className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4 rotate-180" />
+                  Request Return
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

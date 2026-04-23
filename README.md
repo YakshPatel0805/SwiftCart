@@ -26,6 +26,7 @@ A full-stack e-commerce platform built with React, Node.js, Express, and MongoDB
 - **Payment Details Display**: View payment information (amount, method, status, transaction ID) across all order views
 - **Persistent Notification System**: Real-time Admin alerts for new orders, cancellations, and deliveries with history tracking
 - **Selective Notification Filtering**: Intelligent filtering to keep history focused on high-priority order events
+- **Returns & Refunds**: Integrated return request workflow with automatic balance restoration and email confirmation
 
 ## 🛠️ Tech Stack
 
@@ -186,6 +187,7 @@ GET    /api/orders        - Get user orders
 GET    /api/orders/:id    - Get specific order
 POST   /api/orders        - Create new order
 PATCH  /api/orders/:id/cancel - Cancel order
+PATCH  /api/orders/:id/request-return - Request return (within 7 days)
 ```
 
 ### Payment Methods (Protected)
@@ -201,6 +203,7 @@ PATCH  /api/bank/:type/set-default - Set default payment
 POST /api/payments/creditcard      - Process credit card payment
 POST /api/payments/accounttransfer - Process bank transfer
 POST /api/payments/create-with-*   - Create order with payment
+POST /api/payments/refund/:orderId - Process refund (Admin)
 ```
 
 ## 💳 Payment Methods
@@ -228,6 +231,7 @@ Payment information is displayed across all order views for customers, admins, a
 - **Method**: Human-readable payment method label
 - **Status**: Visual indicator (Pending, Success, or Failed)
 - **Transaction ID**: Unique identifier for successful payments
+- **Refund Policy**: Automated balance restoration for digital payments; 7-day return window for delivered items
 
 ### Payment Status
 - **Pending**: Order placed, payment awaiting completion
@@ -256,6 +260,7 @@ Payment information is displayed across all order views for customers, admins, a
 - **Order Confirmation**: Complete order details and tracking info
 - **Payment Confirmation**: Payment receipt for card/digital payments
 - **Order Cancellation**: Cancellation confirmation with refund details
+- **Refund Confirmation**: Notification when a refund has been credited back to the original payment method
 
 ### Admin Notifications
 - **New Order Alerts**: Immediate notification of new orders
@@ -294,7 +299,7 @@ Payment information is displayed across all order views for customers, admins, a
   userId: ObjectId,
   items: [{productId, quantity, price}],
   total: Number,
-  status: String (pending|processing|shipped|delivered|cancelled),
+  status: String (pending|processing|shipped|delivered|cancelled|return-requested|refunded),
   shippingAddress: Object,
   paymentMethod: String,
   createdAt: Date,
@@ -339,7 +344,7 @@ Payment information is displayed across all order views for customers, admins, a
   userId: ObjectId,
   amount: Number,
   method: String (credit-card|google-pay|cash-on-delivery|Account-Transfer),
-  status: String (pending|success|failed),
+  status: String (pending|success|failed|refunded|cancelled),
   transactionId: String,
   createdAt: Date
 }

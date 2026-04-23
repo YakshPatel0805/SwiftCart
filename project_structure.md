@@ -82,7 +82,7 @@ src/services/
 └── api.ts                     # API client with endpoints:
                                # - authAPI (signup, login)
                                # - productsAPI (getAll, getById, getCategories)
-                               # - ordersAPI (getAll, getAllAdmin, create, cancel, updateStatus)
+                               # - ordersAPI (getAll, getAllAdmin, create, cancel, updateStatus, requestReturn)
                                # - wishlistAPI (get, add, remove)
 ```
 
@@ -145,6 +145,7 @@ server/routes/
 │                              # - GET /api/orders/:id
 │                              # - POST /api/orders
 │                              # - PATCH /api/orders/:id/cancel
+│                              # - PATCH /api/orders/:id/request-return
 │                              # - PATCH /api/orders/:id/status (admin)
 │
 └── wishlist.js                # Wishlist routes:
@@ -166,6 +167,7 @@ server/utils/
 └── emailService.js            # Email notifications:
                                # - Order confirmation
                                # - Order cancellation
+                               # - Refund confirmation
                                # - Payment confirmation
                                # - Admin notifications
 ```
@@ -203,7 +205,9 @@ server/scripts/
 ### Order Management
 - **Files**: `Order.js`, `orders.js`, `Orders.tsx`, `AdminOrdersView.tsx`
 - Order creation with email notifications
-- Order status tracking (pending, processing, shipped, delivered, cancelled)
+- Order status tracking (pending, processing, shipped, delivered, cancelled, return-requested, refunded)
+- Return request workflow (7-day window)
+- Admin refund management with balance restoration
 - Admin order management with status updates
 - User order history
 
@@ -223,7 +227,8 @@ server/scripts/
 - **Files**: `emailService.js`
 - Order confirmations
 - Payment confirmations
-- Cancellation notifications
+- Order cancellations
+- Refund confirmations
 - Admin notifications
 
 ---
@@ -277,6 +282,7 @@ ADMIN_EMAIL=_admin@gmail.com
 - `GET /api/orders` - Get user's orders
 - `POST /api/orders` - Create new order
 - `PATCH /api/orders/:id/cancel` - Cancel order
+- `PATCH /api/orders/:id/request-return` - Request return (7 days)
 - `GET /api/wishlist` - Get user's wishlist
 - `POST /api/wishlist/:productId` - Add to wishlist
 - `DELETE /api/wishlist/:productId` - Remove from wishlist
@@ -287,6 +293,7 @@ ADMIN_EMAIL=_admin@gmail.com
 - `DELETE /api/products/:id` - Delete product
 - `GET /api/orders/admin/all` - Get all orders
 - `PATCH /api/orders/:id/status` - Update order status
+- `POST /api/payments/refund/:orderId` - Process refund
 
 ---
 

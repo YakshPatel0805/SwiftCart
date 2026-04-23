@@ -21,6 +21,10 @@ export const getPaymentStatusColor = (status: string): string => {
       return 'bg-red-100 text-red-800';
     case 'pending':
       return 'bg-yellow-100 text-yellow-800';
+    case 'refunded':
+      return 'bg-purple-100 text-purple-800';
+    case 'cancelled':
+      return 'bg-gray-100 text-gray-800';
     default:
       return 'bg-gray-100 text-gray-800';
   }
@@ -34,6 +38,10 @@ export const getPaymentStatusIcon = (status: string): string => {
       return 'XCircle';
     case 'pending':
       return 'Clock';
+    case 'refunded':
+      return 'DollarSign';
+    case 'cancelled':
+      return 'XCircle';
     default:
       return 'AlertCircle';
   }
