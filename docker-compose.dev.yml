@@ -1,0 +1,93 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:latest
+    container_name: swiftcart-mongodb-dev
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: SwiftCart
+    volumes:
+      - mongodb_data_dev:/data/db
+      - mongodb_config_dev:/data/configdb
+    networks:
+      - swiftcart-network-dev
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Database Initialization Service
+  db-init:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: swiftcart-db-init-dev
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/SwiftCart
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - swiftcart-network-dev
+    command: sh -c "sleep 5 && node src/scripts/initMongoAuth.js"
+    restart: "no"
+
+  # Backend Service (Development)
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: swiftcart-backend-dev
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/SwiftCart
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 5000
+      USER_EMAIL: ${USER_EMAIL}
+      USER_EMAIL_PASSWORD: ${USER_EMAIL_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_EMAIL_PASSWORD: ${ADMIN_EMAIL_PASSWORD}
+      REDIS_URI: ${REDIS_URI}
+      NODE_ENV: development
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    networks:
+      - swiftcart-network-dev
+    restart: unless-stopped
+
+  # Frontend Service (Development)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: swiftcart-frontend-dev
+    ports:
+      - "3000:3000"
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://backend:5000
+    depends_on:
+      - backend
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - swiftcart-network-dev
+    restart: unless-stopped
+
+networks:
+  swiftcart-network-dev:
+    driver: bridge
+
+volumes:
+  mongodb_data_dev:
+  mongodb_config_dev:

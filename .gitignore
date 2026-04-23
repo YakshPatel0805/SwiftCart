@@ -28,5 +28,3 @@ node_modules
 .dist
 .env
 .env.docker
-docker-compose.dev.yml
-docker-compose.yml
